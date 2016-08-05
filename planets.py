@@ -16,11 +16,12 @@ class Planet(object):
         self.disc_kp = random.randint(10,100)
         self.disc_rp = random.randint(10,100)
         
-    def unveil(explorer,player_induced):
-        explorer.logbook[self.name].is_discovered = True
-        explorer.logbook[self.name].discovery_time = self.game.gametime.get_tick()
+    def unveil(self,explorer,player_induced):
+        explorer.logbook[self.name].is_known = True
         if player_induced == True:
             explorer.kp -= 5
         
-        
-        
+    def explore(self, explorer):
+        explorer.logbook[self.name].is_discovered = True
+        explorer.logbook[self.name].discovery_time = self.game.gametime.get_tick()
+                
