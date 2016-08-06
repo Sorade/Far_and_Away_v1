@@ -6,19 +6,36 @@ Created on Sat Aug 06 10:06:08 2016
 """
 import pygame
 import functions as fn
+from config import*
+from data import*
 
 class Interface(object):
     def __init__(self,game):
         self.game = game
-        self.screen = 'pygame screen'
+        '''setting screen up'''
+        self.screen = Config.screen
+        '''importing data here to so that the mode is set'''
+        self.bigmap = pygame.Surface((1000,1000))
+        self.bigmap.fill((25,25,35))
         
     def centered_offset(self,offset):
         x,y = offset[0],offset[1]
-        return (self.screen.centerx-x,self.screen.centery-y)
+        return (self.screen.get_rect().centerx-x,self.screen.get_rect().centery-y)
         
-    def view_solarsys(self,offset):
+    def update_bigmap(self):
+        planets_to_blit = []
         for p in self.game.all_planets:
-            self.screen.fn.blitc(p.image,fn.sum_tulp(p.pos,self.centered_offset(offset)))
+            if self.game.player.logbook[p.name].is_explored == True:
+                [pygame.draw.line(self.bigmap, (0,255,0), p.pos, p2.pos, 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_discovered == True]
+                planets_to_blit.append(p)
+                
+        for p in planets_to_blit:
+            if self.game.player.logbook[p.name].is_discovered == True:
+                fn.blitc(self.bigmap, Data.images_planets[p.img_ref], p.pos)
+                
+        
+    def view_solarsys(self,offset,planet):
+        self.screen.blit(self.bigmap,fn.sum_tulp(self.centered_offset(offset),(planet.rect.w/2,planet.rect.h/2)))
             
     def view_planet(self,planet):
         '''make buttons'''
@@ -47,7 +64,8 @@ class Button(pygame.sprite.Sprite):
     def __init__(self, text, binded, x,y):
         super(Button, self).__init__()
         self.text = text
-        self.image = var.but_bg
+        self.image = pygame.Surface(100,50)
+        self.image.fill((100,100,100))
 #        self.text_pos = ((x+w/2),(y+h/2))
 #        self.rect2 = 0
         self.txt_color = (0,0,0)

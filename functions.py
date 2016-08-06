@@ -13,6 +13,8 @@ def sum_tulp(t1,t2):
     
 def blitc(dest,surface,blitpos): #blitpos is the center of the image
     rect = surface.get_rect()
-    dx,dy = blitpos[0]-rect.centerx,blitpos[1]-rect.centery
-    corrected_blitpos = sum_tulp(rect.topleft, (dx,dy))
-    dest.blit(surface.image, corrected_blitpos)
+    corrected_blitpos = (blitpos[0]-rect.w/2,blitpos[1]-rect.h/2)
+#    dx,dy = blitpos[0]-rect.centerx,blitpos[1]-rect.centery
+#    corrected_blitpos = sum_tulp(rect.topleft, (dx,dy))
+    
+    dest.blit(surface, corrected_blitpos)

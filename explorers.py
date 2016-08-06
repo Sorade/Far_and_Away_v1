@@ -10,5 +10,5 @@ class Explorer(object):
     def __init__(self,game):
         self.game = game
         self.location = 0
-        self.logbook = dict(zip(p.name,Logbook(p,False,False) for p in self.game.all_planets))
-        
+        self.logbook = dict(zip((p.name for p in self.game.all_planets),(Logbook(p,True,True) for p in self.game.all_planets)))
+    
