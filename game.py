@@ -27,7 +27,8 @@ class Game(object):
         self.interface = interface.Interface(self)
         '''Create Planets'''
         self.all_planets = pygame.sprite.Group()
-        [self.all_planets.add(planets.Planet(self,(random.randint(50,4950),random.randint(50,4950)))) for x in range(400)]
+        #[self.all_planets.add(planets.Planet(self,(random.randint(50,4950),random.randint(50,4950)))) for x in range(400)]
+        self.generate_planets()
         [p.get_in_SOF() for p in self.all_planets]
         [p.filter_planets() for p in self.all_planets]
         [p.get_in_SOF() for p in self.all_planets]
@@ -35,22 +36,24 @@ class Game(object):
         self.player = explorers.Explorer(self)
         
         '''setting up game switches'''
-        self.map_mode == False
-        self.planet_mode == False
+        self.map_mode = False
+        self.planet_mode = False
         
     def generate_planets(self):
-        w = self.config.Config.screen_w
-        h = self.config.Config.screen_h
+        offset = 50
+        w = config.Config.screen_w-offset
+        h = config.Config.screen_h-offset
         
-        for row in range(h/5):
-            for col in range(0,w/10):
-                planets.Planet(self,(row,col))
+        row_nb,col_nb = 5,10
+        
+        for row in range(offset,h,h/row_nb):
+            for col in range(offset,w,w/col_nb):
+                self.all_planets.add(planets.Planet(self,(col,row)))
 
        
     def run(self):
         '''set up'''
         clock = pygame.time.Clock() #set timer which is used to slow game down
-        yoffset,xoffset = 0,0 #scrolling variables
         black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
         black_bg.fill((0,0,0))
         
@@ -63,23 +66,12 @@ class Game(object):
                     sys.exit()
                     print 'has quit'
 
-            if self.map_mode == True:
-                '''setting up scrolling'''      
-                if pygame.mouse.get_pos()[1] < 20:
-                    yoffset -= 4
-                if pygame.mouse.get_pos()[1] > config.Config.screen_h-20:
-                    yoffset += 4
-                if pygame.mouse.get_pos()[0] < 20:
-                    xoffset -= 4
-                if pygame.mouse.get_pos()[0] > config.Config.screen_w-20:
-                    xoffset += 4
-                
-                self.interface.update_bigmap()
-                
-                '''Calling Display functions'''
-                self.interface.screen.blit(black_bg,(0,0))
-                planet = [ v for v in self.player.logbook.values()][0].instance[0]
-                self.interface.view_solarsys(fn.sum_tulp(planet.pos,(xoffset,yoffset)),planet)
+            self.interface.update_bigmap()
+            
+            '''Calling Display functions'''
+            self.interface.screen.blit(black_bg,(0,0))
+            planet = [ v for v in self.player.logbook.values()][0].instance[0]
+            self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2),planet)
                
             
             pygame.display.update()

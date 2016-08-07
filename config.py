@@ -8,8 +8,8 @@ import pygame
 
 class Config(object):
     fullscreen = False
-    screen_h = 500
-    screen_w = 800
+    screen_h = 700
+    screen_w = 1200
     map_size = 'Huge'
     
     if fullscreen == True:
