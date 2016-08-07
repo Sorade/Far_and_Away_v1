@@ -30,7 +30,7 @@ class Game(object):
 
         '''Create Planets'''
         self.all_planets = pygame.sprite.Group()
-        self.generate_planets()
+        self.dx, self.dy = self.generate_planets()
         [p.get_in_SOF() for p in self.all_planets]
         '''create explorers and player'''
         self.all_explorers = [explorers.Explorer(self) for x in range (2)]
@@ -38,12 +38,17 @@ class Game(object):
         
         '''assign starting planet to player only'''
         delay, x = 20, 0
+        temp_name = 0
         for p in self.all_planets:
-            if x == delay:
+            if x >= delay and len(p.planets_in_SOF) >= 4:
+                self.player.location = temp_name
                 p.chance_of_discovery = 100
-                p.unveil(self.player,False)
+                p.unveil(self.player,False,0)
+                steps = fn.steps(self.player.logbook[temp_name].instance[0].pos,p.pos,self.dx,self.dy)
+                self.player.rp += steps*steps+1
                 p.explore(self.player)
-                break  
+                break
+            temp_name = p.name
             x += 1
         
         '''setting up game switches'''
@@ -62,10 +67,12 @@ class Game(object):
             for col in range(offset/2, int(w + offset*1.5), w/col_nb):
                 self.all_planets.add(planets.Planet(self,(col,row)))
                 
+        return w/col_nb, h/row_nb
+                
                        
     def planet_discovery_event(self,player_induced):
         for log in self.player.logbook.values():
-            log.instance[0].search_in_SOF(self.player,False)
+            log.instance[0].search_in_SOF(self.player,False,0)
             
     def resource_prod_event(self):
         for log in self.player.logbook.values():
@@ -74,10 +81,18 @@ class Game(object):
                 
     def knowledge_prod_event(self):
         for log in self.player.logbook.values():
-            if log.is_explored :
+            if log.is_explored:
                 self.player.kp += log.instance[0].disc_kp/(self.month-log.time_of_exploration)
                 
-    def points_prod_event(self):
+    def network_expenses_event(self):
+        cost = 0
+        for log in self.player.logbook.values():
+            if log.is_explored:
+                cost += 1
+                
+        self.player.rp -= cost
+                
+    def points_adjustement_event(self):
         self.resource_prod_event()
         self.knowledge_prod_event()
                 
@@ -99,7 +114,8 @@ class Game(object):
                 elif event.type == USEREVENT + 1:
                     self.month += 1 #adds a months of gametime every 10 seconds
                     self.planet_discovery_event(False)
-                    self.points_prod_event()
+                    self.points_adjustement_event()
+                    self.network_expenses_event()
                 elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                     self.pressed_left_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 1:

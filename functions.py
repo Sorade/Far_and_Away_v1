@@ -9,6 +9,12 @@ import pygame
 def dist(point1, point2):
     return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**0.5
     
+def steps(point1, point2, dx, dy):
+    x1,y1 = point1[0],point1[1]
+    x2,y2 = point2[0],point2[1]
+    return abs(x1-x2)/dx+abs(y1-y2)/dy
+    
+    
 def sum_tulp(t1,t2):
     return (t1[0]+t2[0],t1[1]+t2[1])
     

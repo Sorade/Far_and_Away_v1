@@ -36,6 +36,10 @@ class Interface(object):
                 self.selected = p
                 return
             if self.game.player.logbook[p.name].is_discovered == True:
+                if self.game.player.logbook[p.name].is_explored == False:
+                    pygame.draw.circle(self.screen, (255,0,0), p.pos, int(p.rect.w*0.6), 0)
+                if self.game.player.location == p.name:
+                    pygame.draw.circle(self.screen, (0,255,0), p.pos, int(p.rect.w*0.75), 0)
                 fn.blitc(self.screen, Data.images_planets[p.img_ref], p.pos)
                 
               
@@ -86,7 +90,7 @@ class Interface(object):
                 planet.visit(self.game.player)
                 
         elif search_button.selected == True and self.game.pressed_left_clic == True:
-            planet.search_in_SOF(self.game.player,True)
+            planet.search_in_SOF(self.game.player,True,30)
             self.game.pressed_left_clic = False
                 
         elif view_solarsys_but.selected == True:
