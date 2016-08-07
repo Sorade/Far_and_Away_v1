@@ -51,7 +51,6 @@ class Interface(object):
         buttons.extend([go_to_button,view_solarsys_but,search_button])
         
         ''' blit all the planet's stats to the screen'''
-        
         if self.game.player.name in planet.explored_by:
             info_ls = [planet.name,planet.pos,planet.discovered_by,planet.explored_by,planet.disc_kp,planet.disc_rp]
         else:
@@ -70,7 +69,10 @@ class Interface(object):
             fn.display_txt(to_blit,'impact',16,(0,255,0),self.screen,(x,y))
             y += 20
             count += 1
-                    
+            
+        '''blit the player's points'''
+        fn.display_txt('Your KP: {}'.format(self.game.player.kp),'impact',16,(0,255,0),self.screen,(Config.screen_w/2,50))
+        fn.display_txt('Your RP: {}'.format(self.game.player.rp),'impact',16,(0,255,0),self.screen,(Config.screen_w/2,75))                    
 
                         
         for but in buttons:
@@ -83,8 +85,9 @@ class Interface(object):
             else:
                 planet.visit(self.game.player)
                 
-        elif search_button.selected == True:
+        elif search_button.selected == True and self.game.pressed_left_clic == True:
             planet.search_in_SOF(self.game.player,True)
+            self.game.pressed_left_clic = False
                 
         elif view_solarsys_but.selected == True:
             self.game.planet_mode = False

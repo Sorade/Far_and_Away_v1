@@ -26,7 +26,7 @@ class Game(object):
     def __init__(self):
         self.interface = interface.Interface(self)
         self.clock = pygame.time.Clock() #set timer which is used to slow game down
-        self.months = 0
+        self.month = 0
 
         '''Create Planets'''
         self.all_planets = pygame.sprite.Group()
@@ -40,14 +40,17 @@ class Game(object):
         delay, x = 20, 0
         for p in self.all_planets:
             if x == delay:
+                p.chance_of_discovery = 100
                 p.unveil(self.player,False)
                 p.explore(self.player)
                 break  
             x += 1
         
         '''setting up game switches'''
+        self.pressed_left_clic = False  
         self.map_mode = True
         self.planet_mode = False
+        
         
     def generate_planets(self):
         offset = 50
@@ -59,17 +62,15 @@ class Game(object):
             for col in range(offset/2, int(w + offset*1.5), w/col_nb):
                 self.all_planets.add(planets.Planet(self,(col,row)))
                 
-#    def planet_discovery_event(self,player_induced):
-#        for log in self.player.logbook.values():
-#            if log.is_explored:
-#                print log.instance[0].planets_in_SOF
-#                for planet in log.instance[0].planets_in_SOF:
-#                    if log.instance[0].chance_of_discovery >= random.randint(0,100):
-#                        planet.unveil(self.player,player_induced)
-                        
+                       
     def planet_discovery_event(self,player_induced):
         for log in self.player.logbook.values():
             log.instance[0].search_in_SOF(self.player,False)
+            
+    def resource_prod_event(self):
+        for log in self.player.logbook.values():
+            if log.instance[0].is_explored :
+                self.player.rp += 5
 
     def run(self):
         '''set up'''
@@ -80,17 +81,19 @@ class Game(object):
         while True:
             self.clock.tick(60) #needed to slow game down
             t0 = time.time()
+                        
             for event in pygame.event.get(): #setting up quit
                 if event.type == QUIT:
                     pygame.quit()
                     sys.exit()
                     print 'has quit'
                 elif event.type == USEREVENT + 1:
-                    self.months += 1 #adds a months of gametime every 10 seconds
+                    self.month += 1 #adds a months of gametime every 10 seconds
                     self.planet_discovery_event(False)
-                    print 'current month: ',self.months
-                    
-            
+                elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                    self.pressed_left_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 1:
+                    self.pressed_left_clic = True
                     
             if self.map_mode == True:
                 '''Calling Display functions'''
@@ -99,7 +102,9 @@ class Game(object):
                 self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2),planet)
                 
             if self.planet_mode == True:
-                self.interface.view_planet(self.interface.selected)
+                self.interface.view_planet(self.interface.selected)            
+                    
+
             
             pygame.display.update()
             t1 = time.time()

@@ -30,16 +30,18 @@ class Planet(sprite.MySprite):
         self.rect.center = pos
         
     def unveil(self,explorer,player_induced):
-        if explorer.logbook[self.name].is_discovered == False:
+        if explorer.logbook[self.name].is_discovered == False and self.chance_of_discovery >= random.randint(0,100):
             explorer.logbook[self.name].is_discovered = True
             self.discovered_by.append(explorer.name)
-            if player_induced == True:
-                explorer.kp -= 5
+        if player_induced == True:
+            explorer.kp -= 5
         
     def explore(self, explorer):
         if explorer.logbook[self.name].is_explored == False:
             explorer.logbook[self.name].is_explored = True
-            #explorer.logbook[self.name].discovery_time = self.game.gametime.get_tick()
+            explorer.logbook[self.name].discovery_time = self.game.month
+            explorer.kp += self.disc_kp
+            explorer.rp += self.disc_rp
             self.visit(explorer)
             self.explored_by.append(explorer.name)
             print 'Player explored {}'.format(self.name)
@@ -52,8 +54,7 @@ class Planet(sprite.MySprite):
     def search_in_SOF(self,explorer,player_induced):
         if explorer.logbook[self.name].is_explored:
             for planet in self.planets_in_SOF:
-                if self.chance_of_discovery >= random.randint(0,100):
-                    planet.unveil(explorer,player_induced)
+                planet.unveil(explorer,player_induced)
 
         
     def get_in_SOF(self):
