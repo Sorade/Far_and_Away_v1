@@ -17,7 +17,8 @@ class Planet(sprite.MySprite):
         self.name = 'X'+str(random.randint(0,1000))+str(random.randint(0,1000))+str(random.randint(0,1000))
         self.pos = pos
         self.discovered_by = []
-        self.radius = random.randint(100,400) #SOF
+        self.explored_by = []
+        self.radius = random.randint(90,180) #SOF
         self.planets_in_SOF = []
         self.diameter = random.randint(5,50)
         self.disc_kp = random.randint(10,100)
@@ -28,13 +29,24 @@ class Planet(sprite.MySprite):
         self.rect.center = pos
         
     def unveil(self,explorer,player_induced):
-        explorer.logbook[self.name].is_known = True
-        if player_induced == True:
-            explorer.kp -= 5
+        if explorer.logbook[self.name].is_discovered == False:
+            explorer.logbook[self.name].is_discovered = True
+            self.discovered_by.append(explorer.name)
+            if player_induced == True:
+                explorer.kp -= 5
         
     def explore(self, explorer):
-        explorer.logbook[self.name].is_discovered = True
-        explorer.logbook[self.name].discovery_time = self.game.gametime.get_tick()
+        if explorer.logbook[self.name].is_explored == False:
+            explorer.logbook[self.name].is_explored = True
+            #explorer.logbook[self.name].discovery_time = self.game.gametime.get_tick()
+            self.visit(explorer)
+            self.explored_by.append(explorer.name)
+            print 'Player explored {}'.format(self.name)
+        
+    def visit(self, explorer):
+        if explorer.location != self.name:
+            explorer.location = self.name
+            print 'Player is at {}'.format(self.name)
         
     def get_in_SOF(self):
         self.planets_in_SOF = []

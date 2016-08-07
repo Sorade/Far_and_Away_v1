@@ -15,69 +15,94 @@ class Interface(object):
         '''setting screen up'''
         self.screen = Config.screen
         self.menu_bg = pygame.Surface((Config.screen_w,Config.screen_h))
-        '''importing data here to so that the mode is set'''
-        self.bigmap = pygame.Surface((5000,5000))
-        self.bigmap.fill((25,25,35))
+        
+        self.selected = None
         
     def centered_offset(self,offset):
         x,y = offset[0],offset[1]
         return (self.screen.get_rect().centerx-x,self.screen.get_rect().centery-y)
         
-    def update_bigmap(self):
+    def view_solarsys(self,offset,planet):
         planets_to_blit = []
         for p in self.game.all_planets:
-            if self.game.player.logbook[p.name].is_explored == True:
-                [pygame.draw.line(self.bigmap, (0,255,0), p.pos, p2.pos, 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_discovered == True]
+            if self.game.player.logbook[p.name].is_discovered == True:
+                [pygame.draw.line(self.screen, (0,255,0), p.pos, p2.pos, 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_explored == True]
                 planets_to_blit.append(p)
                 
         for p in planets_to_blit:
+            if p.rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]:
+                self.game.map_mode = False
+                self.game.planet_mode = True
+                self.selected = p
+                return
             if self.game.player.logbook[p.name].is_discovered == True:
-                fn.blitc(self.bigmap, Data.images_planets[p.img_ref], p.pos)
+                fn.blitc(self.screen, Data.images_planets[p.img_ref], p.pos)
                 
-        
-    def view_solarsys(self,offset,planet):
-        self.screen.blit(self.bigmap,fn.sum_tulp(self.centered_offset(offset),(planet.rect.w/2,planet.rect.h/2)))
+              
             
     def view_planet(self,planet):
-        self.screen.blit(self.screen_bg,(0,0))
+        self.screen.blit(self.menu_bg,(0,0))
         '''make buttons'''
         go_to_button = Button('Travel to',planet,600,600)
-        view_solarsys_but = Button('View in Solar System',planet,600,500)
+        view_solarsys_but = Button('View Solar System',planet,600,500)
         
         buttons = []
         buttons.extend([go_to_button,view_solarsys_but])
         
         ''' blit all the planet's stats to the screen'''
-        #self.screen.blit(planet.stats,(0,0))
         
-        (but.display(self.screen) for but in buttons)
+        if self.game.player.name in planet.explored_by:
+            info_ls = [planet.name,planet.pos,planet.discovered_by,planet.explored_by,planet.disc_kp,planet.disc_rp]
+        else:
+            info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp]
+        x,y = 50,50
+        
+        cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP '}
+        
+        count = 0
+        for stat in info_ls:
+            if type(stat) is list:
+                to_blit = ', '.join(stat)
+            else:
+                to_blit = stat
+            to_blit = cats[count]+ str(to_blit)
+            fn.display_txt(to_blit,'impact',16,(0,255,0),self.screen,(x,y))
+            y += 20
+            count += 1
+                    
+
+                        
+        for but in buttons:
+            but.check_select()
+            but.display(self.screen)
         
         if go_to_button.selected == True:
-            if self.game.player.logbook[planet.name].is_discovered == False:
+            if self.game.player.logbook[planet.name].is_explored == False:
                 planet.explore(self.game.player)
             else:
                 planet.visit(self.game.player)
                 
         elif view_solarsys_but.selected == True:
-            self.view_solarsys(planet.pos,planet)
+            self.game.planet_mode = False
+            self.game.map_mode = True
         
                
 class Button(pygame.sprite.Sprite):
     def __init__(self, text, binded, x,y):
         super(Button, self).__init__()
         self.text = text
-        self.image = pygame.Surface(100,50)
+        self.image = pygame.Surface((100,50))
         self.image.fill((100,100,100))
-#        self.text_pos = ((x+w/2),(y+h/2))
-#        self.rect2 = 0
+        self.text_pos = ((x+75/2),(y+75/2))
+        self.rect2 = 0
         self.txt_color = (0,0,0)
         self.binded = binded
         
        
         self.smallText = pygame.font.Font("freesansbold.ttf",12)
         self.textSurf = self.smallText.render(self.text, True, self.txt_color)
-#        self.rect2 = self.textSurf.get_rect()
-#        self.rect2.center = self.text_pos
+        self.rect2 = self.textSurf.get_rect()
+        self.rect2.center = self.text_pos
         self.image = pygame.transform.scale(self.image, (int(self.rect2.width*1.5),int(self.rect2.height*3)))
         self.rect = pygame.Rect(x,y,self.image.get_rect().width,self.image.get_rect().height)
         

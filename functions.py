@@ -4,6 +4,7 @@ Created on Sat Aug 06 10:00:25 2016
 
 @author: julien
 """
+import pygame
 
 def dist(point1, point2):
     return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**0.5
@@ -18,3 +19,11 @@ def blitc(dest,surface,blitpos): #blitpos is the center of the image
 #    corrected_blitpos = sum_tulp(rect.topleft, (dx,dy))
     
     dest.blit(surface, corrected_blitpos)
+    
+def display_txt(txt,font,size,color,surface,pos):
+    txt = str(txt)
+    font = pygame.font.SysFont(font, size, bold=False, italic=False)
+    text = font.render(txt, True, color)
+    textpos = text.get_rect()
+    textpos.topleft = pos
+    surface.blit(text, textpos)  
