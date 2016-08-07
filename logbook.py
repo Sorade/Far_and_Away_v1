@@ -6,7 +6,7 @@ Created on Sat Aug 06 11:45:26 2016
 """
 
 class Logbook(object):
-    def __init__(self,body,is_discovered, is_explored):
+    def __init__(self, body, is_discovered, is_explored):
         self.instance = [body]
         self.is_discovered = is_discovered
         self.is_explored = is_explored

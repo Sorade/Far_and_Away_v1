@@ -14,8 +14,9 @@ class Interface(object):
         self.game = game
         '''setting screen up'''
         self.screen = Config.screen
+        self.menu_bg = pygame.Surface((Config.screen_w,Config.screen_h))
         '''importing data here to so that the mode is set'''
-        self.bigmap = pygame.Surface((1000,1000))
+        self.bigmap = pygame.Surface((5000,5000))
         self.bigmap.fill((25,25,35))
         
     def centered_offset(self,offset):
@@ -38,6 +39,7 @@ class Interface(object):
         self.screen.blit(self.bigmap,fn.sum_tulp(self.centered_offset(offset),(planet.rect.w/2,planet.rect.h/2)))
             
     def view_planet(self,planet):
+        self.screen.blit(self.screen_bg,(0,0))
         '''make buttons'''
         go_to_button = Button('Travel to',planet,600,600)
         view_solarsys_but = Button('View in Solar System',planet,600,500)
@@ -57,7 +59,7 @@ class Interface(object):
                 planet.visit(self.game.player)
                 
         elif view_solarsys_but.selected == True:
-            self.view_solarsys(planet.pos)
+            self.view_solarsys(planet.pos,planet)
         
                
 class Button(pygame.sprite.Sprite):

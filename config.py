@@ -10,6 +10,7 @@ class Config(object):
     fullscreen = False
     screen_h = 500
     screen_w = 800
+    map_size = 'Huge'
     
     if fullscreen == True:
         screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
