@@ -63,7 +63,7 @@ class Game(object):
         h = config.Config.screen_h-offset
         
         row_nb,col_nb = 5,10
-        for row in range(offset/2, int(h + offset*1.5), h/row_nb):
+        for row in range(offset/2, int(h - offset), h/row_nb):
             for col in range(offset/2, int(w + offset*1.5), w/col_nb):
                 self.all_planets.add(planets.Planet(self,(col,row)))
                 
@@ -99,7 +99,7 @@ class Game(object):
     def run(self):
         '''set up'''
         black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
-        black_bg.fill((0,0,0))
+        black_bg.fill((0,0,25))        
         pygame.time.set_timer(USEREVENT + 1, 10000) # 1 event every 10 seconds
         
         while True:
@@ -121,11 +121,11 @@ class Game(object):
                 elif event.type == MOUSEBUTTONUP and event.button == 1:
                     self.pressed_left_clic = True
                     
-            if self.map_mode == True:
-                '''Calling Display functions'''
-                self.interface.screen.blit(black_bg,(0,0))
-                planet = [ v for v in self.player.logbook.values()][0].instance[0]
-                self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2),planet)
+#            if self.map_mode == True:
+            '''Calling Display functions'''
+            self.interface.screen.blit(black_bg,(0,0))
+            planet = [ v for v in self.player.logbook.values()][0].instance[0]
+            self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2),planet)
                 
             if self.planet_mode == True:
                 self.interface.view_planet(self.interface.selected)            

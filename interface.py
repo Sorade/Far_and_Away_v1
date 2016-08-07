@@ -15,7 +15,7 @@ class Interface(object):
         '''setting screen up'''
         self.screen = Config.screen
         self.menu_bg = pygame.Surface((Config.screen_w,Config.screen_h))
-        
+        self.menu_bg.set_alpha(150)
         self.selected = None
         
     def centered_offset(self,offset):
