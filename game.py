@@ -34,6 +34,19 @@ class Game(object):
         self.all_explorers = [explorers.Explorer(self) for x in range (2)]
         self.player = explorers.Explorer(self)
         
+        '''setting up game switches'''
+        self.map_mode == False
+        self.planet_mode == False
+        
+    def generate_planets(self):
+        w = self.config.Config.screen_w
+        h = self.config.Config.screen_h
+        
+        for row in range(h/5):
+            for col in range(0,w/10):
+                planets.Planet(self,(row,col))
+
+       
     def run(self):
         '''set up'''
         clock = pygame.time.Clock() #set timer which is used to slow game down
@@ -49,24 +62,25 @@ class Game(object):
                     pygame.quit()
                     sys.exit()
                     print 'has quit'
-                    
-            '''setting up scrolling'''      
-            if pygame.mouse.get_pos()[1] < 20:
-                yoffset -= 4
-            if pygame.mouse.get_pos()[1] > config.Config.screen_h-20:
-                yoffset += 4
-            if pygame.mouse.get_pos()[0] < 20:
-                xoffset -= 4
-            if pygame.mouse.get_pos()[0] > config.Config.screen_w-20:
-                xoffset += 4
-            
-            self.interface.update_bigmap()
-            
-            '''Calling Display functions'''
-            self.interface.screen.blit(black_bg,(0,0))
-            planet = [ v for v in self.player.logbook.values()][0].instance[0]
-            self.interface.view_solarsys(fn.sum_tulp(planet.pos,(xoffset,yoffset)),planet)
+
+            if self.map_mode == True:
+                '''setting up scrolling'''      
+                if pygame.mouse.get_pos()[1] < 20:
+                    yoffset -= 4
+                if pygame.mouse.get_pos()[1] > config.Config.screen_h-20:
+                    yoffset += 4
+                if pygame.mouse.get_pos()[0] < 20:
+                    xoffset -= 4
+                if pygame.mouse.get_pos()[0] > config.Config.screen_w-20:
+                    xoffset += 4
                 
+                self.interface.update_bigmap()
+                
+                '''Calling Display functions'''
+                self.interface.screen.blit(black_bg,(0,0))
+                planet = [ v for v in self.player.logbook.values()][0].instance[0]
+                self.interface.view_solarsys(fn.sum_tulp(planet.pos,(xoffset,yoffset)),planet)
+               
             
             pygame.display.update()
             t1 = time.time()

@@ -48,7 +48,7 @@ class Interface(object):
         buttons.extend([go_to_button,view_solarsys_but])
         
         ''' blit all the planet's stats to the screen'''
-        self.screen.blit(planet.stats,(0,0))
+        #self.screen.blit(planet.stats,(0,0))
         
         (but.display(self.screen) for but in buttons)
         
