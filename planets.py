@@ -14,7 +14,7 @@ class Planet(sprite.MySprite):
     def __init__(self, game, pos):
         super(Planet, self).__init__()
         self.game = game
-        self.name = 'X'+str(random.randint(0,1000))+str(random.randint(0,1000))+str(random.randint(0,1000))
+        self.name = '{}-X{}-{}'.format(random.choice(data.Data.planet_names),str(random.randint(0,100)),str(random.randint(0,100)))
         self.pos = pos
         self.discovered_by = []
         self.explored_by = []
@@ -22,8 +22,8 @@ class Planet(sprite.MySprite):
         self.planets_in_SOF = []
         self.chance_of_discovery = 50
         self.diameter = random.randint(5,50)
-        self.disc_kp = random.randint(10,100)
-        self.disc_rp = random.randint(10,100)
+        self.disc_kp = random.randint(0,20)
+        self.disc_rp = random.randint(0,20)
         self.img_ref = 'Venus'
         
         self.rect = data.Data.images_planets[self.img_ref].get_rect()

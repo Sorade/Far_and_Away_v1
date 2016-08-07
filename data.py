@@ -13,3 +13,6 @@ class Data(object):
     
     '''image dictionaries'''
     images_planets = {'Venus' : image_venus}
+    
+    '''planet names'''
+    planet_names = ['Stella','Orma','Rupa','Gamma','Ortia','Zima','Fita','Bella','Ursa']
