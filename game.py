@@ -69,14 +69,23 @@ class Game(object):
             
     def resource_prod_event(self):
         for log in self.player.logbook.values():
-            if log.instance[0].is_explored :
+            if log.is_explored :
                 self.player.rp += 5
-
+                
+    def knowledge_prod_event(self):
+        for log in self.player.logbook.values():
+            if log.is_explored :
+                self.player.kp += 5
+                
+    def points_prod_event(self):
+        self.resource_prod_event()
+        self.knowledge_prod_event()
+                
     def run(self):
         '''set up'''
         black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
         black_bg.fill((0,0,0))
-        pygame.time.set_timer(USEREVENT + 1, 10000) # 1 event every 10 seconds
+        pygame.time.set_timer(USEREVENT + 1, 5000) # 1 event every 10 seconds
         
         while True:
             self.clock.tick(60) #needed to slow game down
@@ -90,6 +99,7 @@ class Game(object):
                 elif event.type == USEREVENT + 1:
                     self.month += 1 #adds a months of gametime every 10 seconds
                     self.planet_discovery_event(False)
+                    self.points_prod_event()
                 elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                     self.pressed_left_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 1:
