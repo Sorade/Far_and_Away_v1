@@ -43,11 +43,12 @@ class Interface(object):
     def view_planet(self,planet):
         self.screen.blit(self.menu_bg,(0,0))
         '''make buttons'''
-        go_to_button = Button('Travel to',planet,600,600)
-        view_solarsys_but = Button('View Solar System',planet,600,500)
+        go_to_button = Button('Travel to',planet,50,Config.screen_h-50)
+        search_button = Button('Search SOF',planet,150,Config.screen_h-50)
+        view_solarsys_but = Button('View Solar System',planet,350,Config.screen_h-50)
         
         buttons = []
-        buttons.extend([go_to_button,view_solarsys_but])
+        buttons.extend([go_to_button,view_solarsys_but,search_button])
         
         ''' blit all the planet's stats to the screen'''
         
@@ -81,6 +82,9 @@ class Interface(object):
                 planet.explore(self.game.player)
             else:
                 planet.visit(self.game.player)
+                
+        elif search_button.selected == True:
+            planet.search_in_SOF(self.game.player,True)
                 
         elif view_solarsys_but.selected == True:
             self.game.planet_mode = False

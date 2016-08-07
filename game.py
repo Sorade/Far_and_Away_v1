@@ -59,21 +59,23 @@ class Game(object):
             for col in range(offset/2, int(w + offset*1.5), w/col_nb):
                 self.all_planets.add(planets.Planet(self,(col,row)))
                 
-    def monthly_planet_discovery_event(self):
+#    def planet_discovery_event(self,player_induced):
+#        for log in self.player.logbook.values():
+#            if log.is_explored:
+#                print log.instance[0].planets_in_SOF
+#                for planet in log.instance[0].planets_in_SOF:
+#                    if log.instance[0].chance_of_discovery >= random.randint(0,100):
+#                        planet.unveil(self.player,player_induced)
+                        
+    def planet_discovery_event(self,player_induced):
         for log in self.player.logbook.values():
-            if log.is_explored:
-                print log.instance[0].planets_in_SOF
-                for planet in log.instance[0].planets_in_SOF:
-                    if log.instance[0].chance_of_discovery >= random.randint(0,100):
-                        planet.unveil(self.player,False)
-                    
-                
-       
+            log.instance[0].search_in_SOF(self.player,False)
+
     def run(self):
         '''set up'''
         black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
         black_bg.fill((0,0,0))
-        pygame.time.set_timer(USEREVENT + 1, 4000) # 1 event every 10 seconds
+        pygame.time.set_timer(USEREVENT + 1, 10000) # 1 event every 10 seconds
         
         while True:
             self.clock.tick(60) #needed to slow game down
@@ -85,7 +87,7 @@ class Game(object):
                     print 'has quit'
                 elif event.type == USEREVENT + 1:
                     self.months += 1 #adds a months of gametime every 10 seconds
-                    self.monthly_planet_discovery_event()
+                    self.planet_discovery_event(False)
                     print 'current month: ',self.months
                     
             

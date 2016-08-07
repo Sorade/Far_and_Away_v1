@@ -20,7 +20,7 @@ class Planet(sprite.MySprite):
         self.explored_by = []
         self.radius = random.randint(90,200) #SOF
         self.planets_in_SOF = []
-        self.chance_of_discovery = 100
+        self.chance_of_discovery = 50
         self.diameter = random.randint(5,50)
         self.disc_kp = random.randint(10,100)
         self.disc_rp = random.randint(10,100)
@@ -48,6 +48,13 @@ class Planet(sprite.MySprite):
         if explorer.location != self.name:
             explorer.location = self.name
             print 'Player is at {}'.format(self.name)
+            
+    def search_in_SOF(self,explorer,player_induced):
+        if explorer.logbook[self.name].is_explored:
+            for planet in self.planets_in_SOF:
+                if self.chance_of_discovery >= random.randint(0,100):
+                    planet.unveil(explorer,player_induced)
+
         
     def get_in_SOF(self):
         self.planets_in_SOF = []
