@@ -52,7 +52,9 @@ class Game(object):
             x += 1
         
         '''setting up game switches'''
-        self.pressed_left_clic = False  
+        self.pressed_left_clic = False 
+        self.pressed_mid_clic = False
+        self.pressed_right_clic = False
         self.map_mode = True
         self.planet_mode = False
         
@@ -120,7 +122,14 @@ class Game(object):
                     self.pressed_left_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 1:
                     self.pressed_left_clic = True
-                    
+                elif event.type == MOUSEBUTTONDOWN and event.button == 2:
+                    self.pressed_mid_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 2:
+                    self.pressed_mid_clic = True                    
+                elif event.type == MOUSEBUTTONDOWN and event.button == 3:
+                    self.pressed_mid_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 3:
+                    self.pressed_mid_clic = True                    
 #            if self.map_mode == True:
             '''Calling Display functions'''
             self.interface.screen.blit(black_bg,(0,0))

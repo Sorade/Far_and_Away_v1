@@ -42,6 +42,17 @@ class Interface(object):
                     pygame.draw.circle(self.screen, (0,255,0), p.pos, int(p.rect.w*0.75), 0)
                 fn.blitc(self.screen, Data.images_planets[p.img_ref], p.pos)
                 
+            '''displacement with right clicl'''
+            if p.rect.collidepoint(pygame.mouse.get_pos()):
+                if pygame.mouse.get_pressed()[2]:
+                    if self.game.player.logbook[p.name].is_explored == False:
+                        p.explore(self.game.player)
+                    else:
+                        p.visit(self.game.player)
+                elif pygame.mouse.get_pressed()[1] and self.game.pressed_mid_clic == True:
+                    p.search_in_SOF(self.game.player,True,30)
+                    self.game.pressed_mid_clic = False
+                print self.game.pressed_mid_clic
               
             
     def view_planet(self,planet):
