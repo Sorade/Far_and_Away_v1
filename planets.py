@@ -39,9 +39,9 @@ class Planet(sprite.MySprite):
     def explore(self, explorer):
         if explorer.logbook[self.name].is_explored == False:
             explorer.logbook[self.name].is_explored = True
-            explorer.logbook[self.name].discovery_time = self.game.month
+            explorer.logbook[self.name].time_of_exploration = self.game.month
             explorer.kp += self.disc_kp
-            explorer.rp += self.disc_rp
+            explorer.rp += self.disc_rp -10
             self.visit(explorer)
             self.explored_by.append(explorer.name)
             print 'Player explored {}'.format(self.name)

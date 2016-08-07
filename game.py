@@ -69,13 +69,13 @@ class Game(object):
             
     def resource_prod_event(self):
         for log in self.player.logbook.values():
-            if log.is_explored :
-                self.player.rp += 5
+            if log.is_explored:
+                self.player.rp += log.instance[0].disc_rp/(self.month-log.time_of_exploration)
                 
     def knowledge_prod_event(self):
         for log in self.player.logbook.values():
             if log.is_explored :
-                self.player.kp += 5
+                self.player.kp += log.instance[0].disc_kp/(self.month-log.time_of_exploration)
                 
     def points_prod_event(self):
         self.resource_prod_event()
@@ -85,7 +85,7 @@ class Game(object):
         '''set up'''
         black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
         black_bg.fill((0,0,0))
-        pygame.time.set_timer(USEREVENT + 1, 5000) # 1 event every 10 seconds
+        pygame.time.set_timer(USEREVENT + 1, 10000) # 1 event every 10 seconds
         
         while True:
             self.clock.tick(60) #needed to slow game down
