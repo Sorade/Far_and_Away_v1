@@ -18,8 +18,9 @@ class Planet(sprite.MySprite):
         self.pos = pos
         self.discovered_by = []
         self.explored_by = []
-        self.radius = random.randint(90,180) #SOF
+        self.radius = random.randint(90,200) #SOF
         self.planets_in_SOF = []
+        self.chance_of_discovery = 100
         self.diameter = random.randint(5,50)
         self.disc_kp = random.randint(10,100)
         self.disc_rp = random.randint(10,100)

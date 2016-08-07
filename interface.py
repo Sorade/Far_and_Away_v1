@@ -26,7 +26,7 @@ class Interface(object):
         planets_to_blit = []
         for p in self.game.all_planets:
             if self.game.player.logbook[p.name].is_discovered == True:
-                [pygame.draw.line(self.screen, (0,255,0), p.pos, p2.pos, 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_explored == True]
+                [pygame.draw.line(self.screen, (0,255,0), p.pos, p2.pos, 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_explored and self.game.player.logbook[p.name].is_explored]
                 planets_to_blit.append(p)
                 
         for p in planets_to_blit:
