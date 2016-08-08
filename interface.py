@@ -87,12 +87,14 @@ class Interface(object):
             planet,self.game.month,self.game.player.logbook[planet.name].time_of_exploration))\
             ,'{} (+{}/month)'.format(\
             planet.disc_rp,fn.rp_formula(\
-            planet,self.game.month,self.game.player.logbook[planet.name].time_of_exploration))]
+            planet,self.game.month,self.game.player.logbook[planet.name].time_of_exploration)),\
+            fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,self.game.dx,self.game.dy))\
+            ,10+fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,self.game.dx,self.game.dy))]
         else:
             info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp]
         x,y = 50,50
         
-        cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP '}
+        cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP ', 6:'Travel cost: '}
         
         count = 0
         for stat in info_ls:

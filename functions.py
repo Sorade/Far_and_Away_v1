@@ -18,6 +18,10 @@ def rp_formula(planet,game_time,exploration_time):
     denom = game_time-exploration_time if game_time-exploration_time != 0 else 1
     return planet.disc_rp/denom
     
+def travel_formula(steps):
+    return steps*steps
+    
+    
 def steps(point1, point2, dx, dy):
     x1,y1 = point1[0],point1[1]
     x2,y2 = point2[0],point2[1]

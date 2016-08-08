@@ -53,7 +53,7 @@ class Planet(sprite.MySprite):
                 explorer.logbook[self.name].is_explored = True
                 explorer.logbook[self.name].time_of_exploration = self.game.month
                 explorer.kp += self.disc_kp
-                explorer.rp += self.disc_rp -10
+                explorer.rp += self.disc_rp -10 #-10 is the exploration malus
                 self.explored_by.append(explorer.name)
                 self.game.interface.add_message('Player explored {}'.format(self.name),1)
                 self.game.interface.add_message(visit_msg,1)
