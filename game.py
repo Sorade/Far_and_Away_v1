@@ -59,8 +59,8 @@ class Game(object):
         self.pressed_left_clic = False 
         self.pressed_mid_clic = False
         self.pressed_right_clic = False
-        self.map_mode = True
-        self.planet_mode = False
+#        self.map_mode = True
+#        self.planet_mode = False
         self.pause = False
         
         
@@ -124,9 +124,6 @@ class Game(object):
             self.interface.screen.blit(black_bg,(0,0))
             planet = [ v for v in self.player.logbook.values()][0].instance[0]
             self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2),planet)
-                
-            if self.planet_mode == True:
-                self.interface.view_planet(self.interface.selected)
                 
             self.interface.final_overlay() #will only display messages when USEREVENT+2 has occured
                     

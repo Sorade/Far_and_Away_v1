@@ -45,11 +45,8 @@ class Interface(object):
                 planets_to_blit.append(p)
                 
         for p in planets_to_blit:
-            if p.rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]:
-                self.game.map_mode = False
-                self.game.planet_mode = True
-                self.selected = p
-                return
+            if p.rect.collidepoint(pygame.mouse.get_pos()):# and pygame.mouse.get_pressed()[0]:
+                self.view_planet()
             if self.game.player.logbook[p.name].is_discovered == True:
                 if self.game.player.logbook[p.name].is_explored == False:
                     pygame.draw.circle(self.screen, (255,0,0), p.pos, int(p.rect.w*0.6), 0)
@@ -69,62 +66,59 @@ class Interface(object):
                     self.game.pressed_mid_clic = False
               
             
-    def view_planet(self,planet):
-        self.screen.blit(self.menu_bg,(0,0))
-        '''make buttons'''
-        go_to_button = Button('Travel to',planet,50,Config.screen_h-50)
-        search_button = Button('Search SOF',planet,150,Config.screen_h-50)
-        view_solarsys_but = Button('View Solar System',planet,350,Config.screen_h-50)
-        
-        buttons = []
-        buttons.extend([go_to_button,view_solarsys_but,search_button])
-        
-        ''' blit all the planet's stats to the screen'''
-        if self.game.player.name in planet.explored_by:
-            info_ls = [planet.name,planet.pos,planet.discovered_by,planet.explored_by,\
-            '{} (+{}/month)'.format(\
-            planet.disc_kp,fn.kp_formula(\
-            planet,self.game.month,self.game.player.logbook[planet.name].time_of_exploration))\
-            ,'{} (+{}/month)'.format(\
-            planet.disc_rp,fn.rp_formula(\
-            planet,self.game.month,self.game.player.logbook[planet.name].time_of_exploration)),\
-            fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,self.game.dx,self.game.dy))\
-            ,10+fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,self.game.dx,self.game.dy))]
-        else:
-            info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp]
-        x,y = 50,50
-        
-        cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP ', 6:'Travel cost: '}
-        
-        count = 0
-        for stat in info_ls:
-            if type(stat) is list:
-                to_blit = ', '.join(stat)
-            else:
-                to_blit = stat                
-            to_blit = cats[count]+ str(to_blit)
-            fn.display_txt(to_blit,'Lucida Console',16,(0,255,0),self.screen,(x,y))
-            y += 20
-            count += 1
+    def view_planet(self):
+        planet_list = [planet for planet in (log.instance[0] for log in self.game.player.logbook.values()) if planet.rect.collidepoint(pygame.mouse.get_pos())]
+        if len(planet_list) > 0: 
+            planet = planet_list[0]
+
+            '''make buttons'''
+            go_to_button = Button('Travel to',planet,50,Config.screen_h-50)
+            search_button = Button('Search SOF',planet,150,Config.screen_h-50)
             
-        for but in buttons:
-            but.check_select()
-            but.display(self.screen)
-        
-        if go_to_button.selected == True:
-            if self.game.player.logbook[planet.name].is_explored == False:
-                planet.explore(self.game.player)
-            else:
-                planet.visit(self.game.player)
-                
-        elif search_button.selected == True and self.game.pressed_left_clic == True:
-            planet.search_in_SOF(self.game.player,True,30)
-            self.game.pressed_left_clic = False
-                
-        elif view_solarsys_but.selected == True:
-            self.game.planet_mode = False
-            self.game.map_mode = True
+            buttons = []
+            buttons.extend([go_to_button,search_button])
             
+            ''' blit all the planet's stats to the screen'''
+            if self.game.player.name in planet.explored_by:
+                info_ls = [
+                planet.name,
+                planet.pos,
+                planet.discovered_by,
+                planet.explored_by,
+                '{} (+{}/month)'.format(planet.disc_kp,fn.kp_formula(planet,self.game.month,self.game.player.logbook[planet.name].time_of_exploration)),
+                '{} (+{}/month)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.month,self.game.player.logbook[planet.name].time_of_exploration)),
+                fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,self.game.dx,self.game.dy))]
+            else:
+                info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp,10+fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,self.game.dx,self.game.dy))]
+            x,y = pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]
+            
+            cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP ', 6:'Travel cost: '}
+            
+            count = 0
+            for stat in info_ls:
+                if type(stat) is list:
+                    to_blit = ', '.join(stat)
+                else:
+                    to_blit = stat                
+                to_blit = cats[count]+ str(to_blit)
+                fn.display_txt(to_blit,'Lucida Console',16,(0,255,0),self.screen,(x,y))
+                y += 20
+                count += 1
+                
+            for but in buttons:
+                but.check_select()
+                but.display(self.screen)
+            
+            if go_to_button.selected == True:
+                if self.game.player.logbook[planet.name].is_explored == False:
+                    planet.explore(self.game.player)
+                else:
+                    planet.visit(self.game.player)
+                    
+            elif search_button.selected == True and self.game.pressed_left_clic == True:
+                planet.search_in_SOF(self.game.player,True,30)
+                self.game.pressed_left_clic = False
+                    
     def add_message(self,msg,disp_time):
         self.messages.append(msg)
         self.message_disp_time += disp_time #adds x seconds to the message timer

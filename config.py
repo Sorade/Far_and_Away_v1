@@ -7,7 +7,7 @@ Created on Sat Aug 06 18:56:10 2016
 import pygame
 
 class Config(object):
-    fullscreen = True
+    fullscreen = False
     screen_h = 700
     screen_w = 1200
     map_size = 'Huge'
