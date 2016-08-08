@@ -14,8 +14,6 @@ class Interface(object):
         self.game = game
         '''setting screen up'''
         self.screen = Config.screen
-        self.menu_bg = pygame.Surface((Config.screen_w,Config.screen_h))
-        self.menu_bg.set_alpha(150)
         self.selected = None
         '''message manager'''
         self.messages = []
@@ -70,13 +68,23 @@ class Interface(object):
         planet_list = [planet for planet in (log.instance[0] for log in self.game.player.logbook.values()) if planet.rect.collidepoint(pygame.mouse.get_pos())]
         if len(planet_list) > 0: 
             planet = planet_list[0]
-
-            '''make buttons'''
-            go_to_button = Button('Travel to',planet,50,Config.screen_h-50)
-            search_button = Button('Search SOF',planet,150,Config.screen_h-50)
             
-            buttons = []
-            buttons.extend([go_to_button,search_button])
+            m_x,m_y = pygame.mouse.get_pos()
+            offset_w,offset_h = 300,220
+            
+            if m_x <= Config.screen_w-offset_w and m_y <= Config.screen_h-offset_h:
+                blitpos = (m_x,m_y)
+            elif m_x > Config.screen_w-offset_w and m_y > Config.screen_h-offset_h:
+                blitpos = (m_x-offset_w,m_y-offset_h)
+            elif m_x > Config.screen_w-offset_w:
+                blitpos = (m_x-offset_w,m_y)
+            elif m_y > Config.screen_h-offset_h:
+                blitpos = (m_x,m_y-offset_h)
+                
+            '''blits bg '''
+            tooltip_bg = pygame.Surface((offset_w,offset_h))
+            tooltip_bg.set_alpha(125)
+            self.screen.blit(tooltip_bg,blitpos)
             
             ''' blit all the planet's stats to the screen'''
             if self.game.player.name in planet.explored_by:
@@ -90,7 +98,7 @@ class Interface(object):
                 fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,self.game.dx,self.game.dy))]
             else:
                 info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp,10+fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,self.game.dx,self.game.dy))]
-            x,y = pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]
+            x,y = blitpos[0],blitpos[1]
             
             cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP ', 6:'Travel cost: '}
             
@@ -105,20 +113,6 @@ class Interface(object):
                 y += 20
                 count += 1
                 
-            for but in buttons:
-                but.check_select()
-                but.display(self.screen)
-            
-            if go_to_button.selected == True:
-                if self.game.player.logbook[planet.name].is_explored == False:
-                    planet.explore(self.game.player)
-                else:
-                    planet.visit(self.game.player)
-                    
-            elif search_button.selected == True and self.game.pressed_left_clic == True:
-                planet.search_in_SOF(self.game.player,True,30)
-                self.game.pressed_left_clic = False
-                    
     def add_message(self,msg,disp_time):
         self.messages.append(msg)
         self.message_disp_time += disp_time #adds x seconds to the message timer
