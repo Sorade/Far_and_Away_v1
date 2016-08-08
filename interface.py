@@ -31,7 +31,7 @@ class Interface(object):
         '''blit pause status'''
         if self.game.pause: fn.display_txt('Game Paused','Impact',16,(0,255,0),self.screen,(int(Config.screen_w*0.75),15))
         '''blit time in months'''
-        fn.display_txt('Month Since Start: {}'.format(self.game.month),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,15))
+        fn.display_txt('Current Month: {}'.format(self.game.month),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,15))
         '''blit the player's points'''
         fn.display_txt('Your KP: {}'.format(self.game.player.kp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,50))
         fn.display_txt('Your RP: {}'.format(self.game.player.rp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,75))                    
@@ -41,7 +41,7 @@ class Interface(object):
         planets_to_blit = []
         for p in self.game.all_planets:
             if self.game.player.logbook[p.name].is_discovered == True:
-                [pygame.draw.line(self.screen, (0,255,0), p.pos, p2.pos, 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_explored and self.game.player.logbook[p.name].is_explored]
+                [pygame.draw.line(self.screen, (0,250,0), p.pos, p2.pos, 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_explored and self.game.player.logbook[p.name].is_explored]
                 planets_to_blit.append(p)
                 
         for p in planets_to_blit:
@@ -81,7 +81,13 @@ class Interface(object):
         
         ''' blit all the planet's stats to the screen'''
         if self.game.player.name in planet.explored_by:
-            info_ls = [planet.name,planet.pos,planet.discovered_by,planet.explored_by,planet.disc_kp,planet.disc_rp]
+            info_ls = [planet.name,planet.pos,planet.discovered_by,planet.explored_by,\
+            '{} (+{}/month)'.format(\
+            planet.disc_kp,fn.kp_formula(\
+            planet,self.game.month,self.game.player.logbook[planet.name].time_of_exploration))\
+            ,'{} (+{}/month)'.format(\
+            planet.disc_rp,fn.rp_formula(\
+            planet,self.game.month,self.game.player.logbook[planet.name].time_of_exploration))]
         else:
             info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp]
         x,y = 50,50
@@ -93,7 +99,7 @@ class Interface(object):
             if type(stat) is list:
                 to_blit = ', '.join(stat)
             else:
-                to_blit = stat
+                to_blit = stat                
             to_blit = cats[count]+ str(to_blit)
             fn.display_txt(to_blit,'Lucida Console',16,(0,255,0),self.screen,(x,y))
             y += 20

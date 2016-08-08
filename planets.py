@@ -44,12 +44,12 @@ class Planet(sprite.MySprite):
     def explore(self, explorer):
         if explorer.logbook[self.name].is_explored == False:
             test = self.visit(explorer)
-            '''remove the visit message so that the exploration message
-            occurs first. If the test is true then the message will be re-added
-            at the end of the message list (after exploration msg)'''
-            visit_msg = self.game.interface.messages[-1]
-            self.game.interface.messages.remove(visit_msg)
             if test == True:
+                '''remove the visit message so that the exploration message
+                occurs first. If the test is true then the message will be re-added
+                at the end of the message list (after exploration msg)'''
+                visit_msg = self.game.interface.messages[-1]
+                self.game.interface.messages.remove(visit_msg)                
                 explorer.logbook[self.name].is_explored = True
                 explorer.logbook[self.name].time_of_exploration = self.game.month
                 explorer.kp += self.disc_kp

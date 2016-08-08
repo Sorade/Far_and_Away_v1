@@ -81,7 +81,7 @@ class Game(object):
         '''set up'''
         black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
         black_bg.fill((0,0,25))        
-        pygame.time.set_timer(USEREVENT + 1, 10000) # 1 event every 10 seconds
+        pygame.time.set_timer(USEREVENT + 1, 5000) # 1 event every 10 seconds
         pygame.time.set_timer(USEREVENT + 2, 1000) # 1 event every 1 seconds
         
         while True:

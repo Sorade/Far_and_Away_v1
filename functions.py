@@ -11,7 +11,12 @@ def dist(point1, point2):
     return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**0.5
 
 def kp_formula(planet,game_time,exploration_time):
-    return planet.disc_rp/(game_time-exploration_time)
+    denom = game_time-exploration_time if game_time-exploration_time != 0 else 1
+    return planet.disc_kp/denom
+    
+def rp_formula(planet,game_time,exploration_time):
+    denom = game_time-exploration_time if game_time-exploration_time != 0 else 1
+    return planet.disc_rp/denom
     
 def steps(point1, point2, dx, dy):
     x1,y1 = point1[0],point1[1]

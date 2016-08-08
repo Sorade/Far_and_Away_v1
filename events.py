@@ -17,12 +17,12 @@ class Event_Manager(object):
     def resource_prod_event(self):
         for log in self.game.player.logbook.values():
             if log.is_explored:
-                self.game.player.rp += fn.kp_formula(log.instance[0],self.game.month,log.time_of_exploration)
+                self.game.player.rp += fn.rp_formula(log.instance[0],self.game.month,log.time_of_exploration)
                 
     def knowledge_prod_event(self):
         for log in self.game.player.logbook.values():
             if log.is_explored:
-                self.game.player.kp += log.instance[0].disc_kp/(self.game.month-log.time_of_exploration)
+                self.game.player.kp += fn.kp_formula(log.instance[0],self.game.month,log.time_of_exploration)
                 
     def network_expenses_event(self):
         cost = 0
