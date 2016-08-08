@@ -15,6 +15,7 @@ pygame.init()
 clock = pygame.time.Clock() #set timer which is used to slow game down
 
 '''import game modules'''
+import events
 import interface
 import planets
 import explorers
@@ -24,66 +25,111 @@ import time
 
 class Game(object):
     def __init__(self):
+        self.event_manager = events.Event_Manager(self)
         self.interface = interface.Interface(self)
+        self.clock = pygame.time.Clock() #set timer which is used to slow game down
+        self.month = 0
+
         '''Create Planets'''
         self.all_planets = pygame.sprite.Group()
-        [self.all_planets.add(planets.Planet(self,(random.randint(50,4950),random.randint(50,4950)))) for x in range(400)]
+        self.dx, self.dy = self.generate_planets()
         [p.get_in_SOF() for p in self.all_planets]
-        [p.filter_planets() for p in self.all_planets]
-        [p.get_in_SOF() for p in self.all_planets]
+        '''create explorers and player'''
         self.all_explorers = [explorers.Explorer(self) for x in range (2)]
         self.player = explorers.Explorer(self)
         
+        '''assign starting planet to player only'''
+        delay, x = 20, 0
+        temp_name = 0
+        for p in self.all_planets:
+            if x >= delay and len(p.planets_in_SOF) >= 4:
+                self.player.location = temp_name
+                p.chance_of_discovery = 100
+                p.kp = 10
+                p.rp = 10
+                p.unveil(self.player,False,0)
+                steps = fn.steps(self.player.logbook[temp_name].instance[0].pos,p.pos,self.dx,self.dy)
+                self.player.rp += steps*steps+1
+                p.explore(self.player)
+                break
+            temp_name = p.name
+            x += 1
+        
         '''setting up game switches'''
-        self.map_mode == False
-        self.planet_mode == False
+        self.pressed_left_clic = False 
+        self.pressed_mid_clic = False
+        self.pressed_right_clic = False
+        self.map_mode = True
+        self.planet_mode = False
+        
         
     def generate_planets(self):
-        w = self.config.Config.screen_w
-        h = self.config.Config.screen_h
+        offset = 50
+        w = config.Config.screen_w-offset
+        h = config.Config.screen_h-offset
         
-        for row in range(h/5):
-            for col in range(0,w/10):
-                planets.Planet(self,(row,col))
-
-       
+        row_nb,col_nb = 5,10
+        for row in range(offset/2, int(h - offset), h/row_nb):
+            for col in range(offset/2, int(w + offset*1.5), w/col_nb):
+                self.all_planets.add(planets.Planet(self,(col,row)))
+                
+        return w/col_nb, h/row_nb
+                
+                       
     def run(self):
         '''set up'''
-        clock = pygame.time.Clock() #set timer which is used to slow game down
-        yoffset,xoffset = 0,0 #scrolling variables
         black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
-        black_bg.fill((0,0,0))
+        black_bg.fill((0,0,25))        
+        pygame.time.set_timer(USEREVENT + 1, 10000) # 1 event every 10 seconds
+        pygame.time.set_timer(USEREVENT + 2, 1000) # 1 event every 1 seconds
         
         while True:
-            clock.tick(60) #needed to slow game down
+            self.clock.tick(60) #needed to slow game down
             t0 = time.time()
+                        
             for event in pygame.event.get(): #setting up quit
                 if event.type == QUIT:
                     pygame.quit()
                     sys.exit()
                     print 'has quit'
+                elif event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                    print 'has quit'                       
+                elif event.type == USEREVENT + 2:
+                    self.interface.display_event = True
+                elif event.type == USEREVENT + 1:
+                    self.month += 1 #adds a months of gametime every 10 seconds
+                    self.event_manager.planet_discovery_event(False)
+                    self.event_manager.points_adjustement_event()
+                    self.event_manager.network_expenses_event()
+                elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                    self.pressed_left_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 1:
+                    self.pressed_left_clic = True
+                elif event.type == MOUSEBUTTONDOWN and event.button == 2:
+                    self.pressed_mid_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 2:
+                    self.pressed_mid_clic = True                    
+                elif event.type == MOUSEBUTTONDOWN and event.button == 3:
+                    self.pressed_mid_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 3:
+                    self.pressed_mid_clic = True                    
 
-            if self.map_mode == True:
-                '''setting up scrolling'''      
-                if pygame.mouse.get_pos()[1] < 20:
-                    yoffset -= 4
-                if pygame.mouse.get_pos()[1] > config.Config.screen_h-20:
-                    yoffset += 4
-                if pygame.mouse.get_pos()[0] < 20:
-                    xoffset -= 4
-                if pygame.mouse.get_pos()[0] > config.Config.screen_w-20:
-                    xoffset += 4
+            '''Calling Display functions'''
+            self.interface.screen.blit(black_bg,(0,0))
+            planet = [ v for v in self.player.logbook.values()][0].instance[0]
+            self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2),planet)
                 
-                self.interface.update_bigmap()
+            if self.planet_mode == True:
+                self.interface.view_planet(self.interface.selected)
                 
-                '''Calling Display functions'''
-                self.interface.screen.blit(black_bg,(0,0))
-                planet = [ v for v in self.player.logbook.values()][0].instance[0]
-                self.interface.view_solarsys(fn.sum_tulp(planet.pos,(xoffset,yoffset)),planet)
-               
+            self.interface.final_overlay() #will only display messages when USEREVENT+2 has occured
+                    
+
             
             pygame.display.update()
             t1 = time.time()
-            print t1-t0
+            #print t1-t0
         
         
