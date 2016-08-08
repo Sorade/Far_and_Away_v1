@@ -17,10 +17,22 @@ class Interface(object):
         self.menu_bg = pygame.Surface((Config.screen_w,Config.screen_h))
         self.menu_bg.set_alpha(150)
         self.selected = None
+        '''message manager'''
+        self.messages = []
+        self.message_disp_time = 0
+        self.display_event = False
         
     def centered_offset(self,offset):
         x,y = offset[0],offset[1]
         return (self.screen.get_rect().centerx-x,self.screen.get_rect().centery-y)
+        
+    def final_overlay(self):
+        self.message_display()
+        
+        '''blit the player's points'''
+        fn.display_txt('Your KP: {}'.format(self.game.player.kp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,50))
+        fn.display_txt('Your RP: {}'.format(self.game.player.rp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,75))                    
+
         
     def view_solarsys(self,offset,planet):
         planets_to_blit = []
@@ -42,7 +54,7 @@ class Interface(object):
                     pygame.draw.circle(self.screen, (0,255,0), p.pos, int(p.rect.w*0.75), 0)
                 fn.blitc(self.screen, Data.images_planets[p.img_ref], p.pos)
                 
-            '''displacement with right clicl'''
+            '''Mouse interaction'''
             if p.rect.collidepoint(pygame.mouse.get_pos()):
                 if pygame.mouse.get_pressed()[2]:
                     if self.game.player.logbook[p.name].is_explored == False:
@@ -52,7 +64,6 @@ class Interface(object):
                 elif pygame.mouse.get_pressed()[1] and self.game.pressed_mid_clic == True:
                     p.search_in_SOF(self.game.player,True,30)
                     self.game.pressed_mid_clic = False
-                print self.game.pressed_mid_clic
               
             
     def view_planet(self,planet):
@@ -81,15 +92,10 @@ class Interface(object):
             else:
                 to_blit = stat
             to_blit = cats[count]+ str(to_blit)
-            fn.display_txt(to_blit,'impact',16,(0,255,0),self.screen,(x,y))
+            fn.display_txt(to_blit,'Lucida Console',16,(0,255,0),self.screen,(x,y))
             y += 20
             count += 1
             
-        '''blit the player's points'''
-        fn.display_txt('Your KP: {}'.format(self.game.player.kp),'impact',16,(0,255,0),self.screen,(Config.screen_w/2,50))
-        fn.display_txt('Your RP: {}'.format(self.game.player.rp),'impact',16,(0,255,0),self.screen,(Config.screen_w/2,75))                    
-
-                        
         for but in buttons:
             but.check_select()
             but.display(self.screen)
@@ -107,6 +113,31 @@ class Interface(object):
         elif view_solarsys_but.selected == True:
             self.game.planet_mode = False
             self.game.map_mode = True
+            
+    def add_message(self,msg,disp_time):
+        self.messages.append(msg)
+        self.message_disp_time += disp_time #adds x seconds to the message timer
+        
+    def message_display(self):
+        if self.display_event == True:
+            '''removes 1 second from the display timer'''
+            self.message_disp_time -= 1
+            if self.message_disp_time < 0: self.message_disp_time = 0
+
+        if len(self.messages) >= 15: self.messages.pop(0) #ensure message list isn't too long
+
+        if self.message_disp_time > 0:
+            '''displays messages'''
+            x = 0
+            for msg in self.messages:
+                fn.display_txt(msg,'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,Config.screen_h/3+x))
+                x += 25
+        else:
+            self.messages = [] #if the message timer reaches 0 the messages are deleted
+        self.display_event = False #disable the display until the next call to USEREVENT+2 in game.py
+            
+
+        
         
                
 class Button(pygame.sprite.Sprite):

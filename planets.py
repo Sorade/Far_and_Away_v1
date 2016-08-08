@@ -14,7 +14,7 @@ class Planet(sprite.MySprite):
     def __init__(self, game, pos):
         super(Planet, self).__init__()
         self.game = game
-        self.name = '{}-X{}-{}'.format(random.choice(data.Data.planet_names),str(random.randint(0,100)),str(random.randint(0,100)))
+        self.name = '{}-{}'.format(fn.name_gen(True),str(random.randint(0,100)))
         self.pos = pos
         self.discovered_by = []
         self.explored_by = []
@@ -35,22 +35,28 @@ class Planet(sprite.MySprite):
             if explorer.logbook[self.name].is_discovered == False and self.chance_of_discovery+bonus >= random.randint(0,100):
                 explorer.logbook[self.name].is_discovered = True
                 self.discovered_by.append(explorer.name)
+                self.game.interface.add_message('Discovered {}'.format(self.name),1)
                 
         elif explorer.logbook[self.name].is_discovered == False and self.chance_of_discovery >= random.randint(0,100):
             explorer.logbook[self.name].is_discovered = True
             self.discovered_by.append(explorer.name)
-
         
     def explore(self, explorer):
         if explorer.logbook[self.name].is_explored == False:
             test = self.visit(explorer)
+            '''remove the visit message so that the exploration message
+            occurs first. If the test is true then the message will be re-added
+            at the end of the message list (after exploration msg)'''
+            visit_msg = self.game.interface.messages[-1]
+            self.game.interface.messages.remove(visit_msg)
             if test == True:
                 explorer.logbook[self.name].is_explored = True
                 explorer.logbook[self.name].time_of_exploration = self.game.month
                 explorer.kp += self.disc_kp
                 explorer.rp += self.disc_rp -10
                 self.explored_by.append(explorer.name)
-                print 'Player explored {}'.format(self.name)
+                self.game.interface.add_message('Player explored {}'.format(self.name),1)
+                self.game.interface.add_message(visit_msg,1)
         
     def visit(self, explorer):
         if explorer.location != self.name:
@@ -58,17 +64,21 @@ class Planet(sprite.MySprite):
             if explorer.rp >= steps*steps:
                 explorer.rp -= steps*steps
                 explorer.location = self.name
-                print 'Player is at {}'.format(self.name)
+                self.game.interface.add_message('Player is at {}'.format(self.name),1)
                 return True
         else:
             return False
             
     def search_in_SOF(self,explorer,player_induced,bonus):
         if explorer.logbook[self.name].is_explored:
+            launch = True if explorer.kp >= 5 else False
+            if player_induced and launch: self.game.interface.add_message('Searching around {} ...'.format(self.name),1)
             for planet in self.planets_in_SOF:
-                if explorer.kp == 0:
+                if launch == False:
                     break
                 planet.unveil(explorer,player_induced,bonus)
+            if player_induced and launch: self.game.interface.add_message('... search completed'.format(self.name),1)
+            
 
     def get_in_SOF(self):
         self.planets_in_SOF = []

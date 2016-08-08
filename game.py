@@ -15,6 +15,7 @@ pygame.init()
 clock = pygame.time.Clock() #set timer which is used to slow game down
 
 '''import game modules'''
+import events
 import interface
 import planets
 import explorers
@@ -24,6 +25,7 @@ import time
 
 class Game(object):
     def __init__(self):
+        self.event_manager = events.Event_Manager(self)
         self.interface = interface.Interface(self)
         self.clock = pygame.time.Clock() #set timer which is used to slow game down
         self.month = 0
@@ -43,6 +45,8 @@ class Game(object):
             if x >= delay and len(p.planets_in_SOF) >= 4:
                 self.player.location = temp_name
                 p.chance_of_discovery = 100
+                p.kp = 10
+                p.rp = 10
                 p.unveil(self.player,False,0)
                 steps = fn.steps(self.player.logbook[temp_name].instance[0].pos,p.pos,self.dx,self.dy)
                 self.player.rp += steps*steps+1
@@ -72,37 +76,12 @@ class Game(object):
         return w/col_nb, h/row_nb
                 
                        
-    def planet_discovery_event(self,player_induced):
-        for log in self.player.logbook.values():
-            log.instance[0].search_in_SOF(self.player,False,0)
-            
-    def resource_prod_event(self):
-        for log in self.player.logbook.values():
-            if log.is_explored:
-                self.player.rp += log.instance[0].disc_rp/(self.month-log.time_of_exploration)
-                
-    def knowledge_prod_event(self):
-        for log in self.player.logbook.values():
-            if log.is_explored:
-                self.player.kp += log.instance[0].disc_kp/(self.month-log.time_of_exploration)
-                
-    def network_expenses_event(self):
-        cost = 0
-        for log in self.player.logbook.values():
-            if log.is_explored:
-                cost += 1
-                
-        self.player.rp -= cost
-                
-    def points_adjustement_event(self):
-        self.resource_prod_event()
-        self.knowledge_prod_event()
-                
     def run(self):
         '''set up'''
         black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
         black_bg.fill((0,0,25))        
         pygame.time.set_timer(USEREVENT + 1, 10000) # 1 event every 10 seconds
+        pygame.time.set_timer(USEREVENT + 2, 1000) # 1 event every 1 seconds
         
         while True:
             self.clock.tick(60) #needed to slow game down
@@ -113,11 +92,17 @@ class Game(object):
                     pygame.quit()
                     sys.exit()
                     print 'has quit'
+                elif event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                    print 'has quit'                       
+                elif event.type == USEREVENT + 2:
+                    self.interface.display_event = True
                 elif event.type == USEREVENT + 1:
                     self.month += 1 #adds a months of gametime every 10 seconds
-                    self.planet_discovery_event(False)
-                    self.points_adjustement_event()
-                    self.network_expenses_event()
+                    self.event_manager.planet_discovery_event(False)
+                    self.event_manager.points_adjustement_event()
+                    self.event_manager.network_expenses_event()
                 elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                     self.pressed_left_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 1:
@@ -130,14 +115,16 @@ class Game(object):
                     self.pressed_mid_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 3:
                     self.pressed_mid_clic = True                    
-#            if self.map_mode == True:
+
             '''Calling Display functions'''
             self.interface.screen.blit(black_bg,(0,0))
             planet = [ v for v in self.player.logbook.values()][0].instance[0]
             self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2),planet)
                 
             if self.planet_mode == True:
-                self.interface.view_planet(self.interface.selected)            
+                self.interface.view_planet(self.interface.selected)
+                
+            self.interface.final_overlay() #will only display messages when USEREVENT+2 has occured
                     
 
             
