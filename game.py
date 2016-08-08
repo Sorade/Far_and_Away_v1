@@ -61,6 +61,7 @@ class Game(object):
         self.pressed_right_clic = False
         self.map_mode = True
         self.planet_mode = False
+        self.pause = False
         
         
     def generate_planets(self):
@@ -95,10 +96,13 @@ class Game(object):
                 elif event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-                    print 'has quit'                       
+                    print 'has quit'        
+                elif event.type == pygame.KEYDOWN and event.key == K_SPACE:
+                    if self.pause == True: self.pause = False
+                    elif self.pause == False: self.pause = True
                 elif event.type == USEREVENT + 2:
                     self.interface.display_event = True
-                elif event.type == USEREVENT + 1:
+                elif event.type == USEREVENT + 1 and self.pause == False:
                     self.month += 1 #adds a months of gametime every 10 seconds
                     self.event_manager.planet_discovery_event(False)
                     self.event_manager.points_adjustement_event()
