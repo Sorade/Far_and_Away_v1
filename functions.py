@@ -9,6 +9,9 @@ import random
 
 def dist(point1, point2):
     return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**0.5
+
+def kp_formula(planet,game_time,exploration_time):
+    return planet.disc_rp/(game_time-exploration_time)
     
 def steps(point1, point2, dx, dy):
     x1,y1 = point1[0],point1[1]

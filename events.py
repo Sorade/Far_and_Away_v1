@@ -4,7 +4,7 @@ Created on Mon Aug 08 12:07:13 2016
 
 @author: Julien
 """
-
+import functions as fn
 
 class Event_Manager(object):
     def __init__(self,game):
@@ -17,7 +17,7 @@ class Event_Manager(object):
     def resource_prod_event(self):
         for log in self.game.player.logbook.values():
             if log.is_explored:
-                self.game.player.rp += log.instance[0].disc_rp/(self.game.month-log.time_of_exploration)
+                self.game.player.rp += fn.kp_formula(log.instance[0],self.game.month,log.time_of_exploration)
                 
     def knowledge_prod_event(self):
         for log in self.game.player.logbook.values():
