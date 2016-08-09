@@ -45,12 +45,12 @@ class Game(object):
             if x >= delay and len(p.planets_in_SOF) >= 4:
                 self.player.location = temp_name
                 p.chance_of_discovery = 100
-                p.kp = 10
-                p.rp = 10
+                p.disc_kp,p.disc_rp = 10,10
                 p.unveil(self.player,False,0)
                 steps = fn.steps(self.player.logbook[temp_name].instance[0].pos,p.pos,self.dx,self.dy)
                 self.player.rp += steps*steps+1
                 p.explore(self.player)
+                p.disc_kp,p.disc_rp = 5,5 #starting values
                 break
             temp_name = p.name
             x += 1
@@ -116,9 +116,9 @@ class Game(object):
                 elif event.type == MOUSEBUTTONUP and event.button == 2:
                     self.pressed_mid_clic = True                    
                 elif event.type == MOUSEBUTTONDOWN and event.button == 3:
-                    self.pressed_mid_clic = True
+                    self.pressed_right_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 3:
-                    self.pressed_mid_clic = True                    
+                    self.pressed_right_clic = True                    
 
             '''Calling Display functions'''
             self.interface.screen.blit(black_bg,(0,0))
@@ -126,7 +126,6 @@ class Game(object):
             self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2),planet)
                 
             self.interface.final_overlay() #will only display messages when USEREVENT+2 has occured
-                    
 
             
             pygame.display.update()

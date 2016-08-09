@@ -19,6 +19,8 @@ class Interface(object):
         self.messages = []
         self.message_disp_time = 0
         self.display_event = False
+        '''variables'''
+        self.hoovered = None
         
     def centered_offset(self,offset):
         x,y = offset[0],offset[1]
@@ -41,33 +43,39 @@ class Interface(object):
             if self.game.player.logbook[p.name].is_discovered == True:
                 [pygame.draw.line(self.screen, (0,250,0), p.pos, p2.pos, 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_explored and self.game.player.logbook[p.name].is_explored]
                 planets_to_blit.append(p)
+                if p.rect.collidepoint(pygame.mouse.get_pos()) : self.hoovered = p
                 
         for p in planets_to_blit:
-            if p.rect.collidepoint(pygame.mouse.get_pos()):# and pygame.mouse.get_pressed()[0]:
-                self.view_planet()
             if self.game.player.logbook[p.name].is_discovered == True:
                 if self.game.player.logbook[p.name].is_explored == False:
                     pygame.draw.circle(self.screen, (255,0,0), p.pos, int(p.rect.w*0.6), 0)
                 if self.game.player.location == p.name:
                     pygame.draw.circle(self.screen, (0,255,0), p.pos, int(p.rect.w*0.75), 0)
                 fn.blitc(self.screen, Data.images_planets[p.img_ref], p.pos)
-                
+                                
             '''Mouse interaction'''
             if p.rect.collidepoint(pygame.mouse.get_pos()):
-                if pygame.mouse.get_pressed()[2]:
+                if pygame.mouse.get_pressed()[0]:
                     if self.game.player.logbook[p.name].is_explored == False:
                         p.explore(self.game.player)
                     else:
                         p.visit(self.game.player)
-                elif pygame.mouse.get_pressed()[1] and self.game.pressed_mid_clic == True:
+                elif pygame.mouse.get_pressed()[2] and self.game.pressed_right_clic == True:
                     p.search_in_SOF(self.game.player,True,30)
-                    self.game.pressed_mid_clic = False
+                    self.game.pressed_right_clic = False
+                    
+            '''blitting planet info'''
+            self.view_planet()
+
               
             
     def view_planet(self):
-        planet_list = [planet for planet in (log.instance[0] for log in self.game.player.logbook.values()) if planet.rect.collidepoint(pygame.mouse.get_pos())]
-        if len(planet_list) > 0: 
-            planet = planet_list[0]
+        #planet_list = [planet for planet in (log.instance[0] for log in self.game.player.logbook.values()) if planet.rect.collidepoint(pygame.mouse.get_pos())]
+        #if len(planet_list) > 0: 
+            #planet = planet_list[0]
+        if self.hoovered is not None:
+            planet = self.hoovered
+            self.hoovered = None
             
             m_x,m_y = pygame.mouse.get_pos()
             offset_w,offset_h = 300,220
