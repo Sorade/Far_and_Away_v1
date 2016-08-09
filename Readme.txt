@@ -5,7 +5,7 @@ Far and Away is set in a distant future (or maby not so distant ... ) where huma
 At the start of the game you will be about to leave your home world for the far reaches of Space. As you will exlopre new worlds humanity will follow in your path exploiting the worlds you have explored to provide you with some knowledge and ressources to continue your journey, and that of humanity. Beware, though, with time the resources and knowledge provided by the worlds you have explore will become insignificant yet you will still have to sustain your fleet. Hence, if you want to survive, and with you humanity, you have to manage your knowledge and resource, wait for peaks in production to explore, know when to spend extra knowledge to aquier resources ... or the opposite.
 
 --Aim of the Game--
-Explore as many planets as possible !!
+Explore as many planets as possible before running out of points !!
 
 -- How to play --
 left-click : Nothing for the moment (needs to be adjusted)
