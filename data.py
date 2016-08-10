@@ -22,7 +22,10 @@ class Data(object):
     
     images_planets = {'Venus' : image_venus}
     
-    event_images = {'Precious Ore Discovered': img_import('mining_event.png',(550,310))}
+    event_images = {'Precious Ore Discovered': img_import('mining_event.png',(550,310)),
+                    'Raiders': img_import('raider_event.png',(550,310)),
+                    'Storm': img_import('storm_event.png',(550,310)),
+                    'Old Archives': img_import('old_archives_event.png',(550,310))}
     
     '''planet names'''
     planet_names = ['Stella','Orma','Rupa','Gamma','Ortia','Zima','Fita','Bella','Ursa']

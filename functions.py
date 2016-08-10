@@ -6,17 +6,19 @@ Created on Sat Aug 06 10:00:25 2016
 """
 import pygame
 import random
+import numpy as np
 
 def dist(point1, point2):
     return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**0.5
 
-def kp_formula(planet,game_time,exploration_time):
-    denom = game_time-exploration_time if game_time-exploration_time != 0 else 1
-    return planet.disc_kp/denom
+def kp_formula(planet,game_time,exploration_time,bonus):
+    dt = game_time - exploration_time if game_time != exploration_time else 1
+    return int(abs(np.sin(dt)*planet.disc_kp*np.exp(-0.025*dt))+bonus)
     
-def rp_formula(planet,game_time,exploration_time):
-    denom = game_time-exploration_time if game_time-exploration_time != 0 else 1
-    return planet.disc_rp/denom
+def rp_formula(planet,game_time,exploration_time,bonus):
+    dt = game_time - exploration_time if game_time != exploration_time else 1
+    return int(planet.disc_rp + bonus * np.exp(-( planet.disc_rp /500)*dt)*(np.cos(2*np.pi*dt)))
+    
     
 def travel_formula(steps):
     return steps*steps

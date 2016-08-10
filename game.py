@@ -59,7 +59,7 @@ class Game(object):
         self.pressed_left_clic = False 
         self.pressed_mid_clic = False
         self.pressed_right_clic = False
-#        self.map_mode = True
+        self.map_active = True
 #        self.planet_mode = False
         self.pause = False
         
@@ -107,6 +107,7 @@ class Game(object):
                     self.interface.display_event = True
                 elif event.type == USEREVENT + 1 and self.pause == False:
                     self.month += 1 #adds a months of gametime every 10 seconds
+                    self.event_manager.get_random_event()
                     self.event_manager.planet_discovery_event(False)
                     self.event_manager.points_adjustement_event()
                     self.event_manager.network_expenses_event()
