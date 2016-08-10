@@ -50,7 +50,7 @@ class Game(object):
                 steps = fn.steps(self.player.logbook[temp_name].instance[0].pos,p.pos,self.dx,self.dy)
                 self.player.rp += steps*steps+1
                 p.explore(self.player)
-                p.disc_kp,p.disc_rp = 5,5 #starting values
+                p.disc_kp,p.disc_rp = 8,8 #starting values
                 break
             temp_name = p.name
             x += 1
