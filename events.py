@@ -5,10 +5,12 @@ Created on Mon Aug 08 12:07:13 2016
 @author: Julien
 """
 import functions as fn
+import random
 
 class Event_Manager(object):
     def __init__(self,game):
         self.game = game
+        self.event_list = [Event('Precious Ore Discovered',8)]
     
     def planet_discovery_event(self,player_induced):
         for log in self.game.player.logbook.values():
@@ -35,3 +37,11 @@ class Event_Manager(object):
     def points_adjustement_event(self):
         self.resource_prod_event()
         self.knowledge_prod_event()
+        
+        
+class Event(object):
+    def __init__(self, name, weight):
+        self.name = name
+        self.weight = weight
+        self.text ='''An ore of precious metal has been found in one of your colonies. It will surely increase our production for a few more years.'''
+    

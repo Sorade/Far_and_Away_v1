@@ -100,6 +100,9 @@ class Game(object):
                 elif event.type == pygame.KEYDOWN and event.key == K_SPACE:
                     if self.pause == True: self.pause = False
                     elif self.pause == False: self.pause = True
+                elif event.type == pygame.KEYDOWN and event.key == K_h:
+                    if self.interface.helpers == True: self.interface.helpers = False
+                    elif self.interface.helpers == False: self.interface.helpers = True                        
                 elif event.type == USEREVENT + 2:
                     self.interface.display_event = True
                 elif event.type == USEREVENT + 1 and self.pause == False:
@@ -122,11 +125,10 @@ class Game(object):
 
             '''Calling Display functions'''
             self.interface.screen.blit(black_bg,(0,0))
-            planet = [ v for v in self.player.logbook.values()][0].instance[0]
-            self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2),planet)
-                
+            self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2))
+            self.interface.event_popup()    
             self.interface.final_overlay() #will only display messages when USEREVENT+2 has occured
-
+            
             
             pygame.display.update()
             t1 = time.time()
