@@ -29,17 +29,17 @@ class Game(object):
         self.interface = interface.Interface(self)
         self.clock = pygame.time.Clock() #set timer which is used to slow game down
         self.month = 0
-
-        '''Create Planets'''
-        self.all_planets = pygame.sprite.Group()
-        self.dx, self.dy = self.generate_planets()
-        [p.get_in_SOF() for p in self.all_planets]
+        
         '''create explorers and player'''
         self.all_explorers = [explorers.Explorer(self) for x in range (2)]
         self.player = explorers.Explorer(self)
+
+        '''Create Planets'''
+        self.all_planets = pygame.sprite.Group()
+        for x in range(2): self.all_planets.add(planets.Planet(self,(config.Config.screen_w/2,config.Config.screen_h/2)))
         
         '''assign starting planet to player only'''
-        delay, x = 20, 0
+        delay, x = 1, 0
         temp_name = 0
         for p in self.all_planets:
             if x >= delay and len(p.planets_in_SOF) >= 4:
@@ -48,7 +48,7 @@ class Game(object):
                 p.disc_kp,p.disc_rp = 10,10
                 p.unveil(self.player,False,0)
                 steps = fn.steps(self.player.logbook[temp_name].instance[0].pos,p.pos,self.dx,self.dy)
-                self.player.rp += steps*steps+1
+                self.player.rp += steps*steps+1000
                 p.explore(self.player)
                 p.disc_kp,p.disc_rp = 8,8 #starting values
                 break
@@ -64,17 +64,9 @@ class Game(object):
         self.pause = False
         
         
-    def generate_planets(self):
-        offset = 50
-        w = config.Config.screen_w-offset
-        h = config.Config.screen_h-offset
-        
-        row_nb,col_nb = 5,10
-        for row in range(offset/2, int(h - offset), h/row_nb):
-            for col in range(offset/2, int(w + offset*1.5), w/col_nb):
-                self.all_planets.add(planets.Planet(self,(col,row)))
-                
-        return w/col_nb, h/row_nb
+    def initial_planet(self):
+        self.all_planets.add(planets.Planet(self,(config.Config.screen_w/2,config.Config.screen_h/2)))
+        for p in self.all_planets: p.pop_around()
                 
                        
     def run(self):
@@ -87,7 +79,12 @@ class Game(object):
         while True:
             self.clock.tick(60) #needed to slow game down
             t0 = time.time()
-                        
+            
+            for p in self.all_planets:
+                print p.name
+            print  self.player.logbook
+
+            
             for event in pygame.event.get(): #setting up quit
                 if event.type == QUIT:
                     pygame.quit()

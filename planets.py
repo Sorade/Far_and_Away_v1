@@ -5,9 +5,11 @@ Created on Fri Aug 05 18:38:25 2016
 @author: Julien
 """
 import random
+import numpy as np
 import pygame
 import data
 import sprite
+import logbook as lgbk
 import functions as fn
 
 class Planet(sprite.MySprite):
@@ -29,7 +31,28 @@ class Planet(sprite.MySprite):
         self.rect = data.Data.images_planets[self.img_ref].get_rect()
         self.rect.center = pos
         
+    def add_to_logbook(self,explorer):
+        explorer.logbook[self.name] = lgbk.Logbook(self,False,False)
+        
+    def pop_around(self):
+        ox,oy = self.pos
+        self.get_in_SOF()
+        while len(self.planets_in_SOF) <= 3:
+            pop_dist = random.randint(self.radius/2,self.radius)
+            pop_angle = random.randint(0,int(2*np.pi))
+            new_p = Planet(self.game,(int(np.cos(pop_angle)*pop_dist),int(np.sin(pop_angle)*pop_dist)))
+            if fn.check_collision(new_p,self.planets_in_SOF) == False:
+                self.planets_in_SOF.append(new_p) 
+                self.game.all_planets.add(new_p)
+                new_p.add_to_logbook(self.game.player)
+            
+        
     def unveil(self,explorer,player_induced,bonus):
+        try:
+            explorer.logbook[self.name]
+        except:
+            self.add_to_logbook(self.game.player)
+        
         if player_induced == True  and explorer.kp >= 5:
             explorer.kp -= 5
             if explorer.logbook[self.name].is_discovered == False and self.chance_of_discovery+bonus >= random.randint(0,100):

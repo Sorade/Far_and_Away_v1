@@ -8,6 +8,12 @@ import pygame
 import random
 import numpy as np
 
+def check_collision(item,list):
+    for x in list:
+        if item.rect.colliderect(x.rect):
+            return True
+    return False
+
 def dist(point1, point2):
     return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**0.5
 
