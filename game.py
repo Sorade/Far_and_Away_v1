@@ -45,12 +45,12 @@ class Game(object):
             if x >= delay and len(p.planets_in_SOF) >= 4:
                 self.player.location = temp_name
                 p.chance_of_discovery = 100
-                p.kp = 10
-                p.rp = 10
+                p.disc_kp,p.disc_rp = 10,10
                 p.unveil(self.player,False,0)
                 steps = fn.steps(self.player.logbook[temp_name].instance[0].pos,p.pos,self.dx,self.dy)
                 self.player.rp += steps*steps+1
                 p.explore(self.player)
+                p.disc_kp,p.disc_rp = 8,8 #starting values
                 break
             temp_name = p.name
             x += 1
@@ -59,8 +59,8 @@ class Game(object):
         self.pressed_left_clic = False 
         self.pressed_mid_clic = False
         self.pressed_right_clic = False
-        self.map_mode = True
-        self.planet_mode = False
+        self.map_active = True
+#        self.planet_mode = False
         self.pause = False
         
         
@@ -81,7 +81,7 @@ class Game(object):
         '''set up'''
         black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
         black_bg.fill((0,0,25))        
-        pygame.time.set_timer(USEREVENT + 1, 10000) # 1 event every 10 seconds
+        pygame.time.set_timer(USEREVENT + 1, 5000) # 1 event every 10 seconds
         pygame.time.set_timer(USEREVENT + 2, 1000) # 1 event every 1 seconds
         
         while True:
@@ -100,10 +100,14 @@ class Game(object):
                 elif event.type == pygame.KEYDOWN and event.key == K_SPACE:
                     if self.pause == True: self.pause = False
                     elif self.pause == False: self.pause = True
+                elif event.type == pygame.KEYDOWN and event.key == K_h:
+                    if self.interface.helpers == True: self.interface.helpers = False
+                    elif self.interface.helpers == False: self.interface.helpers = True                        
                 elif event.type == USEREVENT + 2:
                     self.interface.display_event = True
                 elif event.type == USEREVENT + 1 and self.pause == False:
                     self.month += 1 #adds a months of gametime every 10 seconds
+                    self.event_manager.get_random_event()
                     self.event_manager.planet_discovery_event(False)
                     self.event_manager.points_adjustement_event()
                     self.event_manager.network_expenses_event()
@@ -116,21 +120,16 @@ class Game(object):
                 elif event.type == MOUSEBUTTONUP and event.button == 2:
                     self.pressed_mid_clic = True                    
                 elif event.type == MOUSEBUTTONDOWN and event.button == 3:
-                    self.pressed_mid_clic = True
+                    self.pressed_right_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 3:
-                    self.pressed_mid_clic = True                    
+                    self.pressed_right_clic = True                    
 
             '''Calling Display functions'''
             self.interface.screen.blit(black_bg,(0,0))
-            planet = [ v for v in self.player.logbook.values()][0].instance[0]
-            self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2),planet)
-                
-            if self.planet_mode == True:
-                self.interface.view_planet(self.interface.selected)
-                
+            self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2))
+            self.interface.event_popup()    
             self.interface.final_overlay() #will only display messages when USEREVENT+2 has occured
-                    
-
+            
             
             pygame.display.update()
             t1 = time.time()

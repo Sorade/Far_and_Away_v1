@@ -5,22 +5,25 @@ Created on Sat Aug 06 10:06:08 2016
 @author: julien
 """
 import pygame
+import matplotlib as plt
 import functions as fn
 from config import*
 from data import*
+
 
 class Interface(object):
     def __init__(self,game):
         self.game = game
         '''setting screen up'''
         self.screen = Config.screen
-        self.menu_bg = pygame.Surface((Config.screen_w,Config.screen_h))
-        self.menu_bg.set_alpha(150)
         self.selected = None
         '''message manager'''
         self.messages = []
         self.message_disp_time = 0
         self.display_event = False
+        '''variables'''
+        self.hoovered = None
+        self.helpers = False
         
     def centered_offset(self,offset):
         x,y = offset[0],offset[1]
@@ -31,115 +34,150 @@ class Interface(object):
         '''blit pause status'''
         if self.game.pause: fn.display_txt('Game Paused','Impact',16,(0,255,0),self.screen,(int(Config.screen_w*0.75),15))
         '''blit time in months'''
-        fn.display_txt('Month Since Start: {}'.format(self.game.month),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,15))
+        fn.display_txt('Current Month: {}'.format(self.game.month),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,15))
         '''blit the player's points'''
-        fn.display_txt('Your KP: {}'.format(self.game.player.kp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,50))
-        fn.display_txt('Your RP: {}'.format(self.game.player.rp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,75))                    
+        fn.display_txt('Your KP: {}'.format(self.game.player.kp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-350,Config.screen_h-30))
+        fn.display_txt('Your RP: {}'.format(self.game.player.rp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-150,Config.screen_h-30))                    
 
         
-    def view_solarsys(self,offset,planet):
+    def view_solarsys(self,offset):
         planets_to_blit = []
         for p in self.game.all_planets:
             if self.game.player.logbook[p.name].is_discovered == True:
-                [pygame.draw.line(self.screen, (0,255,0), p.pos, p2.pos, 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_explored and self.game.player.logbook[p.name].is_explored]
+                [pygame.draw.line(self.screen, (0,250,0), p.pos, p2.pos, 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_explored and self.game.player.logbook[p.name].is_explored]
                 planets_to_blit.append(p)
+                if p.rect.collidepoint(pygame.mouse.get_pos()) : self.hoovered = p
                 
         for p in planets_to_blit:
-            if p.rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]:
-                self.game.map_mode = False
-                self.game.planet_mode = True
-                self.selected = p
-                return
             if self.game.player.logbook[p.name].is_discovered == True:
                 if self.game.player.logbook[p.name].is_explored == False:
                     pygame.draw.circle(self.screen, (255,0,0), p.pos, int(p.rect.w*0.6), 0)
                 if self.game.player.location == p.name:
                     pygame.draw.circle(self.screen, (0,255,0), p.pos, int(p.rect.w*0.75), 0)
                 fn.blitc(self.screen, Data.images_planets[p.img_ref], p.pos)
-                
+                                
             '''Mouse interaction'''
-            if p.rect.collidepoint(pygame.mouse.get_pos()):
-                if pygame.mouse.get_pressed()[2]:
+            if p.rect.collidepoint(pygame.mouse.get_pos()) and self.game.map_active:
+                if pygame.mouse.get_pressed()[0]:
                     if self.game.player.logbook[p.name].is_explored == False:
                         p.explore(self.game.player)
                     else:
                         p.visit(self.game.player)
-                elif pygame.mouse.get_pressed()[1] and self.game.pressed_mid_clic == True:
+                elif pygame.mouse.get_pressed()[2] and self.game.pressed_right_clic == True:
                     p.search_in_SOF(self.game.player,True,30)
-                    self.game.pressed_mid_clic = False
+                    self.game.pressed_right_clic = False
+                    
+            '''blitting planet info'''
+            self.view_planet()
+
               
             
-    def view_planet(self,planet):
-        self.screen.blit(self.menu_bg,(0,0))
-        '''make buttons'''
-        go_to_button = Button('Travel to',planet,50,Config.screen_h-50)
-        search_button = Button('Search SOF',planet,150,Config.screen_h-50)
-        view_solarsys_but = Button('View Solar System',planet,350,Config.screen_h-50)
-        
-        buttons = []
-        buttons.extend([go_to_button,view_solarsys_but,search_button])
-        
-        ''' blit all the planet's stats to the screen'''
-        if self.game.player.name in planet.explored_by:
-            info_ls = [planet.name,planet.pos,planet.discovered_by,planet.explored_by,planet.disc_kp,planet.disc_rp]
-        else:
-            info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp]
-        x,y = 50,50
-        
-        cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP '}
-        
-        count = 0
-        for stat in info_ls:
-            if type(stat) is list:
-                to_blit = ', '.join(stat)
-            else:
-                to_blit = stat
-            to_blit = cats[count]+ str(to_blit)
-            fn.display_txt(to_blit,'Lucida Console',16,(0,255,0),self.screen,(x,y))
-            y += 20
-            count += 1
+    def view_planet(self):
+        if self.hoovered is not None:
+            planet = self.hoovered
+            self.hoovered = None
             
-        for but in buttons:
-            but.check_select()
-            but.display(self.screen)
-        
-        if go_to_button.selected == True:
-            if self.game.player.logbook[planet.name].is_explored == False:
-                planet.explore(self.game.player)
-            else:
-                planet.visit(self.game.player)
-                
-        elif search_button.selected == True and self.game.pressed_left_clic == True:
-            planet.search_in_SOF(self.game.player,True,30)
-            self.game.pressed_left_clic = False
-                
-        elif view_solarsys_but.selected == True:
-            self.game.planet_mode = False
-            self.game.map_mode = True
+            m_x,m_y = pygame.mouse.get_pos()
+            offset_w,offset_h = 300,220
             
+            if m_x <= Config.screen_w-offset_w and m_y <= Config.screen_h-offset_h:
+                blitpos = (m_x,m_y)
+            elif m_x > Config.screen_w-offset_w and m_y > Config.screen_h-offset_h:
+                blitpos = (m_x-offset_w,m_y-offset_h)
+            elif m_x > Config.screen_w-offset_w:
+                blitpos = (m_x-offset_w,m_y)
+            elif m_y > Config.screen_h-offset_h:
+                blitpos = (m_x,m_y-offset_h)
+                
+            '''blits bg '''
+            tooltip_bg = pygame.Surface((offset_w,offset_h))
+            tooltip_bg.set_alpha(125)
+            self.screen.blit(tooltip_bg,blitpos)
+            
+            ''' blit all the planet's stats to the screen'''
+            if self.game.player.name in planet.explored_by:
+                info_ls = [
+                planet.name,
+                planet.pos,
+                planet.discovered_by,
+                planet.explored_by,
+                '{} (+{}/month)'.format(planet.disc_kp,fn.kp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.kp_bonus)),
+                '{} (+{}/month)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.rp_bonus)),
+                fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,self.game.dx,self.game.dy))]
+            else:
+                info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp,10+fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,self.game.dx,self.game.dy))]
+            x,y = blitpos[0],blitpos[1]
+            
+            cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP ', 6:'Travel cost: '}
+            
+            count = 0
+            for stat in info_ls:
+                if type(stat) is list:
+                    to_blit = ', '.join(stat)
+                else:
+                    to_blit = stat                
+                to_blit = cats[count]+ str(to_blit)
+                fn.display_txt(to_blit,'Lucida Console',16,(0,255,0),self.screen,(x,y))
+                y += 20
+                count += 1
+                
     def add_message(self,msg,disp_time):
         self.messages.append(msg)
         self.message_disp_time += disp_time #adds x seconds to the message timer
         
     def message_display(self):
-        if self.display_event == True:
+        if self.display_event == True: #displays on call to USEREVENT+2 in game.py
             '''removes 1 second from the display timer'''
             self.message_disp_time -= 1
             if self.message_disp_time < 0: self.message_disp_time = 0
+        self.display_event = False #disable the display until the next call to USEREVENT+2 in game.py
 
         if len(self.messages) >= 15: self.messages.pop(0) #ensure message list isn't too long
 
-        if self.message_disp_time > 0:
+        if self.message_disp_time > 0 and self.helpers:
             '''displays messages'''
             x = 0
             for msg in self.messages:
                 fn.display_txt(msg,'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,Config.screen_h/3+x))
                 x += 25
-        else:
+        elif self.message_disp_time <= 0:
             self.messages = [] #if the message timer reaches 0 the messages are deleted
-        self.display_event = False #disable the display until the next call to USEREVENT+2 in game.py
             
+#    def graph_display(self):
+#        next_month_rp = 0
+#        next_month_kp = 0
+#        for log in (for log in self.game.player.logbook.values() if log.is_explored):
+#            fn.kp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.kp_bonus)
+#            fn.rp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.rp_bonus)
+#            plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
+            
+    def event_popup(self):
+        '''get event from event manager and assign it locally'''
+        event = self.game.event_manager.active_event
+        if event is not None:
+            self.game.pause = True
+            '''blits popup bg '''
+            tooltip_bg = Data.backgrounds['event']
+            tooltip_bg.set_alpha(50)
+            tooltip_rect = tooltip_bg.get_rect()
+            fn.blitc(self.screen,tooltip_bg,(Config.screen_w/2,Config.screen_h/2))
+            '''blit event's img'''
+            fn.blitc(self.screen,Data.event_images[event.name],(Config.screen_w/2,Config.screen_h/2-115)) #-50 to adjust image to pupup bg
+            '''blit event's text'''
+            text_zone = pygame.Rect((Config.screen_w/2-300,Config.screen_h/2+50),(tooltip_rect.w-50,300))
+            fn.drawText(self.screen,event.text,(0,255,0),text_zone, pygame.font.SysFont('Lucida Console', 15))
+            '''button actions'''
+            okay_but = Button('Approve',event,Config.screen_w/2+15,Config.screen_h/2+210)
+            okay_but.check_select()
+            okay_but.display(self.screen)
+            
+            if okay_but.selected:
+                self.game.pause = False
+                event.execute()
+                self.game.event_manager.active_event = None
+                self.game.map_active = True
 
+            
         
         
                

@@ -22,8 +22,8 @@ class Planet(sprite.MySprite):
         self.planets_in_SOF = []
         self.chance_of_discovery = random.randint(0,10)
         self.diameter = random.randint(5,50)
-        self.disc_kp = random.randint(0,20)
-        self.disc_rp = random.randint(0,20)
+        self.disc_kp = random.randint(0,12)
+        self.disc_rp = random.randint(0,12)
         self.img_ref = 'Venus'
         
         self.rect = data.Data.images_planets[self.img_ref].get_rect()
@@ -44,16 +44,16 @@ class Planet(sprite.MySprite):
     def explore(self, explorer):
         if explorer.logbook[self.name].is_explored == False:
             test = self.visit(explorer)
-            '''remove the visit message so that the exploration message
-            occurs first. If the test is true then the message will be re-added
-            at the end of the message list (after exploration msg)'''
-            visit_msg = self.game.interface.messages[-1]
-            self.game.interface.messages.remove(visit_msg)
             if test == True:
+                '''remove the visit message so that the exploration message
+                occurs first. If the test is true then the message will be re-added
+                at the end of the message list (after exploration msg)'''
+                visit_msg = self.game.interface.messages[-1]
+                self.game.interface.messages.remove(visit_msg)                
                 explorer.logbook[self.name].is_explored = True
                 explorer.logbook[self.name].time_of_exploration = self.game.month
                 explorer.kp += self.disc_kp
-                explorer.rp += self.disc_rp -10
+                explorer.rp += self.disc_rp -10 #-10 is the exploration malus
                 self.explored_by.append(explorer.name)
                 self.game.interface.add_message('Player explored {}'.format(self.name),1)
                 self.game.interface.add_message(visit_msg,1)
