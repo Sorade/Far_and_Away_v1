@@ -7,6 +7,7 @@ Created on Sat Aug 06 10:00:25 2016
 import pygame
 import random
 import numpy as np
+from math import pi,radians,sin,cos
 
 def check_collision(item,list):
     for x in list:
@@ -25,6 +26,10 @@ def rp_formula(planet,game_time,exploration_time,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
     return int(planet.disc_rp + bonus * np.exp(-( planet.disc_rp /500)*dt)*(np.cos(2*np.pi*dt)))
     
+def point_pos(pt, d, theta_rad):
+    x0, y0 = pt
+    #theta_rad = pi/2 - radians(theta)
+    return (int(x0 + d*cos(theta_rad)), int(y0 + d*sin(theta_rad)))  
     
 def travel_formula(steps):
     return steps*steps

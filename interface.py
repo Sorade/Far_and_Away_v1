@@ -103,7 +103,7 @@ class Interface(object):
                 planet.explored_by,
                 '{} (+{}/month)'.format(planet.disc_kp,fn.kp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.kp_bonus)),
                 '{} (+{}/month)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.rp_bonus)),
-                fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,self.game.dx,self.game.dy))]
+                fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,100,100))]
             else:
                 info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp,10+fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,100,70))]
             x,y = blitpos[0],blitpos[1]

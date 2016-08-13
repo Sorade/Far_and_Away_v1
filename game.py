@@ -20,6 +20,7 @@ import interface
 import planets
 import explorers
 import config
+import logbook as lgbk
 import functions as fn
 import time
 
@@ -29,6 +30,8 @@ class Game(object):
         self.interface = interface.Interface(self)
         self.clock = pygame.time.Clock() #set timer which is used to slow game down
         self.month = 0
+        self.space_travel_unit = 200
+        self.dx,self.dy = 200,200
         
         '''create explorers and player'''
         self.all_explorers = [explorers.Explorer(self) for x in range (2)]
@@ -36,25 +39,19 @@ class Game(object):
 
         '''Create Planets'''
         self.all_planets = pygame.sprite.Group()
-        for x in range(2): self.all_planets.add(planets.Planet(self,(config.Config.screen_w/2,config.Config.screen_h/2)))
+        self.all_planets.add(planets.Planet(self,(config.Config.screen_w/2,config.Config.screen_h/2)))
         
         '''assign starting planet to player only'''
-        delay, x = 1, 0
-        temp_name = 0
         for p in self.all_planets:
-            if x >= delay and len(p.planets_in_SOF) >= 4:
-                self.player.location = temp_name
-                p.chance_of_discovery = 100
-                p.disc_kp,p.disc_rp = 10,10
-                p.unveil(self.player,False,0)
-                steps = fn.steps(self.player.logbook[temp_name].instance[0].pos,p.pos,self.dx,self.dy)
-                self.player.rp += steps*steps+1000
-                p.explore(self.player)
-                p.disc_kp,p.disc_rp = 8,8 #starting values
-                break
-            temp_name = p.name
-            x += 1
-        
+            self.player.logbook[p.name] = lgbk.Logbook(p,True,True)
+            self.player.logbook[p.name].time_of_exploration = self.month
+            p.discovered_by.append(self.player.name)
+            p.explored_by.append(self.player.name)
+            self.player.location = p.name
+            p.disc_kp,p.disc_rp = 10,10
+            p.radius = 500
+            p.pop_around()
+            
         '''setting up game switches'''
         self.pressed_left_clic = False 
         self.pressed_mid_clic = False
@@ -79,11 +76,6 @@ class Game(object):
         while True:
             self.clock.tick(60) #needed to slow game down
             t0 = time.time()
-            
-            for p in self.all_planets:
-                print p.name
-            print  self.player.logbook
-
             
             for event in pygame.event.get(): #setting up quit
                 if event.type == QUIT:

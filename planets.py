@@ -20,9 +20,9 @@ class Planet(sprite.MySprite):
         self.pos = pos
         self.discovered_by = []
         self.explored_by = []
-        self.radius = random.randint(0,300) #SOF
+        self.radius = random.randint(300,600) #SOF
         self.planets_in_SOF = []
-        self.chance_of_discovery = random.randint(0,10)
+        self.chance_of_discovery = 100#random.randint(0,15)
         self.diameter = random.randint(5,50)
         self.disc_kp = random.randint(0,12)
         self.disc_rp = random.randint(0,12)
@@ -38,9 +38,10 @@ class Planet(sprite.MySprite):
         ox,oy = self.pos
         self.get_in_SOF()
         while len(self.planets_in_SOF) <= 3:
-            pop_dist = random.randint(self.radius/2,self.radius)
-            pop_angle = random.randint(0,int(2*np.pi))
-            new_p = Planet(self.game,(int(np.cos(pop_angle)*pop_dist),int(np.sin(pop_angle)*pop_dist)))
+            pop_dist = random.randint(max(self.rect.w+30,self.radius/2),self.radius)
+            pop_angle = random.randint(0,int(np.pi))
+            new_p_pos = fn.point_pos(self.pos,pop_dist,pop_angle)#(int(np.cos(pop_angle)*pop_dist),int(np.sin(pop_angle)*pop_dist))
+            new_p = Planet(self.game,new_p_pos) 
             if fn.check_collision(new_p,self.planets_in_SOF) == False:
                 self.planets_in_SOF.append(new_p) 
                 self.game.all_planets.add(new_p)
@@ -48,21 +49,18 @@ class Planet(sprite.MySprite):
             
         
     def unveil(self,explorer,player_induced,bonus):
-        try:
-            explorer.logbook[self.name]
-        except:
-            self.add_to_logbook(self.game.player)
-        
         if player_induced == True  and explorer.kp >= 5:
             explorer.kp -= 5
             if explorer.logbook[self.name].is_discovered == False and self.chance_of_discovery+bonus >= random.randint(0,100):
                 explorer.logbook[self.name].is_discovered = True
                 self.discovered_by.append(explorer.name)
+                self.pop_around()
                 self.game.interface.add_message('Discovered {}'.format(self.name),1)
                 
         elif explorer.logbook[self.name].is_discovered == False and self.chance_of_discovery >= random.randint(0,100):
             explorer.logbook[self.name].is_discovered = True
             self.discovered_by.append(explorer.name)
+            self.pop_around()
         
     def explore(self, explorer):
         if explorer.logbook[self.name].is_explored == False:
