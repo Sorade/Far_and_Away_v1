@@ -22,7 +22,7 @@ class Planet(sprite.MySprite):
         self.explored_by = []
         self.radius = random.randint(300,600) #SOF
         self.planets_in_SOF = []
-        self.chance_of_discovery = 100#random.randint(0,15)
+        self.chance_of_discovery = random.randint(0,15)
         self.diameter = random.randint(5,50)
         self.disc_kp = random.randint(0,12)
         self.disc_rp = random.randint(0,12)
@@ -37,7 +37,8 @@ class Planet(sprite.MySprite):
     def pop_around(self):
         ox,oy = self.pos
         self.get_in_SOF()
-        while len(self.planets_in_SOF) <= 3:
+        x = 0
+        while x < 3:#len(self.planets_in_SOF) <= 3:
             pop_dist = random.randint(max(self.rect.w+30,self.radius/2),self.radius)
             pop_angle = random.randint(0,int(np.pi))
             new_p_pos = fn.point_pos(self.pos,pop_dist,pop_angle)#(int(np.cos(pop_angle)*pop_dist),int(np.sin(pop_angle)*pop_dist))
@@ -46,6 +47,7 @@ class Planet(sprite.MySprite):
                 self.planets_in_SOF.append(new_p) 
                 self.game.all_planets.add(new_p)
                 new_p.add_to_logbook(self.game.player)
+            x += 1
             
         
     def unveil(self,explorer,player_induced,bonus):

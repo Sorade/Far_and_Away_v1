@@ -24,7 +24,21 @@ class Interface(object):
         '''variables'''
         self.hoovered = None
         self.helpers = False
+        self.map_offset_x = 0
+        self.map_offset_y = 0
         
+    def get_map_offset(self):
+        mx,my = pygame.mouse.get_pos()
+        if mx <= 10:
+            self.map_offset_x += 1
+        elif mx >= Config.screen_w-10:
+            self.map_offset_x -= 1
+            
+        if my <= 10:
+            self.map_offset_y += 1
+        elif my >= Config.screen_h-10:
+            self.map_offset_y -= 1     
+
     def centered_offset(self,offset):
         x,y = offset[0],offset[1]
         return (self.screen.get_rect().centerx-x,self.screen.get_rect().centery-y)
@@ -44,20 +58,23 @@ class Interface(object):
         planets_to_blit = []
         for p in [log.instance[0] for log in self.game.player.logbook.itervalues()]:
             if self.game.player.logbook[p.name].is_discovered == True:
-                [pygame.draw.line(self.screen, (0,250,0), p.pos, p2.pos, 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_explored and self.game.player.logbook[p.name].is_explored]
+                [pygame.draw.line(self.screen, (0,250,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), fn.sum_tulp(p2.pos,(self.map_offset_x,self.map_offset_y)), 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_explored and self.game.player.logbook[p.name].is_explored]
                 planets_to_blit.append(p)
-                if p.rect.collidepoint(pygame.mouse.get_pos()) : self.hoovered = p
+                '''offset the planet's rect for the check'''
+                offset_rect = pygame.Rect(fn.sum_tulp(p.rect.topleft,(self.map_offset_x,self.map_offset_y)),(p.rect.w,p.rect.h))
+                if offset_rect.collidepoint(pygame.mouse.get_pos()) : self.hoovered = p
                 
         for p in planets_to_blit:
             if self.game.player.logbook[p.name].is_discovered == True:
                 if self.game.player.logbook[p.name].is_explored == False:
-                    pygame.draw.circle(self.screen, (255,0,0), p.pos, int(p.rect.w*0.6), 0)
+                    pygame.draw.circle(self.screen, (255,0,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.6), 0)
                 if self.game.player.location == p.name:
-                    pygame.draw.circle(self.screen, (0,255,0), p.pos, int(p.rect.w*0.75), 0)
-                fn.blitc(self.screen, Data.images_planets[p.img_ref], p.pos)
+                    pygame.draw.circle(self.screen, (0,255,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.75), 0)
+                fn.blitc(self.screen, Data.images_planets[p.img_ref], fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)))
                                 
             '''Mouse interaction'''
-            if p.rect.collidepoint(pygame.mouse.get_pos()) and self.game.map_active:
+            offset_rect = pygame.Rect(fn.sum_tulp(p.rect.topleft,(self.map_offset_x,self.map_offset_y)),(p.rect.w,p.rect.h))
+            if offset_rect.collidepoint(pygame.mouse.get_pos()) and self.game.map_active:
                 if pygame.mouse.get_pressed()[0]:
                     if self.game.player.logbook[p.name].is_explored == False:
                         p.explore(self.game.player)

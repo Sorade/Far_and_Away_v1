@@ -114,6 +114,7 @@ class Game(object):
                     self.pressed_right_clic = True                    
 
             '''Calling Display functions'''
+            self.interface.get_map_offset()
             self.interface.screen.blit(black_bg,(0,0))
             self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2))
             self.interface.event_popup()    
