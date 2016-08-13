@@ -161,14 +161,27 @@ class Interface(object):
         elif self.message_disp_time <= 0:
             self.messages = [] #if the message timer reaches 0 the messages are deleted
             
-#    def graph_display(self):
-#        next_month_rp = 0
-#        next_month_kp = 0
-#        for log in (for log in self.game.player.logbook.values() if log.is_explored):
-#            fn.kp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.kp_bonus)
-#            fn.rp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.rp_bonus)
-#            plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
+        if self.helpers: self.graph_display()
             
+            
+    def graph_display(self):
+        rp_pts = []
+        kp_pts = []
+        for month in range(1,11):
+            next_month_rp = 0
+            next_month_kp = 0
+            for log in (log for log in self.game.player.logbook.itervalues() if log.is_explored):
+                next_month_kp += fn.kp_formula(log.instance[0],self.game.month+month,log.time_of_exploration,self.game.player.kp_bonus)
+                next_month_rp += fn.rp_formula(log.instance[0],self.game.month+month,log.time_of_exploration,self.game.player.rp_bonus)
+            rp_pts.append((month,next_month_rp))
+            kp_pts.append((month,next_month_kp))
+        '''transfer data into graph compatible data'''
+        data,ylab,xlab = fn.get_graph_data(kp_pts,(100,300),(400,250))
+        
+        '''blit graph'''
+        pygame.draw.lines(self.screen, (0,255,0), False, data, 2)
+        [fn.display_txt(val,'Lucida Console',16,(0,255,0),self.screen,(x,y)) for x,y,val in ylab+xlab]
+        
     def event_popup(self):
         '''get event from event manager and assign it locally'''
         event = self.game.event_manager.active_event

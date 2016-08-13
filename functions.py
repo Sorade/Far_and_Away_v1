@@ -9,6 +9,23 @@ import random
 import numpy as np
 from math import pi,radians,sin,cos,acos
 
+'''takes a list of tulpe values and plots them in a graph
+of which the bottom left corner is set as o_pos and has 
+a width and height defined by the dim tulpe = to (w,h)'''
+def get_graph_data(list,o_pos,dim):
+    ox,oy = o_pos
+    w,h = dim
+    dx = float(w)/max([x-1 for x,y in list])
+    dy = float(h)/max([y for x,y in list])
+    data_pts = [(int(ox+(x-1)*dx),int(oy-y*dy)) for x,y in list]
+    #need to add a bg here
+    
+    #y axis labels
+    ylab_pts = [(ox,int(oy-y*dy),y) for x,y in list] # (x,y,val)
+    #x axis labels
+    xlab_pts = [(int(ox+(x-1)*dx),oy,x) for x,y in list]
+    return data_pts,ylab_pts,xlab_pts
+
 def check_collision(item,list):
     for x in list:
         if item.rect.inflate(50,50).colliderect(x.rect):
@@ -24,7 +41,7 @@ def kp_formula(planet,game_time,exploration_time,bonus):
     
 def rp_formula(planet,game_time,exploration_time,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
-    return int(planet.disc_rp + bonus * np.exp(-( planet.disc_rp/500)*dt)*(np.cos(4*np.pi*dt)))
+    return int(planet.disc_rp + bonus * np.exp(-( planet.disc_rp/500)*dt)*(np.cos(2*np.pi*dt)))
     
 def point_pos(pt, d, theta_rad):
     x0, y0 = pt
