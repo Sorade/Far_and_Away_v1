@@ -29,15 +29,16 @@ class Interface(object):
         
     def get_map_offset(self):
         mx,my = pygame.mouse.get_pos()
+        delta = 7
         if mx <= 10:
-            self.map_offset_x += 1
+            self.map_offset_x += delta
         elif mx >= Config.screen_w-10:
-            self.map_offset_x -= 1
+            self.map_offset_x -= delta
             
         if my <= 10:
-            self.map_offset_y += 1
+            self.map_offset_y += delta
         elif my >= Config.screen_h-10:
-            self.map_offset_y -= 1     
+            self.map_offset_y -= delta   
 
     def centered_offset(self,offset):
         x,y = offset[0],offset[1]
@@ -120,9 +121,9 @@ class Interface(object):
                 planet.explored_by,
                 '{} (+{}/month)'.format(planet.disc_kp,fn.kp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.kp_bonus)),
                 '{} (+{}/month)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.rp_bonus)),
-                fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,100,100))]
+                fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos)/self.game.space_travel_unit)]
             else:
-                info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp,10+fn.travel_formula(fn.steps(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos,100,70))]
+                info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp,10+fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos)/self.game.space_travel_unit)]
             x,y = blitpos[0],blitpos[1]
             
             cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP ', 6:'Travel cost: '}

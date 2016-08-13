@@ -20,7 +20,7 @@ class Planet(sprite.MySprite):
         self.pos = pos
         self.discovered_by = []
         self.explored_by = []
-        self.radius = random.randint(300,600) #SOF
+        self.radius = random.randint(250,500) #SOF
         self.planets_in_SOF = []
         self.chance_of_discovery = random.randint(0,15)
         self.diameter = random.randint(5,50)
@@ -37,8 +37,7 @@ class Planet(sprite.MySprite):
     def pop_around(self):
         ox,oy = self.pos
         self.get_in_SOF()
-        x = 0
-        while x < 3:#len(self.planets_in_SOF) <= 3:
+        while len(self.planets_in_SOF) <= 4:
             pop_dist = random.randint(max(self.rect.w+30,self.radius/2),self.radius)
             pop_angle = random.randint(0,int(np.pi))
             new_p_pos = fn.point_pos(self.pos,pop_dist,pop_angle)#(int(np.cos(pop_angle)*pop_dist),int(np.sin(pop_angle)*pop_dist))
@@ -47,7 +46,6 @@ class Planet(sprite.MySprite):
                 self.planets_in_SOF.append(new_p) 
                 self.game.all_planets.add(new_p)
                 new_p.add_to_logbook(self.game.player)
-            x += 1
             
         
     def unveil(self,explorer,player_induced,bonus):
@@ -66,7 +64,7 @@ class Planet(sprite.MySprite):
         
     def explore(self, explorer):
         if explorer.logbook[self.name].is_explored == False:
-            test = self.visit(explorer)
+            test = self.visit(explorer, True)
             if test == True:
                 '''remove the visit message so that the exploration message
                 occurs first. If the test is true then the message will be re-added
@@ -81,11 +79,12 @@ class Planet(sprite.MySprite):
                 self.game.interface.add_message('Player explored {}'.format(self.name),1)
                 self.game.interface.add_message(visit_msg,1)
         
-    def visit(self, explorer):
+    def visit(self, explorer, explo = False):
         if explorer.location != self.name:
-            steps = fn.steps(explorer.logbook[explorer.location].instance[0].pos,self.pos,self.game.dx,self.game.dy)
-            if explorer.rp >= steps*steps:
-                explorer.rp -= steps*steps
+            travel_cost = fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,self.pos)/self.game.space_travel_unit)
+            if explo: travel_cost += 10
+            if explorer.rp >= travel_cost:
+                explorer.rp -= travel_cost
                 explorer.location = self.name
                 self.game.interface.add_message('Player is at {}'.format(self.name),1)
                 return True

@@ -30,8 +30,7 @@ class Game(object):
         self.interface = interface.Interface(self)
         self.clock = pygame.time.Clock() #set timer which is used to slow game down
         self.month = 0
-        self.space_travel_unit = 200
-        self.dx,self.dy = 200,200
+        self.space_travel_unit = 150
         
         '''create explorers and player'''
         self.all_explorers = [explorers.Explorer(self) for x in range (2)]
@@ -48,8 +47,8 @@ class Game(object):
             p.discovered_by.append(self.player.name)
             p.explored_by.append(self.player.name)
             self.player.location = p.name
-            p.disc_kp,p.disc_rp = 10,10
-            p.radius = 500
+            p.disc_kp,p.disc_rp = 4,4
+            p.radius = 700
             p.pop_around()
             
         '''setting up game switches'''
@@ -72,6 +71,7 @@ class Game(object):
         black_bg.fill((0,0,25))        
         pygame.time.set_timer(USEREVENT + 1, 5000) # 1 event every 10 seconds
         pygame.time.set_timer(USEREVENT + 2, 1000) # 1 event every 1 seconds
+        pygame.time.set_timer(USEREVENT + 3, 100) # map offset every 100 ms
         
         while True:
             self.clock.tick(60) #needed to slow game down
@@ -85,7 +85,9 @@ class Game(object):
                 elif event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-                    print 'has quit'        
+                    print 'has quit' 
+                elif event.type == USEREVENT + 3:
+                    self.interface.get_map_offset()
                 elif event.type == pygame.KEYDOWN and event.key == K_SPACE:
                     if self.pause == True: self.pause = False
                     elif self.pause == False: self.pause = True
@@ -114,7 +116,6 @@ class Game(object):
                     self.pressed_right_clic = True                    
 
             '''Calling Display functions'''
-            self.interface.get_map_offset()
             self.interface.screen.blit(black_bg,(0,0))
             self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2))
             self.interface.event_popup()    
