@@ -23,6 +23,7 @@ import config
 import logbook as lgbk
 import functions as fn
 import time
+from worlds import *
 
 class Game(object):
     def __init__(self):
@@ -31,6 +32,7 @@ class Game(object):
         self.clock = pygame.time.Clock() #set timer which is used to slow game down
         self.month = 0
         self.space_travel_unit = 150
+        self.planet_choices = [World_Mining,World_Habitable,World_Frozen]
         
         '''create explorers and player'''
         self.all_explorers = [explorers.Explorer(self) for x in range (2)]
@@ -38,7 +40,7 @@ class Game(object):
 
         '''Create Planets'''
         self.all_planets = pygame.sprite.Group()
-        self.all_planets.add(planets.Planet(self,(config.Config.screen_w/2,config.Config.screen_h/2)))
+        self.all_planets.add(World_Habitable(self,(config.Config.screen_w/2,config.Config.screen_h/2)))
         
         '''assign starting planet to player only'''
         for p in self.all_planets:
@@ -48,7 +50,7 @@ class Game(object):
             p.discovered_by.append(self.player.name)
             p.explored_by.append(self.player.name)
             self.player.location = p.name
-            p.disc_kp,p.disc_rp = 4,4
+            p.disc_kp,p.disc_rp = 10,4
             p.radius = 600
             p.pop_around()
             
@@ -61,9 +63,9 @@ class Game(object):
         self.pause = False
         
         
-    def initial_planet(self):
-        self.all_planets.add(planets.Planet(self,(config.Config.screen_w/2,config.Config.screen_h/2)))
-        for p in self.all_planets: p.pop_around()
+#    def initial_planet(self):
+#        self.all_planets.add(planets.Planet(self,(config.Config.screen_w/2,config.Config.screen_h/2)))
+#        for p in self.all_planets: p.pop_around()
                 
                        
     def run(self):
