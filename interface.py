@@ -29,7 +29,7 @@ class Interface(object):
         
     def get_map_offset(self):
         mx,my = pygame.mouse.get_pos()
-        delta = 7
+        delta = 10
         if mx <= 10:
             self.map_offset_x += delta
         elif mx >= Config.screen_w-10:
@@ -156,7 +156,7 @@ class Interface(object):
             '''displays messages'''
             x = 0
             for msg in self.messages:
-                fn.display_txt(msg,'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,Config.screen_h/3+x))
+                fn.display_txt(msg,'Lucida Console',16,(0,255,0),self.screen,(int(Config.screen_w*0.75),50+x))
                 x += 25
         elif self.message_disp_time <= 0:
             self.messages = [] #if the message timer reaches 0 the messages are deleted
@@ -179,10 +179,13 @@ class Interface(object):
         data_kp,ylab_kp,xlab_kp = fn.get_graph_data(kp_pts,(100,300),(400,250),30)
         data_rp,ylab_rp,xlab_rp = fn.get_graph_data(rp_pts,(100,300),(400,250),15)
         '''blit graph'''
+        self.screen.blit(Data.backgrounds['graph'],(45,25))
         pygame.draw.lines(self.screen, (0,0,255), False, data_kp, 2)
         pygame.draw.lines(self.screen, (255,0,0), False, data_rp, 2)
-        [fn.display_txt(val,'Lucida Console',16,(0,255,0),self.screen,(x,y)) for x,y,val in ylab_rp+xlab_rp+ylab_kp+xlab_kp]
-        
+        [fn.display_txt(val,'Lucida Console',16,(0,0,255),self.screen,(x,y)) for x,y,val in ylab_kp]
+        [fn.display_txt(val,'Lucida Console',16,(255,0,0),self.screen,(x,y)) for x,y,val in ylab_rp]
+        [fn.display_txt(val,'Lucida Console',16,(0,255,0),self.screen,(x,y)) for x,y,val in xlab_rp]
+
     def event_popup(self):
         '''get event from event manager and assign it locally'''
         event = self.game.event_manager.active_event

@@ -24,7 +24,7 @@ def get_graph_data(list,o_pos,dim,  lab_offset):
     #y axis labels
     ylab_pts = [(ox-lab_offset,int(oy-(y-min(yls))*dy),y) for x,y in list] # (x,y,val)
     #x axis labels
-    xlab_pts = [(int(ox+(x-1)*dx),oy,x) for x,y in list]
+    xlab_pts = [(int(ox+(x-1)*dx),oy+lab_offset,x) for x,y in list]
     return data_pts,ylab_pts,xlab_pts
 
 def check_collision(item,list):

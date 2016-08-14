@@ -71,7 +71,7 @@ class Game(object):
         black_bg.fill((0,0,25))        
         pygame.time.set_timer(USEREVENT + 1, 5000) # 1 event every 10 seconds
         pygame.time.set_timer(USEREVENT + 2, 1000) # 1 event every 1 seconds
-        pygame.time.set_timer(USEREVENT + 3, 100) # map offset every 100 ms
+        pygame.time.set_timer(USEREVENT + 3, 75) # map offset every 100 ms
         
         while True:
             self.clock.tick(60) #needed to slow game down

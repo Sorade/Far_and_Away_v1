@@ -18,7 +18,8 @@ class Data(object):
     
     
     '''image dictionaries'''
-    backgrounds = {'event' : pygame.image.load('data\\event_popup.png').convert_alpha()}    
+    backgrounds = {'event' : pygame.image.load('data\\event_popup.png').convert_alpha(),
+                    'graph': img_import('graph_bg_green.png',(500,350))}    
     
     images_planets = {'Venus' : image_venus}
     
