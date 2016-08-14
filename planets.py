@@ -37,15 +37,17 @@ class Planet(sprite.MySprite):
     def pop_around(self):
         ox,oy = self.pos
         self.get_in_SOF()
-        while len(self.planets_in_SOF) <= 4:
+        max_iter = 1
+        while len(self.planets_in_SOF) <= 4 and max_iter <= 100:
             pop_dist = random.randint(max(self.rect.w+30,self.radius/2),self.radius)
-            pop_angle = random.randint(0,int(np.pi))
+            pop_angle = random.randint(0,int(2*np.pi))
             new_p_pos = fn.point_pos(self.pos,pop_dist,pop_angle)#(int(np.cos(pop_angle)*pop_dist),int(np.sin(pop_angle)*pop_dist))
             new_p = Planet(self.game,new_p_pos) 
             if fn.check_collision(new_p,self.planets_in_SOF) == False:
                 self.planets_in_SOF.append(new_p) 
                 self.game.all_planets.add(new_p)
                 new_p.add_to_logbook(self.game.player)
+            max_iter += 1
             
         
     def unveil(self,explorer,player_induced,bonus):
@@ -73,12 +75,12 @@ class Planet(sprite.MySprite):
                 '''remove the visit message so that the exploration message
                 occurs first. If the test is true then the message will be re-added
                 at the end of the message list (after exploration msg)'''
+                explorer.kp += self.disc_kp
+                explorer.rp += self.disc_rp - fn.exploration_cost_formula(len([log for log in self.game.player.logbook.values() if log.is_explored]),self.game.player.kp)
                 visit_msg = self.game.interface.messages[-1]
                 self.game.interface.messages.remove(visit_msg)                
                 explorer.logbook[self.name].is_explored = True
                 explorer.logbook[self.name].time_of_exploration = self.game.month
-                explorer.kp += self.disc_kp
-                explorer.rp += self.disc_rp -10 #-10 is the exploration malus
                 self.explored_by.append(explorer.name)
                 self.game.interface.add_message('Player explored {}'.format(self.name),1)
                 self.game.interface.add_message(visit_msg,1)
@@ -86,7 +88,7 @@ class Planet(sprite.MySprite):
     def visit(self, explorer, explo = False):
         if explorer.location != self.name:
             travel_cost = fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,self.pos)/self.game.space_travel_unit)
-            if explo: travel_cost += 10
+            if explo: travel_cost += fn.exploration_cost_formula(len([log for log in self.game.player.logbook.values() if log.is_explored]),self.game.player.kp)
             if explorer.rp >= travel_cost:
                 explorer.rp -= travel_cost
                 explorer.location = self.name

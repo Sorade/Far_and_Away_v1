@@ -29,7 +29,7 @@ def get_graph_data(list,o_pos,dim,  lab_offset):
 
 def check_collision(item,list):
     for x in list:
-        if item.rect.inflate(50,50).colliderect(x.rect):
+        if item.rect.inflate(100,100).colliderect(x.rect):
             return True
     return False
 
@@ -42,7 +42,10 @@ def kp_formula(planet,game_time,exploration_time,bonus):
     
 def rp_formula(planet,game_time,exploration_time,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
-    return int(planet.disc_rp + bonus * np.exp(-( planet.disc_rp/500)*dt)*(np.cos(2*np.pi*dt)))
+    return int((planet.disc_rp + bonus) * np.exp(-( planet.disc_rp/500)*dt)*(np.cos(2*np.pi*dt)))
+    
+def exploration_cost_formula(nb_explored,kp):
+    return int(nb_explored*(nb_explored/(kp+1)))
     
 def point_pos(pt, d, theta_rad):
     x0, y0 = pt

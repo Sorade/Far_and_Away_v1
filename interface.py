@@ -127,7 +127,8 @@ class Interface(object):
                 '{} (+{}/month)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.rp_bonus)),
                 fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos)/self.game.space_travel_unit)]
             else:
-                info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp,10+fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos)/self.game.space_travel_unit)]
+                info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp,
+                           fn.exploration_cost_formula(len([log for log in self.game.player.logbook.values() if log.is_explored]),self.game.player.kp) + fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos)/self.game.space_travel_unit)]
             x,y = blitpos[0],blitpos[1]
             
             cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP ', 6:'Travel cost: '}

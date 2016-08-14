@@ -42,13 +42,14 @@ class Game(object):
         
         '''assign starting planet to player only'''
         for p in self.all_planets:
+            p.name = 'Tierra'
             self.player.logbook[p.name] = lgbk.Logbook(p,True,True)
             self.player.logbook[p.name].time_of_exploration = self.month
             p.discovered_by.append(self.player.name)
             p.explored_by.append(self.player.name)
             self.player.location = p.name
             p.disc_kp,p.disc_rp = 4,4
-            p.radius = 700
+            p.radius = 600
             p.pop_around()
             
         '''setting up game switches'''
@@ -121,7 +122,8 @@ class Game(object):
             self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2))
             self.interface.event_popup()    
             self.interface.final_overlay() #will only display messages when USEREVENT+2 has occured
-            
+            fn.display_txt(str(len(self.all_planets)),'Lucida Console',16,(200,200,0),self.interface.screen,(500,80))
+
             
             pygame.display.update()
             t1 = time.time()
