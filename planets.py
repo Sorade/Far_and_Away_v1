@@ -13,7 +13,7 @@ import logbook as lgbk
 import functions as fn
 
 class Planet(sprite.MySprite):
-    def __init__(self, game, pos):
+    def __init__(self, game, pos, img_ref):
         super(Planet, self).__init__()
         self.game = game
         self.name = '{}-{}'.format(fn.name_gen(True),str(random.randint(0,100)))
@@ -26,7 +26,7 @@ class Planet(sprite.MySprite):
         self.diameter = random.randint(5,50)
         self.disc_kp = random.randint(0,12)
         self.disc_rp = random.randint(0,12)
-        self.img_ref = 'Venus'
+        self.img_ref = img_ref
         
         self.rect = data.Data.images_planets[self.img_ref].get_rect()
         self.rect.center = pos
@@ -42,7 +42,7 @@ class Planet(sprite.MySprite):
             pop_dist = random.randint(max(self.rect.w+30,self.radius/2),self.radius)
             pop_angle = random.randint(0,int(2*np.pi))
             new_p_pos = fn.point_pos(self.pos,pop_dist,pop_angle)#(int(np.cos(pop_angle)*pop_dist),int(np.sin(pop_angle)*pop_dist))
-            new_p = Planet(self.game,new_p_pos) 
+            new_p = random.choice(self.game.planet_choices)(self.game,new_p_pos) 
             if fn.check_collision(new_p,self.planets_in_SOF) == False:
                 self.planets_in_SOF.append(new_p) 
                 self.game.all_planets.add(new_p)
@@ -113,21 +113,5 @@ class Planet(sprite.MySprite):
         for p in self.game.all_planets:
             if fn.dist(self.pos,p.pos) <= self.radius:
                 self.planets_in_SOF.append(p)
-                
-    def filter_planets(self):
-        if len(self.planets_in_SOF) == 0:
-            self.game.all_planets.remove(self)
-            return
-        group_without_self = self.game.all_planets
-        group_without_self.remove(self)
-        collisions = pygame.sprite.spritecollideany(self, group_without_self)
-        group_without_self.add(self)
-        if collisions != None:
-            self.game.all_planets.remove(collisions)
-            
-            
-#        for p in self.game.all_planets:
-#            if self.rect.colliderect(p.rect) == True:
-#                self.game.all_planets.remove(p)
                 
                 
