@@ -61,6 +61,10 @@ class Planet(sprite.MySprite):
             explorer.logbook[self.name].is_discovered = True
             self.discovered_by.append(explorer.name)
             self.pop_around()
+            self.game.interface.add_message('Auto-Discovered {}'.format(self.name),1)
+            arrow_stats = self.game.interface.arrow_param(self)
+            if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
+            
         
     def explore(self, explorer):
         if explorer.logbook[self.name].is_explored == False:

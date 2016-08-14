@@ -96,6 +96,7 @@ class Game(object):
                     elif self.interface.helpers == False: self.interface.helpers = True                        
                 elif event.type == USEREVENT + 2:
                     self.interface.display_event = True
+                    if self.interface.arrow_disp_time > 0: self.interface.arrow_disp_time -= 1
                 elif event.type == USEREVENT + 1 and self.pause == False:
                     self.month += 1 #adds a months of gametime every 10 seconds
                     self.event_manager.get_random_event()

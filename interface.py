@@ -18,12 +18,15 @@ class Interface(object):
         self.screen = Config.screen
         self.selected = None
         '''message manager'''
-        self.messages = []
+        self.messages = [] # contains angles at which to blit  and the blitpos as a tulp
         self.message_disp_time = 0
         self.display_event = False
+        '''planet discovery arrow'''
+        self.arrows = []
+        self.arrow_disp_time = 0
         '''variables'''
         self.hoovered = None
-        self.helpers = True
+        self.helpers = False
         self.map_offset_x = 0
         self.map_offset_y = 0
         
@@ -53,7 +56,8 @@ class Interface(object):
         '''blit the player's points'''
         fn.display_txt('Your KP: {}'.format(self.game.player.kp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-350,Config.screen_h-30))
         fn.display_txt('Your RP: {}'.format(self.game.player.rp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-150,Config.screen_h-30))                    
-
+        '''display arrows'''
+        self.show_arrows()
         
     def view_solarsys(self,offset):
         planets_to_blit = []
@@ -143,6 +147,45 @@ class Interface(object):
         self.messages.append(msg)
         self.message_disp_time += disp_time #adds x seconds to the message timer
         
+    def arrow_param(self,planet):
+        offset_x = planet.rect.centerx+self.map_offset_x
+        offset_y = planet.rect.centery+self.map_offset_y
+        
+        d = 60        
+        
+        if offset_x > Config.screen_w:
+            if offset_y > Config.screen_h:
+                return (-135,(Config.screen_w-d,Config.screen_h-d))
+            elif offset_y < 0:
+                return (-45,(Config.screen_w-d,d))
+            return (-90,(Config.screen_w-d,Config.screen_h/2))
+        elif offset_x < 0:
+            if offset_y > Config.screen_h:
+                return (135,(d,Config.screen_h-d))
+            elif offset_y < 0:
+                return (45,(d,d))
+            return (90,(d,Config.screen_h/2))
+        elif offset_y > Config.screen_h:
+            return (180, (Config.screen_w/2,Config.screen_h-d))
+        elif offset_y < 0 :
+            return (0, (Config.screen_w/2,d))
+            
+        else:
+            return False
+            
+    def add_arrow(self,(angle,pos),disp_time):
+        self.arrows.append((angle,pos))
+        self.arrow_disp_time += disp_time
+        
+    def show_arrows(self):
+        if self.arrow_disp_time > 0:
+            for angle,pos in self.arrows:
+                img = pygame.transform.rotate(Data.misc['arrow'],angle)
+                fn.blitc(self.screen,img,pos)
+                
+        if self.arrow_disp_time == 0:
+            self.arrows = []
+        
     def message_display(self):
         if self.display_event == True: #displays on call to USEREVENT+2 in game.py
             '''removes 1 second from the display timer'''
@@ -185,7 +228,7 @@ class Interface(object):
         [fn.display_txt(val,'Lucida Console',16,(0,0,255),self.screen,(x,y)) for x,y,val in ylab_kp]
         [fn.display_txt(val,'Lucida Console',16,(255,0,0),self.screen,(x,y)) for x,y,val in ylab_rp]
         [fn.display_txt(val,'Lucida Console',16,(0,255,0),self.screen,(x,y)) for x,y,val in xlab_rp]
-
+        
     def event_popup(self):
         '''get event from event manager and assign it locally'''
         event = self.game.event_manager.active_event
