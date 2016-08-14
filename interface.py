@@ -23,7 +23,7 @@ class Interface(object):
         self.display_event = False
         '''variables'''
         self.hoovered = None
-        self.helpers = False
+        self.helpers = True
         self.map_offset_x = 0
         self.map_offset_y = 0
         
@@ -176,11 +176,12 @@ class Interface(object):
             rp_pts.append((month,next_month_rp))
             kp_pts.append((month,next_month_kp))
         '''transfer data into graph compatible data'''
-        data,ylab,xlab = fn.get_graph_data(kp_pts,(100,300),(400,250))
-        
+        data_kp,ylab_kp,xlab_kp = fn.get_graph_data(kp_pts,(100,300),(400,250),30)
+        data_rp,ylab_rp,xlab_rp = fn.get_graph_data(rp_pts,(100,300),(400,250),15)
         '''blit graph'''
-        pygame.draw.lines(self.screen, (0,255,0), False, data, 2)
-        [fn.display_txt(val,'Lucida Console',16,(0,255,0),self.screen,(x,y)) for x,y,val in ylab+xlab]
+        pygame.draw.lines(self.screen, (0,0,255), False, data_kp, 2)
+        pygame.draw.lines(self.screen, (255,0,0), False, data_rp, 2)
+        [fn.display_txt(val,'Lucida Console',16,(0,255,0),self.screen,(x,y)) for x,y,val in ylab_rp+xlab_rp+ylab_kp+xlab_kp]
         
     def event_popup(self):
         '''get event from event manager and assign it locally'''

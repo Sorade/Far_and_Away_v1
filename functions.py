@@ -12,16 +12,17 @@ from math import pi,radians,sin,cos,acos
 '''takes a list of tulpe values and plots them in a graph
 of which the bottom left corner is set as o_pos and has 
 a width and height defined by the dim tulpe = to (w,h)'''
-def get_graph_data(list,o_pos,dim):
+def get_graph_data(list,o_pos,dim,  lab_offset):
     ox,oy = o_pos
     w,h = dim
-    dx = float(w)/max([x-1 for x,y in list])
-    dy = float(h)/max([y for x,y in list])
-    data_pts = [(int(ox+(x-1)*dx),int(oy-y*dy)) for x,y in list]
+    xls,yls = [x-1 for x,y in list], [y for x,y in list]
+    dx = float(w)/(max(xls)-min(xls)) if max(xls)-min(xls) != 0 else w#float(w)/max(xls)
+    dy = float(h)/(max(yls)-min(yls)) if max(yls)-min(yls) != 0 else h#float(h)/max(yls)
+    data_pts = [(int(ox+(x-1)*dx),int(oy-(y-min(yls))*dy)) for x,y in list]
     #need to add a bg here
     
     #y axis labels
-    ylab_pts = [(ox,int(oy-y*dy),y) for x,y in list] # (x,y,val)
+    ylab_pts = [(ox-lab_offset,int(oy-(y-min(yls))*dy),y) for x,y in list] # (x,y,val)
     #x axis labels
     xlab_pts = [(int(ox+(x-1)*dx),oy,x) for x,y in list]
     return data_pts,ylab_pts,xlab_pts
