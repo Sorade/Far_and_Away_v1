@@ -61,7 +61,7 @@ class Interface(object):
         
     def view_solarsys(self,offset):
         planets_to_blit = []
-        for p in [log.instance[0] for log in self.game.player.logbook.itervalues()]:
+        for p in (log.instance[0] for log in self.game.player.logbook.itervalues()):
             if self.game.player.logbook[p.name].is_discovered == True:
                 [pygame.draw.line(self.screen, (0,250,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), fn.sum_tulp(p2.pos,(self.map_offset_x,self.map_offset_y)), 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_explored and self.game.player.logbook[p.name].is_explored]
                 planets_to_blit.append(p)
@@ -128,7 +128,7 @@ class Interface(object):
                 fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos)/self.game.space_travel_unit)]
             else:
                 info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp,
-                           fn.exploration_cost_formula(len([log for log in self.game.player.logbook.values() if log.is_explored]),self.game.player.kp) + fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos)/self.game.space_travel_unit)]
+                           fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),self.game.player.kp) + fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos)/self.game.space_travel_unit)]
             x,y = blitpos[0],blitpos[1]
             
             cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP ', 6:'Travel cost: '}

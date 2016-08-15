@@ -76,7 +76,7 @@ class Planet(sprite.MySprite):
                 occurs first. If the test is true then the message will be re-added
                 at the end of the message list (after exploration msg)'''
                 explorer.kp += self.disc_kp
-                explorer.rp += self.disc_rp - fn.exploration_cost_formula(len([log for log in self.game.player.logbook.values() if log.is_explored]),self.game.player.kp)
+                explorer.rp += self.disc_rp - fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),self.game.player.kp)
                 visit_msg = self.game.interface.messages[-1]
                 self.game.interface.messages.remove(visit_msg)                
                 explorer.logbook[self.name].is_explored = True
@@ -88,7 +88,7 @@ class Planet(sprite.MySprite):
     def visit(self, explorer, explo = False):
         if explorer.location != self.name:
             travel_cost = fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,self.pos)/self.game.space_travel_unit)
-            if explo: travel_cost += fn.exploration_cost_formula(len([log for log in self.game.player.logbook.values() if log.is_explored]),self.game.player.kp)
+            if explo: travel_cost += fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),self.game.player.kp)
             if explorer.rp >= travel_cost:
                 explorer.rp -= travel_cost
                 explorer.location = self.name
