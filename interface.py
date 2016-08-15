@@ -97,7 +97,6 @@ class Interface(object):
     def view_planet(self):
         if self.hoovered is not None:
             planet = self.hoovered
-            self.hoovered = None
             
             m_x,m_y = pygame.mouse.get_pos()
             offset_w,offset_h = 300,220
@@ -117,6 +116,8 @@ class Interface(object):
             self.screen.blit(tooltip_bg,blitpos)
             
             ''' blit all the planet's stats to the screen'''
+            #update's travel information for the planet
+            self.game.player.logbook[planet.name].get_travel_info(self.game.player.logbook[self.game.player.location].instance[0])
             if self.game.player.name in planet.explored_by:
                 info_ls = [
                 planet.name,
@@ -125,13 +126,15 @@ class Interface(object):
                 planet.explored_by,
                 '{} (+{}/month)'.format(planet.disc_kp,fn.kp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.kp_bonus)),
                 '{} (+{}/month)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.rp_bonus)),
-                fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos)/self.game.space_travel_unit)]
+                self.game.player.logbook[planet.name].travel_cost,
+                self.game.player.logbook[planet.name].travel_time]
             else:
                 info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp,
-                           fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),self.game.player.kp) + fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,planet.pos)/self.game.space_travel_unit)]
+                           fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),self.game.player.kp) + self.game.player.logbook[planet.name].travel_cost,
+                            self.game.player.logbook[planet.name].travel_time]
             x,y = blitpos[0],blitpos[1]
             
-            cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP ', 6:'Travel cost: '}
+            cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP ', 6:'Travel cost: ', 7:'Travel time: '}
             
             count = 0
             for stat in info_ls:
@@ -143,6 +146,9 @@ class Interface(object):
                 fn.display_txt(to_blit,'Lucida Console',16,(0,255,0),self.screen,(x,y))
                 y += 20
                 count += 1
+                
+            self.hoovered = None
+
                 
     def add_message(self,msg,disp_time):
         self.messages.append(msg)
