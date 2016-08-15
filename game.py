@@ -32,7 +32,7 @@ class Game(object):
         self.clock = pygame.time.Clock() #set timer which is used to slow game down
         self.month = 0
         self.space_travel_unit = 150
-        self.planet_choices = [World_Mining,World_Habitable,World_Frozen]
+        self.planet_choices = [World_Mining,World_Habitable,World_Frozen,World_Alien]
         
         '''create explorers and player'''
         self.all_explorers = [explorers.Explorer(self) for x in range (2)]
@@ -50,7 +50,7 @@ class Game(object):
             p.discovered_by.append(self.player.name)
             p.explored_by.append(self.player.name)
             self.player.location = p.name
-            p.disc_kp,p.disc_rp = 10,4
+            p.disc_kp,p.disc_rp = 10,8
             p.radius = 600
             p.pop_around()
             

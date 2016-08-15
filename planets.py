@@ -39,10 +39,12 @@ class Planet(sprite.MySprite):
         self.get_in_SOF()
         max_iter = 1
         while len(self.planets_in_SOF) <= 4 and max_iter <= 100:
-            pop_dist = random.randint(max(self.rect.w+30,self.radius/2),self.radius)
+            #remove the radius of the planet so that planets do not overlap
+            #will only work if the radius of all planets are the same
+            pop_dist = random.randint(max(self.rect.w+30,self.radius/2),self.radius-self.rect.w/2)
             pop_angle = random.randint(0,int(2*np.pi))
             new_p_pos = fn.point_pos(self.pos,pop_dist,pop_angle)#(int(np.cos(pop_angle)*pop_dist),int(np.sin(pop_angle)*pop_dist))
-            new_p = random.choice(self.game.planet_choices)(self.game,new_p_pos) 
+            new_p = fn.choice_weighted(self.game.planet_choices)(self.game,new_p_pos) 
             if fn.check_collision(new_p,self.planets_in_SOF) == False:
                 self.planets_in_SOF.append(new_p) 
                 self.game.all_planets.add(new_p)
@@ -58,6 +60,8 @@ class Planet(sprite.MySprite):
                 self.discovered_by.append(explorer.name)
                 self.pop_around()
                 self.game.interface.add_message('Discovered {}'.format(self.name),1)
+                arrow_stats = self.game.interface.arrow_param(self)
+                if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
                 
         elif explorer.logbook[self.name].is_discovered == False and self.chance_of_discovery >= random.randint(0,100):
             explorer.logbook[self.name].is_discovered = True

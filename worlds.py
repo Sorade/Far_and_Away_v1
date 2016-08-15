@@ -11,7 +11,7 @@ import functions as fn
 class World_Mining(Planet):
     img_ref = 'Venus'
     cat = 'Mining World'
-    
+    weight = 8
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.name = '{}-{}'.format(fn.name_gen(True),str(random.randint(0,100)))
@@ -22,7 +22,7 @@ class World_Mining(Planet):
 class World_Habitable(Planet):
     img_ref = 'Earth'
     cat = 'Habitable World'
-    
+    weight = 3
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.name = '{}-{}'.format(fn.name_gen(True),str(random.randint(0,100)))
@@ -33,7 +33,7 @@ class World_Habitable(Planet):
 class World_Frozen(Planet):
     img_ref = 'Frozen'
     cat = 'Frozen World'
-
+    weight = 10
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.name = '{}-{}'.format(fn.name_gen(True),str(random.randint(0,100)))
@@ -44,7 +44,7 @@ class World_Frozen(Planet):
 class World_Alien(Planet):
     img_ref = 'Alien_hive'
     cat = 'Alien World'
-
+    weight = 1
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.name = '{}-{}'.format(fn.name_gen(True),str(random.randint(0,100)))

@@ -46,7 +46,7 @@ def rp_formula(planet,game_time,exploration_time,bonus):
     return int(abs(np.sin(dt)*(planet.disc_rp+bonus)*np.exp(-0.025*dt)))
     
 def exploration_cost_formula(nb_explored,kp):
-    return int(nb_explored*(nb_explored/(kp+1)))
+    return int(5+nb_explored*(nb_explored/(kp+1)))
     
 def point_pos(pt, d, theta_rad):
     x0, y0 = pt
@@ -56,7 +56,9 @@ def point_pos(pt, d, theta_rad):
    
 def travel_formula(steps):
     return int(steps*steps)
-    
+
+''' List -> Object
+takes a list of object with a weight attribute and returns an object of this list randomly'''
 def choice_weighted(list):
     weighted_choices = list#[Event('Red',8), Event('Blue', 2)]
     population = [event for event in weighted_choices for i in range(event.weight)]

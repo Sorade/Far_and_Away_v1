@@ -89,8 +89,8 @@ class Interface(object):
                     p.search_in_SOF(self.game.player,True,30)
                     self.game.pressed_right_clic = False
                     
-            '''blitting planet info'''
-            self.view_planet()
+        '''blitting planet info'''
+        self.view_planet()
 
               
             
@@ -217,6 +217,7 @@ class Interface(object):
             for log in (log for log in self.game.player.logbook.itervalues() if log.is_explored):
                 next_month_kp += fn.kp_formula(log.instance[0],self.game.month+month,log.time_of_exploration,self.game.player.kp_bonus)
                 next_month_rp += fn.rp_formula(log.instance[0],self.game.month+month,log.time_of_exploration,self.game.player.rp_bonus)
+            next_month_rp -= self.game.player.monthly_expense
             rp_pts.append((month,next_month_rp))
             kp_pts.append((month,next_month_kp))
         '''transfer data into graph compatible data'''

@@ -38,15 +38,16 @@ class Event_Manager(object):
             if log.is_explored:
                 self.game.player.kp += fn.kp_formula(log.instance[0],self.game.month,log.time_of_exploration,self.game.player.kp_bonus)
                 
- ''''Make this into a function... maybe store all event values as event manager
-variables and make a new method handling those variables'''   
+    ''''Make this into a function... maybe store all event values as event manager
+    variables and make a new method handling those variables'''   
     def network_expenses_event(self):
         cost = 0
         for log in self.game.player.logbook.values():
             if log.is_explored:
                 cost += 1
-                
         self.game.player.rp -= cost*2
+        self.game.player.monthly_expense = cost*2 #stores the cost value for the current game state in a variable
+        #so that it can be accessed in the graph display
                 
     def points_adjustement_event(self):
         self.resource_prod_event()
