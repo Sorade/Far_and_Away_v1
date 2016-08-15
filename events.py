@@ -13,6 +13,13 @@ class Event_Manager(object):
         self.event_list = [Precious_Ore_Discovered(game),Raiders(game),Old_Archives(game),Storm(game)]
         self.active_event = None
         
+    def all_monthly_events(self):
+        self.game.month += 1 #adds a months of gametime every 10 seconds
+        self.get_random_event()
+        self.planet_discovery_event(False)
+        self.points_adjustement_event()
+        self.network_expenses_event()
+        
     def get_random_event(self):
         '''get random event'''
         if random.randint(0,5) == 0: 

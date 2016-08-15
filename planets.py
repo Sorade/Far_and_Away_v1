@@ -91,7 +91,11 @@ class Planet(sprite.MySprite):
         
     def visit(self, explorer, explo = False):
         if explorer.location != self.name:
-            travel_cost = fn.travel_formula(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,self.pos)/self.game.space_travel_unit)
+#            travel_time = fn.travel_time(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,self.pos)/self.game.space_travel_unit)
+#            travel_cost = fn.travel_formula(travel_time)
+            #generate travel time and cost for the planet
+            self.game.player.logbook[self.game.player.location].get_travel_info(self)
+            travel_cost = self.game.player.logbook[self.game.player.location].travel_cost
             if explo: travel_cost += fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),self.game.player.kp)
             if explorer.rp >= travel_cost:
                 explorer.rp -= travel_cost

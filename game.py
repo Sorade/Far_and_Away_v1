@@ -101,11 +101,7 @@ class Game(object):
                     self.interface.display_event = True
                     if self.interface.arrow_disp_time > 0: self.interface.arrow_disp_time -= 1
                 elif event.type == USEREVENT + 1 and self.pause == False:
-                    self.month += 1 #adds a months of gametime every 10 seconds
-                    self.event_manager.get_random_event()
-                    self.event_manager.planet_discovery_event(False)
-                    self.event_manager.points_adjustement_event()
-                    self.event_manager.network_expenses_event()
+                    self.event_manager.all_monthly_events()
                 elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                     self.pressed_left_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 1:
