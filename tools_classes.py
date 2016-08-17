@@ -53,7 +53,7 @@ to the reference points'''
         #builds an assigned list
         counter = 0
         for w in Quad.weights:
-            Quad.angle_list[counter] = [counter*pi/2+1,(counter+1)*pi/2-1,w]
+            Quad.angle_list[counter] = [counter*pi/2+0.2,(counter+1)*pi/2-0.2,w]
             counter += 1
             
     @staticmethod    
