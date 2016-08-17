@@ -1,3 +1,5 @@
+'''link to pygame multi-thread game engine code : https://github.com/Earlo/Virvatuli/blob/multiprocess/Code/Engine/engine.py'''
+
 '''a class which enables to return weighted quadrants based on the
 inverse amount of occurences in the given quadrant.
 eg. if occurences are TP,TR,BR,BL = 1,1,0,2
