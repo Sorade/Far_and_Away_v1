@@ -11,6 +11,7 @@ import data
 import sprite
 import logbook as lgbk
 import functions as fn
+from tools_classes import Quad
 
 class Planet(sprite.MySprite):
     def __init__(self, game, pos, img_ref):
@@ -20,7 +21,6 @@ class Planet(sprite.MySprite):
         self.pos = pos
         self.discovered_by = []
         self.explored_by = []
-        self.radius = random.randint(250,500) #SOF
         self.planets_in_SOF = []
         self.chance_of_discovery = random.randint(0,15)
         self.diameter = random.randint(5,50)
@@ -37,18 +37,24 @@ class Planet(sprite.MySprite):
     def pop_around(self):
         ox,oy = self.pos
         self.get_in_SOF()
+        Quad.get_content(self.pos,[p.pos for p in self.game.all_planets])
+        Quad.get_weights()
         max_iter = 1
-        while len(self.planets_in_SOF) <= 4 and max_iter <= 100:
+        max_planet = 1
+        while max_planet <= 2 and max_iter <= 5:#len(self.planets_in_SOF) <= 4 and max_iter <= 100:
             #remove the radius of the planet so that planets do not overlap
             #will only work if the radius of all planets are the same
-            pop_dist = random.randint(max(self.rect.w+30,self.radius/2),self.radius-self.rect.w/2)
-            pop_angle = random.randint(0,int(2*np.pi))
+            pop_dist = random.randint(max(self.rect.w+30,self.radius/2),self.radius-self.rect.w)
+            angle_min,angle_max = fn.choice_weighted(Quad.angle_list, True)
+            pop_angle = random.uniform(angle_min,angle_max)
             new_p_pos = fn.point_pos(self.pos,pop_dist,pop_angle)#(int(np.cos(pop_angle)*pop_dist),int(np.sin(pop_angle)*pop_dist))
             new_p = fn.choice_weighted(self.game.planet_choices)(self.game,new_p_pos) 
             if fn.check_collision(new_p,self.planets_in_SOF) == False:
                 self.planets_in_SOF.append(new_p) 
                 self.game.all_planets.add(new_p)
                 new_p.add_to_logbook(self.game.player)
+                Quad.update_weights(self.pos,new_p_pos)
+                max_planet += 1
             max_iter += 1
             
         
@@ -58,7 +64,7 @@ class Planet(sprite.MySprite):
             if explorer.logbook[self.name].is_discovered == False and self.chance_of_discovery+bonus >= random.randint(0,100):
                 explorer.logbook[self.name].is_discovered = True
                 self.discovered_by.append(explorer.name)
-                self.pop_around()
+                #self.pop_around()
                 self.game.interface.add_message('Discovered {}'.format(self.name),1)
                 arrow_stats = self.game.interface.arrow_param(self)
                 if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
@@ -66,7 +72,7 @@ class Planet(sprite.MySprite):
         elif explorer.logbook[self.name].is_discovered == False and self.chance_of_discovery >= random.randint(0,100):
             explorer.logbook[self.name].is_discovered = True
             self.discovered_by.append(explorer.name)
-            self.pop_around()
+            #self.pop_around()
             self.game.interface.add_message('Auto-Discovered {}'.format(self.name),1)
             arrow_stats = self.game.interface.arrow_param(self)
             if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
@@ -88,6 +94,7 @@ class Planet(sprite.MySprite):
                 self.explored_by.append(explorer.name)
                 self.game.interface.add_message('Player explored {}'.format(self.name),1)
                 self.game.interface.add_message(visit_msg,1)
+                self.pop_around()
         
     def visit(self, explorer, explo = False):
         if explorer.location != self.name:

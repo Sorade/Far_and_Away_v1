@@ -18,7 +18,7 @@ class Event_Manager(object):
         self.get_random_event()
         self.planet_discovery_event(False)
         self.points_adjustement_event()
-        self.network_expenses_event()
+        #self.network_expenses_event()
         
     def get_random_event(self):
         '''get random event'''

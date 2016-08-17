@@ -62,10 +62,18 @@ def travel_formula(travel_time):
 
 ''' List -> Object
 takes a list of object with a weight attribute and returns an object of this list randomly'''
-def choice_weighted(list):
+def choice_weighted(list, a_class = False):
     weighted_choices = list#[Event('Red',8), Event('Blue', 2)]
-    population = [event for event in weighted_choices for i in range(event.weight)]
+    if a_class == False:
+        population = [event for event in weighted_choices for i in range(event.weight)]
+    else:
+        population = [(angle_min,angle_max) for angle_min,angle_max,weight in weighted_choices for i in range(weight)]
     return random.choice(population)
+    
+#>>> weighted_choices = [('Red', 3), ('Blue', 2), ('Yellow', 1), ('Green', 4)]
+#>>> population = [val for val, cnt in weighted_choices for i in range(cnt)]
+#>>> random.choice(population)
+#'Green'
     
 def steps(point1, point2, dx, dy):
     x1,y1 = point1[0],point1[1]
