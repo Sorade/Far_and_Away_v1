@@ -1,3 +1,12 @@
+''' Example of using enumerate rather than a counter value.
+a = [3, 4, 5]
+for i, item in enumerate(a):
+    print i, item
+# prints
+# 0 3
+# 1 4
+# 2 5
+
 '''link to pygame multi-thread game engine code : https://github.com/Earlo/Virvatuli/blob/multiprocess/Code/Engine/engine.py'''
 
 '''a class which enables to return weighted quadrants based on the
