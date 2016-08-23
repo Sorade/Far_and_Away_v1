@@ -12,11 +12,13 @@ class Explorer(object):
         self.game = game
         self.name = random.choice(['Roger','Logan','Fred','Susan','Morgane','Iloa'])
         self.location = 0
-        self.logbook = dict(zip((p.name for p in self.game.all_planets),(Logbook(p,False,False) for p in self.game.all_planets)))
+        self.logbook = {}
         self.kp = 10
         self.rp = 10
         self.kp_bonus = 0
         self.rp_bonus = 0
+        self.monthly_rp_expense = 0
+        self.monthly_rp_income = 0
         
     @property
     def kp(self):

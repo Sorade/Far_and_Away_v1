@@ -7,26 +7,73 @@ Created on Sat Aug 06 10:00:25 2016
 import pygame
 import random
 import numpy as np
+from math import pi,radians,sin,cos,acos
+
+'''takes a list of tulpe values and plots them in a graph
+of which the bottom left corner is set as o_pos and has 
+a width and height defined by the dim tulpe = to (w,h)'''
+def get_graph_data(list,o_pos,dim,  lab_offset):
+    ox,oy = o_pos
+    w,h = dim
+    xls,yls = [x-1 for x,y in list], [y for x,y in list]
+    dx = float(w)/(max(xls)-min(xls)) if max(xls)-min(xls) != 0 else w#float(w)/max(xls)
+    dy = float(h)/(max(yls)-min(yls)) if max(yls)-min(yls) != 0 else h#float(h)/max(yls)
+    data_pts = [(int(ox+(x-1)*dx),int(oy-(y-min(yls))*dy)) for x,y in list]
+    #need to add a bg here
+    
+    #y axis labels
+    ylab_pts = [(ox-lab_offset,int(oy-(y-min(yls))*dy),y) for x,y in list] # (x,y,val)
+    #x axis labels
+    xlab_pts = [(int(ox+(x-1)*dx),oy+lab_offset,x) for x,y in list]
+    return data_pts,ylab_pts,xlab_pts
+
+def check_collision(item,list):
+    for x in list:
+        if item.rect.inflate(100,100).colliderect(x.rect):
+            return True
+    return False
 
 def dist(point1, point2):
     return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**0.5
 
 def kp_formula(planet,game_time,exploration_time,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
-    return int(abs(np.sin(dt)*planet.disc_kp*np.exp(-0.025*dt))+bonus)
+    return int(abs(np.sin(dt)*(planet.disc_kp+bonus)*np.exp(-0.025*dt)))
     
 def rp_formula(planet,game_time,exploration_time,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
-    return int(planet.disc_rp + bonus * np.exp(-( planet.disc_rp /500)*dt)*(np.cos(2*np.pi*dt)))
+#    return int((planet.disc_rp + bonus) * np.exp(-( planet.disc_rp/500)*dt)*(np.cos(2*np.pi*dt)))
+    return int(abs(np.sin(dt)*(planet.disc_rp+bonus)*np.exp(-0.025*dt)))
     
+def exploration_cost_formula(nb_explored,kp):
+    return int(5+nb_explored*(nb_explored/(kp+1)))
     
-def travel_formula(steps):
-    return steps*steps
+def travel_time(distance,travel_units):
+    return int(distance/travel_units)
     
-def choice_weighted(list):
+def point_pos(pt, d, theta_rad):
+    x0, y0 = pt
+    #theta_rad = pi/2 - radians(theta)
+    return (int(x0 + d*cos(theta_rad)), int(y0 + d*sin(theta_rad)))
+    
+   
+def travel_formula(travel_time):
+    return int(travel_time*travel_time)
+
+''' List -> Object
+takes a list of object with a weight attribute and returns an object of this list randomly'''
+def choice_weighted(list, a_class = False):
     weighted_choices = list#[Event('Red',8), Event('Blue', 2)]
-    population = [event for event in weighted_choices for i in range(event.weight)]
+    if a_class == False:
+        population = [event for event in weighted_choices for i in range(event.weight)]
+    else:
+        population = [(angle_min,angle_max) for angle_min,angle_max,weight in weighted_choices for i in range(weight)]
     return random.choice(population)
+    
+#>>> weighted_choices = [('Red', 3), ('Blue', 2), ('Yellow', 1), ('Green', 4)]
+#>>> population = [val for val, cnt in weighted_choices for i in range(cnt)]
+#>>> random.choice(population)
+#'Green'
     
 def steps(point1, point2, dx, dy):
     x1,y1 = point1[0],point1[1]

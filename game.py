@@ -20,8 +20,10 @@ import interface
 import planets
 import explorers
 import config
+import logbook as lgbk
 import functions as fn
 import time
+from worlds import *
 
 class Game(object):
     def __init__(self):
@@ -29,32 +31,29 @@ class Game(object):
         self.interface = interface.Interface(self)
         self.clock = pygame.time.Clock() #set timer which is used to slow game down
         self.month = 0
-
-        '''Create Planets'''
-        self.all_planets = pygame.sprite.Group()
-        self.dx, self.dy = self.generate_planets()
-        [p.get_in_SOF() for p in self.all_planets]
+        self.space_travel_unit = 150
+        self.planet_choices = [World_Mining,World_Habitable,World_Frozen,World_Alien]
+        
         '''create explorers and player'''
         self.all_explorers = [explorers.Explorer(self) for x in range (2)]
         self.player = explorers.Explorer(self)
+
+        '''Create Planets'''
+        self.all_planets = pygame.sprite.Group()
+        self.all_planets.add(World_Habitable(self,(config.Config.screen_w/2,config.Config.screen_h/2)))
         
         '''assign starting planet to player only'''
-        delay, x = 20, 0
-        temp_name = 0
         for p in self.all_planets:
-            if x >= delay and len(p.planets_in_SOF) >= 4:
-                self.player.location = temp_name
-                p.chance_of_discovery = 100
-                p.disc_kp,p.disc_rp = 10,10
-                p.unveil(self.player,False,0)
-                steps = fn.steps(self.player.logbook[temp_name].instance[0].pos,p.pos,self.dx,self.dy)
-                self.player.rp += steps*steps+1
-                p.explore(self.player)
-                p.disc_kp,p.disc_rp = 8,8 #starting values
-                break
-            temp_name = p.name
-            x += 1
-        
+            p.name = 'Tierra'
+            self.player.logbook[p.name] = lgbk.Logbook(p,True,True)
+            self.player.logbook[p.name].time_of_exploration = self.month
+            p.discovered_by.append(self.player.name)
+            p.explored_by.append(self.player.name)
+            self.player.location = p.name
+            p.disc_kp,p.disc_rp = 10,8
+            p.radius = 600
+            p.pop_around()
+            
         '''setting up game switches'''
         self.pressed_left_clic = False 
         self.pressed_mid_clic = False
@@ -64,17 +63,9 @@ class Game(object):
         self.pause = False
         
         
-    def generate_planets(self):
-        offset = 50
-        w = config.Config.screen_w-offset
-        h = config.Config.screen_h-offset
-        
-        row_nb,col_nb = 5,10
-        for row in range(offset/2, int(h - offset), h/row_nb):
-            for col in range(offset/2, int(w + offset*1.5), w/col_nb):
-                self.all_planets.add(planets.Planet(self,(col,row)))
-                
-        return w/col_nb, h/row_nb
+#    def initial_planet(self):
+#        self.all_planets.add(planets.Planet(self,(config.Config.screen_w/2,config.Config.screen_h/2)))
+#        for p in self.all_planets: p.pop_around()
                 
                        
     def run(self):
@@ -83,11 +74,12 @@ class Game(object):
         black_bg.fill((0,0,25))        
         pygame.time.set_timer(USEREVENT + 1, 5000) # 1 event every 10 seconds
         pygame.time.set_timer(USEREVENT + 2, 1000) # 1 event every 1 seconds
+        pygame.time.set_timer(USEREVENT + 3, 75) # map offset every 100 ms
         
         while True:
             self.clock.tick(60) #needed to slow game down
             t0 = time.time()
-                        
+            
             for event in pygame.event.get(): #setting up quit
                 if event.type == QUIT:
                     pygame.quit()
@@ -96,7 +88,9 @@ class Game(object):
                 elif event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-                    print 'has quit'        
+                    print 'has quit' 
+                elif event.type == USEREVENT + 3:
+                    self.interface.get_map_offset()
                 elif event.type == pygame.KEYDOWN and event.key == K_SPACE:
                     if self.pause == True: self.pause = False
                     elif self.pause == False: self.pause = True
@@ -105,12 +99,9 @@ class Game(object):
                     elif self.interface.helpers == False: self.interface.helpers = True                        
                 elif event.type == USEREVENT + 2:
                     self.interface.display_event = True
+                    if self.interface.arrow_disp_time > 0: self.interface.arrow_disp_time -= 1
                 elif event.type == USEREVENT + 1 and self.pause == False:
-                    self.month += 1 #adds a months of gametime every 10 seconds
-                    self.event_manager.get_random_event()
-                    self.event_manager.planet_discovery_event(False)
-                    self.event_manager.points_adjustement_event()
-                    self.event_manager.network_expenses_event()
+                    self.event_manager.all_monthly_events()
                 elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                     self.pressed_left_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 1:
@@ -129,7 +120,8 @@ class Game(object):
             self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2))
             self.interface.event_popup()    
             self.interface.final_overlay() #will only display messages when USEREVENT+2 has occured
-            
+            fn.display_txt(str(len(self.all_planets)),'Lucida Console',16,(200,200,0),self.interface.screen,(500,80))
+
             
             pygame.display.update()
             t1 = time.time()
