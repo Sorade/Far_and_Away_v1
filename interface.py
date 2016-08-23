@@ -101,12 +101,13 @@ class Interface(object):
         
         #checks for mouse colision with the planet and if the map is active
         if offset_rect.collidepoint(pygame.mouse.get_pos()) and self.game.map_active:
-            if pygame.mouse.get_pressed()[0]:
+            if pygame.mouse.get_pressed()[0] and self.game.pressed_left_clic:
                 #choses between visit and exploration
                 explorer.select_displacement(planet)
                     
-            elif pygame.mouse.get_pressed()[2] and self.game.pressed_right_clic == True:
-                planet.search_in_SOF(explorer,True,30)
+            elif pygame.mouse.get_pressed()[2] and self.game.pressed_right_clic:
+                bonus = 50 if explorer.location == planet.name else 30
+                planet.search_in_SOF(explorer, True, bonus)
                 self.game.pressed_right_clic = False
                 
     def check_hovered(self, planet):
@@ -210,7 +211,7 @@ class Interface(object):
                 img = pygame.transform.rotate(Data.misc['arrow'],angle)
                 fn.blitc(self.screen,img,pos)
                 
-        if self.arrow_disp_time == 0:
+        if self.arrow_disp_time <= 0:
             self.arrows = []
         
     def message_display(self):
@@ -278,11 +279,11 @@ class Interface(object):
             okay_but.display(self.screen)
             
             if okay_but.selected and self.game.pressed_left_clic:
-                self.game.pressed_left_clic = False
                 self.game.pause = False
                 event.execute()
                 self.game.event_manager.active_events.remove(event)
                 self.game.map_active = True
+                self.game.pressed_left_clic = False
             break #only does the function for one event at a time
 
             
