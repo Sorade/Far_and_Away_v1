@@ -61,12 +61,13 @@ to the reference points'''
         Quad.conts = [0,0,0,0]
         Quad.ref_x,Quad.ref_y = ref_pt
         x,y = pt
-        if x < Quad.ref_x and y <= Quad.ref_y:
-            if Quad.angle_list[0][2] > 0: Quad.angle_list[0][2] -= 1 #TL
-        elif x >= Quad.ref_x and y < Quad.ref_y:
-            if Quad.angle_list[3][2] > 0: Quad.angle_list[3][2] -= 1 #TR
-        elif x > Quad.ref_x and y >= Quad.ref_y:
-            if Quad.angle_list[2][2] > 0: Quad.angle_list[2][2] -= 1 #BL
-        else:
-            if Quad.angle_list[1][2] > 0: Quad.angle_list[1][2] -= 1 #BR
+        if sum([Quad.angle_list[n][2] for n in range(4)]) > 1:
+            if x < Quad.ref_x and y <= Quad.ref_y:
+                Quad.angle_list[0][2] -= 1 #TL
+            elif x >= Quad.ref_x and y < Quad.ref_y:
+                Quad.angle_list[3][2] -= 1 #TR
+            elif x > Quad.ref_x and y >= Quad.ref_y:
+                Quad.angle_list[2][2] -= 1 #BL
+            else:
+                Quad.angle_list[1][2] -= 1 #BR
           

@@ -259,8 +259,8 @@ class Interface(object):
         
     def event_popup(self):
         '''get event from event manager and assign it locally'''
-        event = self.game.event_manager.active_event
-        if event is not None:
+        events = self.game.event_manager.active_events
+        for event in events:
             self.game.pause = True
             '''blits popup bg '''
             tooltip_bg = Data.backgrounds['event']
@@ -277,16 +277,15 @@ class Interface(object):
             okay_but.check_select()
             okay_but.display(self.screen)
             
-            if okay_but.selected:
+            if okay_but.selected and self.game.pressed_left_clic:
+                self.game.pressed_left_clic = False
                 self.game.pause = False
                 event.execute()
-                self.game.event_manager.active_event = None
+                self.game.event_manager.active_events.remove(event)
                 self.game.map_active = True
+            break #only does the function for one event at a time
 
             
-        
-        
-               
 class Button(pygame.sprite.Sprite):
     def __init__(self, text, binded, x,y):
         super(Button, self).__init__()

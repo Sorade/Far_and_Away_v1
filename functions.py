@@ -12,7 +12,7 @@ from math import pi,radians,sin,cos,acos
 '''takes a list of tulpe values and plots them in a graph
 of which the bottom left corner is set as o_pos and has 
 a width and height defined by the dim tulpe = to (w,h)'''
-def get_graph_data(list,o_pos,dim,  lab_offset):
+def get_graph_data(list,o_pos, dim,  lab_offset):
     ox,oy = o_pos
     w,h = dim
     xls,yls = [x-1 for x,y in list], [y for x,y in list]
@@ -38,7 +38,7 @@ def dist(point1, point2):
 
 def kp_formula(planet,game_time,exploration_time,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
-    return int(abs(np.sin(dt)*(planet.disc_kp+bonus)*np.exp(-0.025*dt)))
+    return int(abs(np.sin(dt*0.5)*(planet.disc_kp+bonus)*np.exp(-0.01*dt)))
     
 def rp_formula(planet,game_time,exploration_time,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1

@@ -11,19 +11,19 @@ class Event_Manager(object):
     def __init__(self,game):
         self.game = game
         self.event_list = [Precious_Ore_Discovered(game),Raiders(game),Old_Archives(game),Storm(game)]
-        self.active_event = None
+        self.active_events = []
         
     def all_monthly_events(self):
         self.game.month += 1 #adds a months of gametime every 10 seconds
         self.get_random_event()
         self.planet_discovery_event(False)
         self.points_adjustement_event()
-        #self.network_expenses_event()
+        self.network_expenses_event()
         
     def get_random_event(self):
         '''get random event'''
         if random.randint(0,5) == 0: 
-            self.active_event = fn.choice_weighted(self.game.event_manager.event_list)
+            self.active_events.append(fn.choice_weighted(self.game.event_manager.event_list))
             self.game.map_active = False
             
         '''removes bonuses'''
@@ -52,8 +52,8 @@ class Event_Manager(object):
         for log in self.game.player.logbook.values():
             if log.is_explored:
                 cost += 1
-        self.game.player.rp -= cost*2
-        self.game.player.monthly_expense = cost*2 #stores the cost value for the current game state in a variable
+        self.game.player.rp -= int(cost*1.5)
+        self.game.player.monthly_rp_expense = int(cost*1.5) #stores the cost value for the current game state in a variable
         #so that it can be accessed in the graph display
                 
     def points_adjustement_event(self):

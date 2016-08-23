@@ -39,20 +39,20 @@ class Game(object):
         self.player = explorers.Explorer(self)
 
         '''Create Planets'''
+        tierra = World_Habitable(self,(config.Config.screen_w/2,config.Config.screen_h/2))
         self.all_planets = pygame.sprite.Group()
-        self.all_planets.add(World_Habitable(self,(config.Config.screen_w/2,config.Config.screen_h/2)))
+        self.all_planets.add(tierra)
         
         '''assign starting planet to player only'''
-        for p in self.all_planets:
-            p.name = 'Tierra'
-            self.player.logbook[p.name] = lgbk.Logbook(p,True,True)
-            self.player.logbook[p.name].time_of_exploration = self.month
-            p.discovered_by.append(self.player.name)
-            p.explored_by.append(self.player.name)
-            self.player.location = p.name
-            p.disc_kp,p.disc_rp = 10,8
-            p.radius = 600
-            p.pop_around(max_iter = 5)
+        tierra.name = 'Tierra'
+        self.player.logbook[tierra.name] = lgbk.Logbook(tierra,True,True)
+        self.player.logbook[tierra.name].time_of_exploration = self.month
+        tierra.discovered_by.append(self.player.name)
+        tierra.explored_by.append(self.player.name)
+        self.player.location = tierra.name
+        tierra.disc_kp,tierra.disc_rp = 10,8
+        tierra.radius = 600
+        tierra.pop_around(max_planet = 5, max_iter = 10)
             
         '''setting up game switches'''
         self.pressed_left_clic = False 
