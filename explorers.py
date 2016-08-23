@@ -37,4 +37,25 @@ class Explorer(object):
     def rp(self, rp):
         rp = 0 if rp < 0 else rp
         self._rp = rp
+        
+    def select_displacement(self, planet):
+        ''' checks whether the explorer has explored the planet or not and
+            performs the corresponding displacement function (explore or visit)
+            Explorer Planet -> None
+            SE: -explore
+                -visit
+        '''
+        if not self.check_exploration(planet):
+            planet.explore(self)
+        else:
+            planet.visit(self)
+            
+    def check_dicovery(self, planet):
+        return True if self.name in planet.discovered_by else False
 
+    def check_exploration(self, planet):
+        return True if self.name in planet.explored_by else False
+        
+    def get_logbook_planets(self):
+        for log in self.logbook.itervalues():
+            yield log.instance[0] 

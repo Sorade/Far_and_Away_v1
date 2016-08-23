@@ -25,7 +25,7 @@ class Interface(object):
         self.arrows = []
         self.arrow_disp_time = 0
         '''variables'''
-        self.hoovered = None
+        self.hovered = None
         self.helpers = False
         self.map_offset_x = 0
         self.map_offset_y = 0
@@ -47,56 +47,76 @@ class Interface(object):
         x,y = offset[0],offset[1]
         return (self.screen.get_rect().centerx-x,self.screen.get_rect().centery-y)
         
-    def final_overlay(self):
+    def final_overlay(self,explorer):
         self.message_display()
         '''blit pause status'''
         if self.game.pause: fn.display_txt('Game Paused','Impact',16,(0,255,0),self.screen,(int(Config.screen_w*0.75),15))
         '''blit time in months'''
         fn.display_txt('Current Month: {}'.format(self.game.month),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,15))
         '''blit the player's points'''
-        fn.display_txt('Your KP: {}'.format(self.game.player.kp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-350,Config.screen_h-30))
-        fn.display_txt('Your RP: {}'.format(self.game.player.rp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-150,Config.screen_h-30))                    
+        fn.display_txt('Your KP: {}'.format(explorer.kp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-350,Config.screen_h-30))
+        fn.display_txt('Your RP: {}'.format(explorer.rp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-150,Config.screen_h-30))                    
         '''display arrows'''
         self.show_arrows()
         
-    def view_solarsys(self,offset):
+    def view_solarsys(self,explorer,offset):
+        ''' 
+            !!! draw line between discovered planets
+            !!! blit discovered planets
+            !!! blit red halo to unexplored
+            !!! blit green halo to player's location
+            '''
         planets_to_blit = []
-        for p in (log.instance[0] for log in self.game.player.logbook.itervalues()):
-            if self.game.player.logbook[p.name].is_discovered == True:
-                [pygame.draw.line(self.screen, (0,250,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), fn.sum_tulp(p2.pos,(self.map_offset_x,self.map_offset_y)), 5) for p2 in p.planets_in_SOF if self.game.player.logbook[p2.name].is_explored and self.game.player.logbook[p.name].is_explored]
+        for p in explorer.get_logbook_planets():
+            if explorer.check_dicovery(p):
+                if explorer.check_exploration(p):
+                    [pygame.draw.line(self.screen, (0,250,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), fn.sum_tulp(p2.pos,(self.map_offset_x,self.map_offset_y)), 5) for p2 in p.planets_in_SOF if explorer.check_exploration(p2)]
                 planets_to_blit.append(p)
-                '''offset the planet's rect for the check'''
-                offset_rect = pygame.Rect(fn.sum_tulp(p.rect.topleft,(self.map_offset_x,self.map_offset_y)),(p.rect.w,p.rect.h))
-                if offset_rect.collidepoint(pygame.mouse.get_pos()) : self.hoovered = p
-                
+                self.check_hovered(p)
+        
+        #need another loop to ensure planets are blitted in front of all the lines        
         for p in planets_to_blit:
-            if self.game.player.logbook[p.name].is_discovered == True:
-                if self.game.player.logbook[p.name].is_explored == False:
+            if explorer.check_dicovery(p):
+                if not explorer.check_exploration(p):
                     pygame.draw.circle(self.screen, (255,0,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.6), 0)
-                if self.game.player.location == p.name:
+                if explorer.location == p.name:
                     pygame.draw.circle(self.screen, (0,255,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.75), 0)
                 fn.blitc(self.screen, Data.images_planets[p.img_ref], fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)))
                                 
             '''Mouse interaction'''
-            offset_rect = pygame.Rect(fn.sum_tulp(p.rect.topleft,(self.map_offset_x,self.map_offset_y)),(p.rect.w,p.rect.h))
-            if offset_rect.collidepoint(pygame.mouse.get_pos()) and self.game.map_active:
-                if pygame.mouse.get_pressed()[0]:
-                    if self.game.player.logbook[p.name].is_explored == False:
-                        p.explore(self.game.player)
-                    else:
-                        p.visit(self.game.player)
-                elif pygame.mouse.get_pressed()[2] and self.game.pressed_right_clic == True:
-                    p.search_in_SOF(self.game.player,True,30)
-                    self.game.pressed_right_clic = False
-                    
+            self.solar_sys_mouse_interaction(explorer,p)
+            
         '''blitting planet info'''
         self.view_planet()
-
-              
+    
+    def solar_sys_mouse_interaction(self,explorer,planet):
+        ''' None -> None
+            Handles mouse interaction when in solar system view
+            SE: -player exploration
+                -player visit
+                -search is SOF'''
+                
+        #offsets the rectangle of the planet by the map offset        
+        offset_rect = pygame.Rect(fn.sum_tulp(planet.rect.topleft,(self.map_offset_x,self.map_offset_y)),(planet.rect.w,planet.rect.h))
+        
+        #checks for mouse colision with the planet and if the map is active
+        if offset_rect.collidepoint(pygame.mouse.get_pos()) and self.game.map_active:
+            if pygame.mouse.get_pressed()[0]:
+                #choses between visit and exploration
+                explorer.select_displacement(planet)
+                    
+            elif pygame.mouse.get_pressed()[2] and self.game.pressed_right_clic == True:
+                planet.search_in_SOF(explorer,True,30)
+                self.game.pressed_right_clic = False
+                
+    def check_hovered(self, planet):
+        offset_rect = pygame.Rect(fn.sum_tulp(planet.rect.topleft,(self.map_offset_x,self.map_offset_y)),(planet.rect.w,planet.rect.h))
+        if offset_rect.collidepoint(pygame.mouse.get_pos()) : self.hovered = planet
+     
             
     def view_planet(self):
-        if self.hoovered is not None:
-            planet = self.hoovered
+        if self.hovered is not None:
+            planet = self.hovered
             
             m_x,m_y = pygame.mouse.get_pos()
             offset_w,offset_h = 300,220
@@ -147,7 +167,7 @@ class Interface(object):
                 y += 20
                 count += 1
                 
-            self.hoovered = None
+            self.hovered = None
 
                 
     def add_message(self,msg,disp_time):

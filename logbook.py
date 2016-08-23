@@ -19,3 +19,4 @@ class Logbook(object):
         self.travel_time = fn.travel_time(fn.dist(self.instance[0].pos,planet.pos),self.instance[0].game.space_travel_unit)
         self.travel_cost = fn.travel_formula(self.travel_time)
         
+       

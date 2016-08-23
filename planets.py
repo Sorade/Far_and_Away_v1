@@ -22,7 +22,7 @@ class Planet(sprite.MySprite):
         self.discovered_by = []
         self.explored_by = []
         self.planets_in_SOF = []
-        self.chance_of_discovery = random.randint(0,15)
+        self.chance_of_discovery = random.randint(90,100)
         self.diameter = random.randint(5,50)
         self.disc_kp = random.randint(0,12)
         self.disc_rp = random.randint(0,12)
@@ -34,17 +34,18 @@ class Planet(sprite.MySprite):
     def add_to_logbook(self,explorer):
         explorer.logbook[self.name] = lgbk.Logbook(self,False,False)
         
-    def pop_around(self):
+    def pop_around(self, max_iter = 3):
         ox,oy = self.pos
         self.get_in_SOF()
         Quad.get_content(self.pos,[p.pos for p in self.game.all_planets])
         Quad.get_weights()
-        max_iter = 1
+        iteration = 1
         max_planet = 1
-        while max_planet <= 2 and max_iter <= 5:#len(self.planets_in_SOF) <= 4 and max_iter <= 100:
+        while max_planet <= 2 and iteration <= max_iter :#len(self.planets_in_SOF) <= 4 and max_iter <= 100:
             #remove the radius of the planet so that planets do not overlap
             #will only work if the radius of all planets are the same
             pop_dist = random.randint(max(self.rect.w+30,self.radius/2),self.radius-self.rect.w)
+            print Quad.angle_list
             angle_min,angle_max = fn.choice_weighted(Quad.angle_list, True)
             pop_angle = random.uniform(angle_min,angle_max)
             new_p_pos = fn.point_pos(self.pos,pop_dist,pop_angle)#(int(np.cos(pop_angle)*pop_dist),int(np.sin(pop_angle)*pop_dist))
@@ -55,7 +56,7 @@ class Planet(sprite.MySprite):
                 new_p.add_to_logbook(self.game.player)
                 Quad.update_weights(self.pos,new_p_pos)
                 max_planet += 1
-            max_iter += 1
+            iteration += 1
             
         
     def unveil(self,explorer,player_induced,bonus):

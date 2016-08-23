@@ -52,7 +52,7 @@ class Game(object):
             self.player.location = p.name
             p.disc_kp,p.disc_rp = 10,8
             p.radius = 600
-            p.pop_around()
+            p.pop_around(max_iter = 5)
             
         '''setting up game switches'''
         self.pressed_left_clic = False 
@@ -117,9 +117,9 @@ class Game(object):
 
             '''Calling Display functions'''
             self.interface.screen.blit(black_bg,(0,0))
-            self.interface.view_solarsys((config.Config.screen_w/2,config.Config.screen_h/2))
+            self.interface.view_solarsys(self.player,(config.Config.screen_w/2,config.Config.screen_h/2))
             self.interface.event_popup()    
-            self.interface.final_overlay() #will only display messages when USEREVENT+2 has occured
+            self.interface.final_overlay(self.player) #will only display messages when USEREVENT+2 has occured
             fn.display_txt(str(len(self.all_planets)),'Lucida Console',16,(200,200,0),self.interface.screen,(500,80))
 
             
