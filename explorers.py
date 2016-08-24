@@ -50,7 +50,7 @@ class Explorer(object):
         else:
             planet.visit(self)
             
-    def check_dicovery(self, planet):
+    def check_discovery(self, planet):
         return True if self.name in planet.discovered_by else False
 
     def check_exploration(self, planet):

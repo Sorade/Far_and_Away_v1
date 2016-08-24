@@ -68,7 +68,7 @@ class Interface(object):
             '''
         planets_to_blit = []
         for p in explorer.get_logbook_planets():
-            if explorer.check_dicovery(p):
+            if explorer.check_discovery(p):
                 if explorer.check_exploration(p):
                     [pygame.draw.line(self.screen, (0,250,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), fn.sum_tulp(p2.pos,(self.map_offset_x,self.map_offset_y)), 5) for p2 in p.planets_in_SOF if explorer.check_exploration(p2)]
                 planets_to_blit.append(p)
@@ -76,7 +76,7 @@ class Interface(object):
         
         #need another loop to ensure planets are blitted in front of all the lines        
         for p in planets_to_blit:
-            if explorer.check_dicovery(p):
+            if explorer.check_discovery(p):
                 if not explorer.check_exploration(p):
                     pygame.draw.circle(self.screen, (255,0,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.6), 0)
                 if explorer.location == p.name:
@@ -116,6 +116,8 @@ class Interface(object):
      
             
     def view_planet(self):
+        ''' if the planet is hovered upon by the mouse, information on it is
+            blitted to the screen'''
         if self.hovered is not None:
             planet = self.hovered
             
@@ -263,6 +265,7 @@ class Interface(object):
         events = self.game.event_manager.active_events
         for event in events:
             self.game.pause = True
+            event.update()
             '''blits popup bg '''
             tooltip_bg = Data.backgrounds['event']
             tooltip_bg.set_alpha(50)

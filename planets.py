@@ -24,8 +24,6 @@ class Planet(sprite.MySprite):
         self.planets_in_SOF = []
         self.chance_of_discovery = random.randint(0,15)
         self.diameter = random.randint(5,50)
-        self.disc_kp = random.randint(0,12)
-        self.disc_rp = random.randint(0,12)
         self.img_ref = img_ref
         
         self.rect = data.Data.images_planets[self.img_ref].get_rect()

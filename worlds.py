@@ -15,7 +15,6 @@ class World_Mining(Planet):
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.radius = random.randint(250,400) #SOF
-        self.name = '{}-{}'.format(fn.name_gen(True),str(random.randint(0,100)))
         self.chance_of_discovery = random.randint(0,10)
         self.disc_kp = random.randint(0,3)
         self.disc_rp = random.randint(10,15)
@@ -27,7 +26,6 @@ class World_Habitable(Planet):
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.radius = random.randint(250,500) #SOF
-        self.name = '{}-{}'.format(fn.name_gen(True),str(random.randint(0,100)))
         self.chance_of_discovery = random.randint(0,15)
         self.disc_kp = random.randint(5,10)
         self.disc_rp = random.randint(10,10)
@@ -38,8 +36,7 @@ class World_Frozen(Planet):
     weight = 10
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
-        self.radius = random.randint(400,700) #SOF
-        self.name = '{}-{}'.format(fn.name_gen(True),str(random.randint(0,100)))
+        self.radius = random.randint(500,700) #SOF
         self.chance_of_discovery = random.randint(0,15)
         self.disc_kp = random.randint(0,2)
         self.disc_rp = random.randint(0,2)
@@ -51,7 +48,6 @@ class World_Alien(Planet):
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.radius = random.randint(250,600) #SOF
-        self.name = '{}-{}'.format(fn.name_gen(True),str(random.randint(0,100)))
         self.chance_of_discovery = random.randint(0,15)
         self.disc_kp = random.randint(20,30)
         self.disc_rp = random.randint(5,10)

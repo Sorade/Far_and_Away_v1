@@ -15,7 +15,8 @@ pygame.init()
 clock = pygame.time.Clock() #set timer which is used to slow game down
 
 '''import game modules'''
-import events
+import event_manager as em
+from events import *
 import interface
 import planets
 import explorers
@@ -27,13 +28,12 @@ from worlds import *
 
 class Game(object):
     def __init__(self):
-        self.event_manager = events.Event_Manager(self)
+        self.event_manager = em.Event_Manager(self)
         self.interface = interface.Interface(self)
         self.clock = pygame.time.Clock() #set timer which is used to slow game down
         self.month = 0
         self.space_travel_unit = 150
         self.planet_choices = [World_Mining,World_Habitable,World_Frozen,World_Alien]
-        
         '''create explorers and player'''
         self.all_explorers = [explorers.Explorer(self) for x in range (2)]
         self.player = explorers.Explorer(self)
@@ -52,7 +52,11 @@ class Game(object):
         self.player.location = tierra.name
         tierra.disc_kp,tierra.disc_rp = 10,8
         tierra.radius = 600
-        tierra.pop_around(max_planet = 5, max_iter = 10)
+        tierra.pop_around(max_planet = 5, max_iter = 50)
+        
+        '''creats events'''
+        self.event_list = [Precious_Ore_Discovered(self),Raiders(self),Old_Archives(self),Storm(self),Rebellion(self)]
+
             
         '''setting up game switches'''
         self.pressed_left_clic = False 
@@ -101,7 +105,9 @@ class Game(object):
                     self.interface.display_event = True
                     if self.interface.arrow_disp_time > 0: self.interface.arrow_disp_time -= 1
                 elif event.type == USEREVENT + 1 and self.pause == False:
+                    #Monthly Events and actions
                     self.event_manager.all_monthly_events()
+                    for event in self.event_list: event.get_weight()
                 elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                     self.pressed_left_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 1:
