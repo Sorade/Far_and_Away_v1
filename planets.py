@@ -56,21 +56,19 @@ class Planet(sprite.MySprite):
             iteration += 1
             
         
-    def unveil(self,explorer,player_induced,bonus):
+    def unveil(self,explorer,player_induced):
         if player_induced == True  and explorer.kp >= 5:
             explorer.kp -= 5
-            if explorer.logbook[self.name].is_discovered == False and self.chance_of_discovery+bonus >= random.randint(0,100):
+            if not explorer.check_discovery(self) and self.chance_of_discovery + explorer.search_bonus >= random.randint(0,100):
                 explorer.logbook[self.name].is_discovered = True
                 self.discovered_by.append(explorer.name)
-                #self.pop_around()
                 self.game.interface.add_message('Discovered {}'.format(self.name),1)
                 arrow_stats = self.game.interface.arrow_param(self)
                 if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
                 
-        elif explorer.logbook[self.name].is_discovered == False and self.chance_of_discovery >= random.randint(0,100):
+        elif not explorer.check_discovery(self) and self.chance_of_discovery >= random.randint(0,100):
             explorer.logbook[self.name].is_discovered = True
             self.discovered_by.append(explorer.name)
-            #self.pop_around()
             self.game.interface.add_message('Auto-Discovered {}'.format(self.name),1)
             arrow_stats = self.game.interface.arrow_param(self)
             if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
@@ -112,17 +110,20 @@ class Planet(sprite.MySprite):
         else:
             return False
             
-    def search_in_SOF(self,explorer,player_induced,bonus):
+    def search_in_SOF(self,explorer,player_induced):
         if explorer.logbook[self.name].is_explored:
             launch = True if explorer.kp >= 5 else False
-            if player_induced and launch: self.game.interface.add_message('Searching around {} ...'.format(self.name),1)
+            if player_induced and launch: 
+                self.game.interface.add_message('Searching around {} ...'.format(self.name),1)
+                if explorer.location == self.name: explorer.search_bonus += 50 # adds a loc bonus
             for planet in self.planets_in_SOF:
                 if launch == False:
                     break
                 if not explorer.check_discovery(planet): #prevents checking already explored planets
-                    planet.unveil(explorer,player_induced,bonus)
-            if player_induced and launch: self.game.interface.add_message('... search completed'.format(self.name),1)
-            
+                    planet.unveil(explorer,player_induced)
+            if player_induced and launch:
+                self.game.interface.add_message('... search completed'.format(self.name),1)
+                if explorer.location == self.name: explorer.search_bonus -= 50 #remove the loc bonus
 
     def get_in_SOF(self):
         self.planets_in_SOF = []

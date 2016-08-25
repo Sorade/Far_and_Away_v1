@@ -106,8 +106,7 @@ class Interface(object):
                 explorer.select_displacement(planet)
                     
             elif pygame.mouse.get_pressed()[2] and self.game.pressed_right_clic:
-                bonus = 50 if explorer.location == planet.name else 30
-                planet.search_in_SOF(explorer, True, bonus)
+                planet.search_in_SOF(explorer, True)
                 self.game.pressed_right_clic = False
                 
     def check_hovered(self, planet):

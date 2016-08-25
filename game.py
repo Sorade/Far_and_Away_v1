@@ -55,7 +55,7 @@ class Game(object):
         tierra.pop_around(max_planet = 5, max_iter = 50)
         
         '''creats events'''
-        self.event_manager.event_list = [Precious_Ore_Discovered(self),Raiders(self),Old_Archives(self),Storm(self),Rebellion(self),Alien_Tech(self)]
+        self.event_manager.event_list = [Precious_Ore_Discovered(self),Raiders(self),Old_Archives(self),Storm(self),Rebellion(self),Alien_Tech(self),Astronomer(self)]
 
             
         '''setting up game switches'''
@@ -125,7 +125,7 @@ class Game(object):
             self.interface.view_solarsys(self.player,(config.Config.screen_w/2,config.Config.screen_h/2))
             self.interface.event_popup(self.event_manager.active_events,self.player)    
             self.interface.final_overlay(self.player) #will only display messages when USEREVENT+2 has occured
-            fn.display_txt(str(len(self.all_planets)),'Lucida Console',16,(200,200,0),self.interface.screen,(500,80))
+            fn.display_txt(str(len(self.all_planets)),'Lucida Console',16,(200,200,0),self.interface.screen,(20,20))
 
             
             pygame.display.update()

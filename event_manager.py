@@ -34,7 +34,7 @@ class Event_Manager(object):
     
     def planet_discovery_event(self,player_induced):
         for log in self.game.player.logbook.values():
-            log.instance[0].search_in_SOF(self.game.player,False,0)
+            log.instance[0].search_in_SOF(self.game.player,False)
             
     def resource_prod_event(self):
         for log in self.game.player.logbook.values():

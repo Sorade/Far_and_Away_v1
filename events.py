@@ -30,7 +30,7 @@ class Precious_Ore_Discovered(Event):
     def get_weight(self,explorer):
         total_explored_mining_worlds = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Mining World'])
         self.weight = total_explored_mining_worlds*11/(self.game.month+1)
-        print 'mining',self.weight
+#        print 'mining',self.weight
         
     def execute(self):
         self.game.player.rp_bonus += 2
@@ -52,7 +52,7 @@ class Raiders(Event):
     def get_weight(self,explorer):
         total_unexplored_planets = len([p for p in self.game.all_planets if not self.game.player.check_exploration(p) and  self.game.player.check_discovery(p)])
         self.weight = total_unexplored_planets*10/(self.game.month+1) if total_unexplored_planets > 5 else 0
-        print 'raider',self.weight
+#        print 'raider',self.weight
         
     def execute(self):
         self.game.player.rp_bonus += -2
@@ -77,7 +77,7 @@ class Old_Archives(Event):
     def get_weight(self,explorer):
         total_explored_habitable_alien = len([p for p in self.game.all_planets if explorer.check_exploration(p) and (p.cat == 'Habitable World' or p.cat == 'Alien World')])
         self.weight = total_explored_habitable_alien*20/(self.game.month+1)
-        print 'archive',self.weight
+#        print 'archive',self.weight
         
     def execute(self):
         self.game.player.kp_bonus += 2
@@ -93,7 +93,7 @@ class Rebellion(Event):
     def get_weight(self,explorer):
         total_explored_planets = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.name != explorer.location])
         self.weight = total_explored_planets*6/(self.game.month+1) if total_explored_planets > 5 else 0
-        print 'rebel',self.weight
+#        print 'rebel',self.weight
 
     def execute(self):
         self.game.player.logbook[self.planet_pointer[0].name].is_explored = False
@@ -124,9 +124,26 @@ class Alien_Tech(Event):
         self.newly_explored = total_explored_alien - self.already_explored
         self.already_explored = total_explored_alien
         self.weight = total_explored_alien*3 if self.newly_explored > 0 else 0
-        print 'AlienTech',self.weight
+#        print 'AlienTech',self.weight
         
     def execute(self):
         self.game.player.travel_bonus += 1
+        
+class Astronomer(Event):
+    def __init__(self,game):
+        self.name = 'Astronomer'
+        self.weight = 2
+        self.already_occured = False
+        self.text ='An astronomer has joined your high-command concil, enhancing your research efforts for new worlds.'
+        super(type(self), self).__init__(game,self.name,self.weight,self.text)
+        
+    def get_weight(self,explorer):
+        total_explored = len([p for p in self.game.all_planets if explorer.check_exploration(p)])
+        self.weight = 2 if self.game.month > 10 and not self.already_occured and total_explored > 15 else 0
+#        print 'Astro',self.weight
+        
+    def execute(self):
+        self.game.player.search_bonus += 10
+        self.already_occured = True
 
 
