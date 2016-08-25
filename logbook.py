@@ -15,8 +15,8 @@ class Logbook(object):
         self.travel_time = 0
         self.travel_cost = 0
         
-    def get_travel_info(self,planet):
-        self.travel_time = fn.travel_time(fn.dist(self.instance[0].pos,planet.pos),self.instance[0].game.space_travel_unit)
+    def get_travel_info(self,planet,travel_bonus):
+        self.travel_time = fn.travel_time(fn.dist(self.instance[0].pos,planet.pos),self.instance[0].game.space_travel_unit)/travel_bonus
         self.travel_cost = fn.travel_formula(self.travel_time)
         
        

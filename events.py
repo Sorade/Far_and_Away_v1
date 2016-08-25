@@ -13,7 +13,7 @@ class Event(object):
         self.weight = weight
         self.text = text
         
-    def get_weight(self):
+    def get_weight(self,explorer):
         pass
         
     def update(self):
@@ -27,8 +27,8 @@ class Precious_Ore_Discovered(Event):
         self.text ='''An ore of precious metal has been found in one of your colonies and is being traded throughout the galaxy. It will surely increase our production for a few more years.'''
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
         
-    def get_weight(self):
-        total_explored_mining_worlds = len([p for p in self.game.all_planets if self.game.player.check_exploration(p) and p.cat == 'Mining World'])
+    def get_weight(self,explorer):
+        total_explored_mining_worlds = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Mining World'])
         self.weight = total_explored_mining_worlds*11/(self.game.month+1)
         print 'mining',self.weight
         
@@ -49,7 +49,7 @@ class Raiders(Event):
         self.text ='''Raiders have been reported to disrupt our supply lines and are causing havoc amongst interplanetary trade. This is starting to show in our finances.'''
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
         
-    def get_weight(self):
+    def get_weight(self,explorer):
         total_unexplored_planets = len([p for p in self.game.all_planets if not self.game.player.check_exploration(p) and  self.game.player.check_discovery(p)])
         self.weight = total_unexplored_planets*10/(self.game.month+1) if total_unexplored_planets > 5 else 0
         print 'raider',self.weight
@@ -60,7 +60,7 @@ class Raiders(Event):
 class Storm(Event):
     def __init__(self,game):
         self.name = 'Storm'
-        self.weight = 2
+        self.weight = 1
         self.text ='''An electromagnetic storm has damaged our servers costing us some precious data which we had spend years gathering !!'''
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
         
@@ -70,9 +70,14 @@ class Storm(Event):
 class Old_Archives(Event):
     def __init__(self,game):
         self.name = 'Old Archives'
-        self.weight = 3
+        self.weight = 2
         self.text ='''One of your crew librarians has managed to find some long lost archives. They must surely be of interest to us.'''
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
+        
+    def get_weight(self,explorer):
+        total_explored_habitable_alien = len([p for p in self.game.all_planets if explorer.check_exploration(p) and (p.cat == 'Habitable World' or p.cat == 'Alien World')])
+        self.weight = total_explored_habitable_alien*20/(self.game.month+1)
+        print 'archive',self.weight
         
     def execute(self):
         self.game.player.kp_bonus += 2
@@ -85,8 +90,8 @@ class Rebellion(Event):
         self.text = 'to be defined at exec'
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
         
-    def get_weight(self):
-        total_explored_planets = len([p for p in self.game.all_planets if self.game.player.check_exploration(p) and p.name != self.game.player.location])
+    def get_weight(self,explorer):
+        total_explored_planets = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.name != explorer.location])
         self.weight = total_explored_planets*6/(self.game.month+1) if total_explored_planets > 5 else 0
         print 'rebel',self.weight
 
@@ -99,3 +104,23 @@ class Rebellion(Event):
         if self.planet_pointer is None:
             self.planet_pointer = [random.choice([p for p in self.game.all_planets if self.game.player.check_exploration(p) and p.name != self.game.player.location])]
             self.text ='''The governement of {} has rebelled against your authority. Refusing to pay you the taxes you are owed to carry your duty.'''.format(self.planet_pointer[0].name)
+
+class Alien_Tech(Event):
+    def __init__(self,game):
+        self.name = 'Alien Tech'
+        self.weight = 10
+        self.text ='New Alien hyperdrive technology is available, making our travels faster !'
+        self.newly_explored = 0
+        self.already_explored = 0
+        super(type(self), self).__init__(game,self.name,self.weight,self.text)
+        
+    def get_weight(self,explorer):
+        total_explored_alien = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Alien World'])
+        self.newly_explored = total_explored_alien - self.already_explored
+        self.weight = total_explored_alien if self.newly_explored > 0 else 0
+        print 'AlienTech',self.weight
+        
+    def execute(self):
+        self.game.player.travel_bonus += 1
+
+

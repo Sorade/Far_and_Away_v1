@@ -17,8 +17,10 @@ class Explorer(object):
         self.rp = 10
         self.kp_bonus = 0
         self.rp_bonus = 0
+        self.travel_bonus = 1
         self.monthly_rp_expense = 0
         self.monthly_rp_income = 0
+        
         
     @property
     def kp(self):

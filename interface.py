@@ -87,7 +87,7 @@ class Interface(object):
             self.solar_sys_mouse_interaction(explorer,p)
             
         '''blitting planet info'''
-        self.view_planet()
+        self.view_planet(explorer)
     
     def solar_sys_mouse_interaction(self,explorer,planet):
         ''' None -> None
@@ -115,7 +115,7 @@ class Interface(object):
         if offset_rect.collidepoint(pygame.mouse.get_pos()) : self.hovered = planet
      
             
-    def view_planet(self):
+    def view_planet(self,explorer):
         ''' if the planet is hovered upon by the mouse, information on it is
             blitted to the screen'''
         if self.hovered is not None:
@@ -140,21 +140,21 @@ class Interface(object):
             
             ''' blit all the planet's stats to the screen'''
             #update's travel information for the planet
-            self.game.player.logbook[planet.name].get_travel_info(self.game.player.logbook[self.game.player.location].instance[0])
-            if self.game.player.name in planet.explored_by:
+            explorer.logbook[planet.name].get_travel_info(explorer.logbook[explorer.location].instance[0],explorer.travel_bonus)
+            if explorer.name in planet.explored_by:
                 info_ls = [
                 planet.name,
                 planet.pos,
                 planet.discovered_by,
                 planet.explored_by,
-                '{} (+{}/month)'.format(planet.disc_kp,fn.kp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.kp_bonus)),
-                '{} (+{}/month)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.month+1,self.game.player.logbook[planet.name].time_of_exploration,self.game.player.rp_bonus)),
-                self.game.player.logbook[planet.name].travel_cost,
-                self.game.player.logbook[planet.name].travel_time]
+                '{} (+{}/month)'.format(planet.disc_kp,fn.kp_formula(planet,self.game.month+1,explorer.logbook[planet.name].time_of_exploration,explorer.kp_bonus)),
+                '{} (+{}/month)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.month+1,explorer.logbook[planet.name].time_of_exploration,explorer.rp_bonus)),
+                explorer.logbook[planet.name].travel_cost,
+                explorer.logbook[planet.name].travel_time]
             else:
-                info_ls = [planet.name,planet.pos,self.game.player.name,'not explored', planet.disc_kp,planet.disc_rp,
-                           fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),self.game.player.kp) + self.game.player.logbook[planet.name].travel_cost,
-                            self.game.player.logbook[planet.name].travel_time]
+                info_ls = [planet.name,planet.pos,explorer.name,'not explored', planet.disc_kp,planet.disc_rp,
+                           fn.exploration_cost_formula(len([log for log in explorer.logbook.itervalues() if log.is_explored]),explorer.kp) + explorer.logbook[planet.name].travel_cost,
+                            explorer.logbook[planet.name].travel_time]
             x,y = blitpos[0],blitpos[1]
             
             cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP ', 6:'Travel cost: ', 7:'Travel time: '}
@@ -260,9 +260,9 @@ class Interface(object):
         [fn.display_txt(val,'Lucida Console',16,(255,0,0),self.screen,(x,y)) for x,y,val in ylab_rp]
         [fn.display_txt(val,'Lucida Console',16,(0,255,0),self.screen,(x,y)) for x,y,val in xlab_rp]
         
-    def event_popup(self):
+    def event_popup(self,event_list,explorer):
         '''get event from event manager and assign it locally'''
-        events = self.game.event_manager.active_events
+        events = event_list
         for event in events:
             self.game.pause = True
             event.update()

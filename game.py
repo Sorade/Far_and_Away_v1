@@ -55,7 +55,7 @@ class Game(object):
         tierra.pop_around(max_planet = 5, max_iter = 50)
         
         '''creats events'''
-        self.event_list = [Precious_Ore_Discovered(self),Raiders(self),Old_Archives(self),Storm(self),Rebellion(self)]
+        self.event_list = [Precious_Ore_Discovered(self),Raiders(self),Old_Archives(self),Storm(self),Rebellion(self),Alien_Tech(self)]
 
             
         '''setting up game switches'''
@@ -107,7 +107,7 @@ class Game(object):
                 elif event.type == USEREVENT + 1 and self.pause == False:
                     #Monthly Events and actions
                     self.event_manager.all_monthly_events()
-                    for event in self.event_list: event.get_weight()
+                    for event in self.event_list: event.get_weight(self.player)
                 elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                     self.pressed_left_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 1:
@@ -124,7 +124,7 @@ class Game(object):
             '''Calling Display functions'''
             self.interface.screen.blit(black_bg,(0,0))
             self.interface.view_solarsys(self.player,(config.Config.screen_w/2,config.Config.screen_h/2))
-            self.interface.event_popup()    
+            self.interface.event_popup(self.event_manager.active_events,self.player)    
             self.interface.final_overlay(self.player) #will only display messages when USEREVENT+2 has occured
             fn.display_txt(str(len(self.all_planets)),'Lucida Console',16,(200,200,0),self.interface.screen,(500,80))
 

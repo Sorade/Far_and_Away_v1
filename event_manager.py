@@ -51,8 +51,8 @@ class Event_Manager(object):
         for log in self.game.player.logbook.values():
             if log.is_explored:
                 cost += 1
-        self.game.player.rp -= int(cost*1.5)
-        self.game.player.monthly_rp_expense = int(cost*1.5) #stores the cost value for the current game state in a variable
+        self.game.player.rp -= int(cost*1.2)
+        self.game.player.monthly_rp_expense = int(cost*1.2) #stores the cost value for the current game state in a variable
         #so that it can be accessed in the graph display
                 
     def points_adjustement_event(self):

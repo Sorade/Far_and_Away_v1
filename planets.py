@@ -99,13 +99,13 @@ class Planet(sprite.MySprite):
 #            travel_time = fn.travel_time(fn.dist(self.game.player.logbook[self.game.player.location].instance[0].pos,self.pos)/self.game.space_travel_unit)
 #            travel_cost = fn.travel_formula(travel_time)
             #generate travel time and cost for the planet
-            self.game.player.logbook[explorer.location].get_travel_info(self)
-            travel_cost = self.game.player.logbook[self.game.player.location].travel_cost
-            if explo: travel_cost += fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),self.game.player.kp)
+            explorer.logbook[explorer.location].get_travel_info(self,explorer.travel_bonus)
+            travel_cost = explorer.logbook[explorer.location].travel_cost
+            if explo: travel_cost += fn.exploration_cost_formula(len([log for log in explorer.logbook.itervalues() if log.is_explored]),explorer.kp)
             if explorer.rp >= travel_cost:
                 explorer.rp -= travel_cost
                 explorer.location = self.name
-                for x in range(self.game.player.logbook[self.game.player.location].travel_time):
+                for x in range(explorer.logbook[explorer.location].travel_time):
                     self.game.event_manager.all_monthly_events()
                 self.game.interface.add_message('Player is at {}'.format(self.name),1)
                 return True
