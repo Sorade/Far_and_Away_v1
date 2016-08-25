@@ -11,18 +11,20 @@ class Event_Manager(object):
     def __init__(self,game):
         self.game = game
         self.active_events = []
+        self.event_list = None
         
-    def all_monthly_events(self):
+    def all_monthly_events(self,explorer):
         self.game.month += 1 #adds a months of gametime every 10 seconds
         self.get_random_event()
         self.planet_discovery_event(False)
         self.points_adjustement_event()
         self.network_expenses_event()
+        for event in self.event_list: event.get_weight(explorer)
         
     def get_random_event(self):
         '''get random event'''
         if random.randint(0,5) == 0: 
-            self.active_events.append(fn.choice_weighted(self.game.event_list))
+            self.active_events.append(fn.choice_weighted(self.event_list))
             self.game.map_active = False
             
         '''removes bonuses'''

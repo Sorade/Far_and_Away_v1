@@ -53,10 +53,10 @@ class Explorer(object):
             planet.visit(self)
             
     def check_discovery(self, planet):
-        return True if self.name in planet.discovered_by else False
+        return self.name in planet.discovered_by
 
     def check_exploration(self, planet):
-        return True if self.name in planet.explored_by else False
+        return self.name in planet.explored_by
         
     def get_logbook_planets(self):
         for log in self.logbook.itervalues():

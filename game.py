@@ -55,7 +55,7 @@ class Game(object):
         tierra.pop_around(max_planet = 5, max_iter = 50)
         
         '''creats events'''
-        self.event_list = [Precious_Ore_Discovered(self),Raiders(self),Old_Archives(self),Storm(self),Rebellion(self),Alien_Tech(self)]
+        self.event_manager.event_list = [Precious_Ore_Discovered(self),Raiders(self),Old_Archives(self),Storm(self),Rebellion(self),Alien_Tech(self)]
 
             
         '''setting up game switches'''
@@ -106,8 +106,7 @@ class Game(object):
                     if self.interface.arrow_disp_time > 0: self.interface.arrow_disp_time -= 1
                 elif event.type == USEREVENT + 1 and self.pause == False:
                     #Monthly Events and actions
-                    self.event_manager.all_monthly_events()
-                    for event in self.event_list: event.get_weight(self.player)
+                    self.event_manager.all_monthly_events(self.player)                    
                 elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                     self.pressed_left_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 1:

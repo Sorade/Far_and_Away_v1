@@ -102,7 +102,12 @@ class Rebellion(Event):
         
     def update(self):
         if self.planet_pointer is None:
-            self.planet_pointer = [random.choice([p for p in self.game.all_planets if self.game.player.check_exploration(p) and p.name != self.game.player.location])]
+            self.planet_pointer = [random.choice([p for p in self.game.all_planets if
+                                        self.game.player.check_exploration(p)
+                                        and p.name != self.game.player.location
+                                        and (p.cat == 'Habitable World'
+                                        or p.cat == 'Alien World' 
+                                        or p.cat == 'Mining World')])]
             self.text ='''The governement of {} has rebelled against your authority. Refusing to pay you the taxes you are owed to carry your duty.'''.format(self.planet_pointer[0].name)
 
 class Alien_Tech(Event):
@@ -117,7 +122,8 @@ class Alien_Tech(Event):
     def get_weight(self,explorer):
         total_explored_alien = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Alien World'])
         self.newly_explored = total_explored_alien - self.already_explored
-        self.weight = total_explored_alien if self.newly_explored > 0 else 0
+        self.already_explored = total_explored_alien
+        self.weight = total_explored_alien*3 if self.newly_explored > 0 else 0
         print 'AlienTech',self.weight
         
     def execute(self):

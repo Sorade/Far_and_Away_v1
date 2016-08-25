@@ -106,7 +106,7 @@ class Planet(sprite.MySprite):
                 explorer.rp -= travel_cost
                 explorer.location = self.name
                 for x in range(explorer.logbook[explorer.location].travel_time):
-                    self.game.event_manager.all_monthly_events()
+                    self.game.event_manager.all_monthly_events(explorer)
                 self.game.interface.add_message('Player is at {}'.format(self.name),1)
                 return True
         else:
@@ -119,7 +119,8 @@ class Planet(sprite.MySprite):
             for planet in self.planets_in_SOF:
                 if launch == False:
                     break
-                planet.unveil(explorer,player_induced,bonus)
+                if not explorer.check_discovery(planet): #prevents checking already explored planets
+                    planet.unveil(explorer,player_induced,bonus)
             if player_induced and launch: self.game.interface.add_message('... search completed'.format(self.name),1)
             
 
