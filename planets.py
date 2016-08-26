@@ -115,7 +115,8 @@ class Planet(sprite.MySprite):
             launch = True if explorer.kp >= 5 else False
             if player_induced and launch: 
                 self.game.interface.add_message('Searching around {} ...'.format(self.name),1)
-                if explorer.location == self.name: explorer.search_bonus += 50 # adds a loc bonus
+                loc_bonus = 20
+                if explorer.location == self.name: explorer.search_bonus += loc_bonus # adds a loc bonus
             for planet in self.planets_in_SOF:
                 if launch == False:
                     break
@@ -123,7 +124,7 @@ class Planet(sprite.MySprite):
                     planet.unveil(explorer,player_induced)
             if player_induced and launch:
                 self.game.interface.add_message('... search completed'.format(self.name),1)
-                if explorer.location == self.name: explorer.search_bonus -= 50 #remove the loc bonus
+                if explorer.location == self.name: explorer.search_bonus -= loc_bonus #remove the loc bonus
 
     def get_in_SOF(self):
         self.planets_in_SOF = []

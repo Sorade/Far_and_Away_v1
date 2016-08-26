@@ -38,7 +38,7 @@ def dist(point1, point2):
 
 def kp_formula(planet,game_time,exploration_time,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
-    return int(abs(np.sin(dt*0.5)*(planet.disc_kp+bonus)*np.exp(-0.01*dt)))
+    return int(abs(np.sin(dt*0.5)*(planet.disc_kp+bonus)*np.exp(-0.02*dt)))
     
 def rp_formula(planet,game_time,exploration_time,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1

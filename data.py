@@ -33,8 +33,8 @@ class Data(object):
                     'Storm': img_import('storm_event.png',(550,310)),
                     'Old Archives': img_import('old_archives_event.png',(550,310)),
                     'Rebellion': img_import('rebellion.png',(550,310)),
-                    'Alien Tech': img_import('rebellion.png',(550,310)),
-                    'Astronomer': img_import('rebellion.png',(550,310))}
+                    'Alien Tech': img_import('alien_tech.png',(550,310)),
+                    'Astronomer': img_import('astronomer.png',(550,310))}
     
     
     

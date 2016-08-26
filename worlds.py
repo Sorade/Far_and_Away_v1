@@ -44,7 +44,7 @@ class World_Frozen(Planet):
 class World_Alien(Planet):
     img_ref = 'Alien_hive'
     cat = 'Alien World'
-    weight = 1
+    weight = 2
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.radius = random.randint(250,600) #SOF
