@@ -45,8 +45,8 @@ def rp_formula(planet,game_time,exploration_time,bonus):
 #    return int((planet.disc_rp + bonus) * np.exp(-( planet.disc_rp/500)*dt)*(np.cos(2*np.pi*dt)))
     return int(abs(np.sin(dt)*(planet.disc_rp+bonus)*np.exp(-0.025*dt)))
     
-def exploration_cost_formula(nb_explored,kp):
-    return int(5+nb_explored*(nb_explored/(kp+1)))
+def exploration_cost_formula(nb_explored,exp_kp,disc_kp):
+    return int(5+disc_kp+nb_explored*(nb_explored/(exp_kp+1)))
     
 def travel_time(distance,travel_units):
     return int(distance/travel_units)
@@ -58,7 +58,7 @@ def point_pos(pt, d, theta_rad):
     
    
 def travel_formula(travel_time):
-    return int(travel_time*travel_time)
+    return int((travel_time)**2+2)
 
 ''' List -> Object
 takes a list of object with a weight attribute and returns an object of this list randomly'''

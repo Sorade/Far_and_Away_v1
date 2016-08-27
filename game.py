@@ -33,7 +33,11 @@ class Game(object):
         self.clock = pygame.time.Clock() #set timer which is used to slow game down
         self.month = 0
         self.space_travel_unit = 150
-        self.planet_choices = [World_Mining,World_Habitable,World_Frozen,World_Alien]
+        self.planet_choices = [World_Mining, 
+                               World_Habitable, 
+                               World_Frozen, 
+                               World_Alien, 
+                               World_Jungle]
         '''create explorers and player'''
         self.all_explorers = [explorers.Explorer(self) for x in range (2)]
         self.player = explorers.Explorer(self)
@@ -45,6 +49,7 @@ class Game(object):
         
         '''assign starting planet to player only'''
         tierra.name = 'Tierra'
+        tierra.img_ref = 'Earth'
         self.player.logbook[tierra.name] = lgbk.Logbook(tierra,True,True)
         self.player.logbook[tierra.name].time_of_exploration = self.month
         tierra.discovered_by.append(self.player.name)

@@ -25,8 +25,10 @@ class Data(object):
     
     images_planets = {'Venus' : image_venus,
                       'Earth' : img_import('earth.png',(50,50)),
+                        'Habitable_world' : img_import('habitable_world.png',(50,50)),
                         'Frozen' : img_import('frozen.png',(50,50)),
-                        'Alien_hive' : img_import('alien_hive.png',(50,50)) }
+                        'Alien_hive' : img_import('alien_hive.png',(50,50)),
+                        'Jungle' : img_import('jungle_world.png',(50,50)) }
     
     event_images = {'Precious Ore Discovered': img_import('mining_event.png',(550,310)),
                     'Raiders': img_import('raider_event.png',(550,310)),

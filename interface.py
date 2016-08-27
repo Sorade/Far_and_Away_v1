@@ -152,7 +152,7 @@ class Interface(object):
                 explorer.logbook[planet.name].travel_time]
             else:
                 info_ls = [planet.name,planet.pos,explorer.name,'not explored', planet.disc_kp,planet.disc_rp,
-                           fn.exploration_cost_formula(len([log for log in explorer.logbook.itervalues() if log.is_explored]),explorer.kp) + explorer.logbook[planet.name].travel_cost,
+                           fn.exploration_cost_formula(len([log for log in explorer.logbook.itervalues() if log.is_explored]),explorer.kp,planet.disc_kp) + explorer.logbook[planet.name].travel_cost,
                             explorer.logbook[planet.name].travel_time]
             x,y = blitpos[0],blitpos[1]
             

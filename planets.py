@@ -25,6 +25,7 @@ class Planet(sprite.MySprite):
         self.chance_of_discovery = random.randint(0,15)
         self.diameter = random.randint(5,50)
         self.img_ref = img_ref
+        self.is_virgin =  True
         
         self.rect = data.Data.images_planets[self.img_ref].get_rect()
         self.rect.center = pos
@@ -32,7 +33,7 @@ class Planet(sprite.MySprite):
     def add_to_logbook(self,explorer):
         explorer.logbook[self.name] = lgbk.Logbook(self,False,False)
         
-    def pop_around(self, max_planet = 2, max_iter = 3):
+    def pop_around(self, max_planet = 2, max_iter = 4):
         ox,oy = self.pos
         self.get_in_SOF()
         Quad.get_content(self.pos,[p.pos for p in self.game.all_planets])
@@ -63,6 +64,7 @@ class Planet(sprite.MySprite):
                 explorer.logbook[self.name].is_discovered = True
                 self.discovered_by.append(explorer.name)
                 self.game.interface.add_message('Discovered {}'.format(self.name),1)
+                self.pop_around()
                 arrow_stats = self.game.interface.arrow_param(self)
                 if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
                 
@@ -70,6 +72,7 @@ class Planet(sprite.MySprite):
             explorer.logbook[self.name].is_discovered = True
             self.discovered_by.append(explorer.name)
             self.game.interface.add_message('Auto-Discovered {}'.format(self.name),1)
+            self.pop_around()
             arrow_stats = self.game.interface.arrow_param(self)
             if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
             
@@ -81,16 +84,22 @@ class Planet(sprite.MySprite):
                 '''remove the visit message so that the exploration message
                 occurs first. If the test is true then the message will be re-added
                 at the end of the message list (after exploration msg)'''
-                explorer.kp += self.disc_kp
-                explorer.rp += self.disc_rp - fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),self.game.player.kp)
+                #to do only for first explorer to explore
+                if self.is_virgin:
+                    explorer.kp += self.disc_kp
+                    #works out cost/gain from exploration
+                    explorer.rp += self.disc_rp - fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),explorer.kp,self.disc_kp)
+                    explorer.logbook[self.name].time_of_exploration = self.game.month
+                    #self.pop_around()
+                    self.is_virgin = False
+
+                #to do at every exploration or re-explroation
                 visit_msg = self.game.interface.messages[-1]
                 self.game.interface.messages.remove(visit_msg)                
                 explorer.logbook[self.name].is_explored = True
-                explorer.logbook[self.name].time_of_exploration = self.game.month
                 self.explored_by.append(explorer.name)
                 self.game.interface.add_message('Player explored {}'.format(self.name),1)
                 self.game.interface.add_message(visit_msg,1)
-                self.pop_around()
         
     def visit(self, explorer, explo = False):
         if explorer.location != self.name:
@@ -99,9 +108,10 @@ class Planet(sprite.MySprite):
             #generate travel time and cost for the planet
             explorer.logbook[explorer.location].get_travel_info(self,explorer.travel_bonus)
             travel_cost = explorer.logbook[explorer.location].travel_cost
-            if explo: travel_cost += fn.exploration_cost_formula(len([log for log in explorer.logbook.itervalues() if log.is_explored]),explorer.kp)
+            if explo: travel_cost += fn.exploration_cost_formula(len([log for log in explorer.logbook.itervalues() if log.is_explored]),explorer.kp,self.disc_kp)
             if explorer.rp >= travel_cost:
-                explorer.rp -= travel_cost
+                #removes cost of travel
+                explorer.rp -= explorer.logbook[explorer.location].travel_cost
                 explorer.location = self.name
                 for x in range(explorer.logbook[explorer.location].travel_time):
                     self.game.event_manager.all_monthly_events(explorer)

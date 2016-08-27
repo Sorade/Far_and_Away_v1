@@ -113,7 +113,7 @@ class Rebellion(Event):
 class Alien_Tech(Event):
     def __init__(self,game):
         self.name = 'Alien Tech'
-        self.weight = 10
+        self.weight = 0
         self.text ='New Alien hyperdrive technology is available, making our travels faster !'
         self.newly_explored = 0
         self.already_explored = 0
@@ -132,7 +132,7 @@ class Alien_Tech(Event):
 class Astronomer(Event):
     def __init__(self,game):
         self.name = 'Astronomer'
-        self.weight = 2
+        self.weight = 0
         self.already_occured = False
         self.text ='An astronomer has joined your high-command concil, enhancing your research efforts for new worlds.'
         super(type(self), self).__init__(game,self.name,self.weight,self.text)

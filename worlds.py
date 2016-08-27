@@ -14,13 +14,13 @@ class World_Mining(Planet):
     weight = 8
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
-        self.radius = random.randint(250,400) #SOF
+        self.radius = random.randint(250,350) #SOF
         self.chance_of_discovery = random.randint(0,10)
         self.disc_kp = random.randint(0,3)
         self.disc_rp = random.randint(10,15)
         
 class World_Habitable(Planet):
-    img_ref = 'Earth'
+    img_ref = 'Habitable_world'
     cat = 'Habitable World'
     weight = 3
     def __init__(self, game, pos):
@@ -48,10 +48,20 @@ class World_Alien(Planet):
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.radius = random.randint(250,600) #SOF
-        self.chance_of_discovery = random.randint(0,15)
+        self.chance_of_discovery = random.randint(0,25)
         self.disc_kp = random.randint(20,30)
         self.disc_rp = random.randint(5,10)
-
+        
+class World_Jungle(Planet):
+    img_ref = 'Jungle'
+    cat = 'Jungle World'
+    weight = 5
+    def __init__(self, game, pos):
+        super(type(self), self).__init__(game,pos, type(self).img_ref)
+        self.radius = random.randint(350,550) #SOF
+        self.chance_of_discovery = random.randint(0,10)
+        self.disc_kp = random.randint(10,20)
+        self.disc_rp = random.randint(1,10)
         
         
 
