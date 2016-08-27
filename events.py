@@ -29,12 +29,13 @@ class Precious_Ore_Discovered(Event):
         
     def get_weight(self,explorer):
         total_explored_mining_worlds = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Mining World'])
-        self.weight = total_explored_mining_worlds*11/(self.game.month+1)
+        self.weight = total_explored_mining_worlds*11/(self.game.year+1)
 #        print 'mining',self.weight
         
     def execute(self):
         self.game.player.rp_bonus += 2
         self.planet_pointer[0].disc_rp += 10
+        self.planet_pointer = None
         
     def update(self):
         if self.planet_pointer is None:
@@ -51,7 +52,7 @@ class Raiders(Event):
         
     def get_weight(self,explorer):
         total_unexplored_planets = len([p for p in self.game.all_planets if not self.game.player.check_exploration(p) and  self.game.player.check_discovery(p)])
-        self.weight = total_unexplored_planets*10/(self.game.month+1) if total_unexplored_planets > 5 else 0
+        self.weight = total_unexplored_planets*10/(self.game.year+1) if total_unexplored_planets > 5 else 0
 #        print 'raider',self.weight
         
     def execute(self):
@@ -76,7 +77,7 @@ class Old_Archives(Event):
         
     def get_weight(self,explorer):
         total_explored_habitable_alien = len([p for p in self.game.all_planets if explorer.check_exploration(p) and (p.cat == 'Habitable World' or p.cat == 'Alien World')])
-        self.weight = total_explored_habitable_alien*20/(self.game.month+1)
+        self.weight = total_explored_habitable_alien*20/(self.game.year+1)
 #        print 'archive',self.weight
         
     def execute(self):
@@ -92,7 +93,7 @@ class Rebellion(Event):
         
     def get_weight(self,explorer):
         total_explored_planets = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.name != explorer.location])
-        self.weight = total_explored_planets*6/(self.game.month+1) if total_explored_planets > 5 else 0
+        self.weight = total_explored_planets*6/(self.game.year+1) if total_explored_planets > 5 else 0
 #        print 'rebel',self.weight
 
     def execute(self):
@@ -102,12 +103,13 @@ class Rebellion(Event):
         
     def update(self):
         if self.planet_pointer is None:
-            self.planet_pointer = [random.choice([p for p in self.game.all_planets if
+            list_of_potential_rebelious_planets = [p for p in self.game.all_planets if
                                         self.game.player.check_exploration(p)
                                         and p.name != self.game.player.location
                                         and (p.cat == 'Habitable World'
                                         or p.cat == 'Alien World' 
-                                        or p.cat == 'Mining World')])]
+                                        or p.cat == 'Mining World')]
+            if len(list_of_potential_rebelious_planets) > 0: self.planet_pointer = [random.choice(list_of_potential_rebelious_planets)]
             self.text ='''The governement of {} has rebelled against your authority. Refusing to pay you the taxes you are owed to carry your duty.'''.format(self.planet_pointer[0].name)
 
 class Alien_Tech(Event):
@@ -139,7 +141,7 @@ class Astronomer(Event):
         
     def get_weight(self,explorer):
         total_explored = len([p for p in self.game.all_planets if explorer.check_exploration(p)])
-        self.weight = 2 if self.game.month > 10 and not self.already_occured and total_explored > 15 else 0
+        self.weight = 2 if self.game.year > 10 and not self.already_occured and total_explored > 15 else 0
 #        print 'Astro',self.weight
         
     def execute(self):

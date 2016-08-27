@@ -13,8 +13,8 @@ class Event_Manager(object):
         self.active_events = []
         self.event_list = None
         
-    def all_monthly_events(self,explorer):
-        self.game.month += 1 #adds a months of gametime every 10 seconds
+    def all_yearly_events(self,explorer):
+        self.game.year += 1 #adds a years of gametime every 10 seconds
         self.get_random_event()
         self.planet_discovery_event(False)
         self.points_adjustement_event()
@@ -39,22 +39,22 @@ class Event_Manager(object):
     def resource_prod_event(self):
         for log in self.game.player.logbook.values():
             if log.is_explored:
-                self.game.player.rp += fn.rp_formula(log.instance[0],self.game.month,log.time_of_exploration,self.game.player.rp_bonus)
+                self.game.player.rp += fn.rp_formula(log.instance[0],self.game.year,log.time_of_exploration,self.game.player.rp_bonus)
                 
     def knowledge_prod_event(self):
         for log in self.game.player.logbook.values():
             if log.is_explored:
-                self.game.player.kp += fn.kp_formula(log.instance[0],self.game.month,log.time_of_exploration,self.game.player.kp,self.game.player.kp_bonus)
+                self.game.player.kp += fn.kp_formula(log.instance[0],self.game.year,log.time_of_exploration,self.game.player.kp,self.game.player.kp_bonus)
                 
     ''''Make this into a function... maybe store all event values as event manager
     variables and make a new method handling those variables'''   
     def network_expenses_event(self):
         cost = 0
         for log in self.game.player.logbook.values():
-            if log.is_explored and self.game.month - log.time_of_exploration <= 100:
+            if log.is_explored and self.game.year - log.time_of_exploration <= 100:
                 cost += 1
         self.game.player.rp -= int(cost)
-        self.game.player.monthly_rp_expense = int(cost) #stores the cost value for the current game state in a variable
+        self.game.player.yearly_rp_expense = int(cost) #stores the cost value for the current game state in a variable
         #so that it can be accessed in the graph display
                 
     def points_adjustement_event(self):

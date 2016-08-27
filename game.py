@@ -11,6 +11,7 @@ import random
 import sys
 
 '''Game Init'''
+pygame.mixer.init()
 pygame.init()
 clock = pygame.time.Clock() #set timer which is used to slow game down
 
@@ -25,13 +26,14 @@ import logbook as lgbk
 import functions as fn
 import time
 from worlds import *
+import data
 
 class Game(object):
     def __init__(self):
         self.event_manager = em.Event_Manager(self)
         self.interface = interface.Interface(self)
         self.clock = pygame.time.Clock() #set timer which is used to slow game down
-        self.month = 0
+        self.year = 0
         self.space_travel_unit = 150
         self.planet_choices = [World_Mining, 
                                World_Habitable, 
@@ -51,13 +53,13 @@ class Game(object):
         tierra.name = 'Tierra'
         tierra.img_ref = 'Earth'
         self.player.logbook[tierra.name] = lgbk.Logbook(tierra,True,True)
-        self.player.logbook[tierra.name].time_of_exploration = self.month
+        self.player.logbook[tierra.name].time_of_exploration = self.year
         tierra.discovered_by.append(self.player.name)
         tierra.explored_by.append(self.player.name)
         self.player.location = tierra.name
         tierra.disc_kp,tierra.disc_rp = 15,8
         tierra.radius = 600
-        tierra.pop_around(max_planet = 5, max_iter = 50)
+        tierra.pop_around(max_planet = 5, max_iter = 100)
         
         #increases the chance of discovery of starting planets
         for planet in self.all_planets:
@@ -89,9 +91,12 @@ class Game(object):
         pygame.time.set_timer(USEREVENT + 2, 1000) # 1 event every 1 seconds
         pygame.time.set_timer(USEREVENT + 3, 75) # map offset every 100 ms
         
+        pygame.mixer.music.load(data.Data.musics['theme'])
+        pygame.mixer.music.play(-1,0.0)
+        
         while True:
             self.clock.tick(60) #needed to slow game down
-            t0 = time.time()
+            #t0 = time.time()
             
             for event in pygame.event.get(): #setting up quit
                 if event.type == QUIT:
@@ -114,8 +119,8 @@ class Game(object):
                     self.interface.display_event = True
                     if self.interface.arrow_disp_time > 0: self.interface.arrow_disp_time -= 1
                 elif event.type == USEREVENT + 1 and self.pause == False:
-                    #Monthly Events and actions
-                    self.event_manager.all_monthly_events(self.player)                    
+                    #yearly Events and actions
+                    self.event_manager.all_yearly_events(self.player)                    
                 elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                     self.pressed_left_clic = True
                 elif event.type == MOUSEBUTTONUP and event.button == 1:
@@ -135,10 +140,91 @@ class Game(object):
             self.interface.event_popup(self.event_manager.active_events,self.player)    
             self.interface.final_overlay(self.player) #will only display messages when USEREVENT+2 has occured
             fn.display_txt(str(len(self.all_planets)),'Lucida Console',16,(200,200,0),self.interface.screen,(20,20))
-
+            fn.display_txt('score: '+str(self.get_score()),'Lucida Console',16,(200,200,0),self.interface.screen,(20,40))
             
             pygame.display.update()
-            t1 = time.time()
-            #print t1-t0
+            
+            '''Checks if game ends'''
+            if self.player.rp  == 0: self.game_over_screen()
+            
+    def get_score(self):
+        total_explored_planets = sum([1 for planet in self.all_planets if self.player.check_exploration(planet)])
+        return total_explored_planets + self.year
         
+    def game_over_screen(self):
+        while True:
+            self.clock.tick(60) #needed to slow game down
+            for event in pygame.event.get(): #setting up quit
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                    print 'has quit'
+                elif event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                    print 'has quit' 
+                elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                    self.pressed_left_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 1:
+                    self.pressed_left_clic = True
+                elif event.type == MOUSEBUTTONDOWN and event.button == 2:
+                    self.pressed_mid_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 2:
+                    self.pressed_mid_clic = True                    
+                elif event.type == MOUSEBUTTONDOWN and event.button == 3:
+                    self.pressed_right_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 3:
+                    self.pressed_right_clic = True
+
+            '''Calling Display functions'''
+            self.interface.screen.blit(pygame.transform.smoothscale(data.Data.backgrounds['game_over'],(config.Config.screen_w,config.Config.screen_h)),(0,0))
+            fn.display_txt('score: '+str(self.get_score()),'Lucida Console',50,(200,200,0),self.interface.screen,(config.Config.screen_w/2,config.Config.screen_h/4),True)
+            
+            pygame.display.update()
+            
+    def start_menu(self):
+        '''set up'''
+        pygame.time.set_timer(USEREVENT + 1, 1000) # 1 event every 1 second
+        show_press_to_start = True
+        
+        while True:
+            self.clock.tick(60) #needed to slow game down
+            for event in pygame.event.get(): #setting up quit
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                    print 'has quit'
+                elif event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                    print 'has quit' 
+                elif event.type == pygame.KEYDOWN and event.key == K_SPACE:
+                    if self.pause == True: self.pause = False
+                    elif self.pause == False: self.pause = True
+                elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                    self.pressed_left_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 1:
+                    self.pressed_left_clic = True
+                elif event.type == MOUSEBUTTONDOWN and event.button == 2:
+                    self.pressed_mid_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 2:
+                    self.pressed_mid_clic = True                    
+                elif event.type == MOUSEBUTTONDOWN and event.button == 3:
+                    self.pressed_right_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 3:
+                    self.pressed_right_clic = True
+                elif event.type == pygame.KEYDOWN and event.key == K_RETURN:
+                    self.run()                    
+                elif event.type == USEREVENT + 1:
+                    show_press_to_start = False if show_press_to_start else True
+                    
+
+            '''Calling Display functions'''
+            self.interface.screen.blit(pygame.transform.smoothscale(data.Data.backgrounds['game_over'],(config.Config.screen_w,config.Config.screen_h)),(0,0))
+            fn.display_txt('FAR AND AWAY','Lucida Console',80,(200,200,0),self.interface.screen,(config.Config.screen_w/2,config.Config.screen_h/5),True)
+
+            if show_press_to_start:
+                fn.display_txt('PRESS ENTER TO START GAME','Lucida Console',50,(200,200,0),self.interface.screen,(config.Config.screen_w/2,config.Config.screen_h/2),True)
+    
+            pygame.display.update()        
         

@@ -19,7 +19,8 @@ class Data(object):
     
     '''image dictionaries'''
     backgrounds = {'event' : pygame.image.load('data\\event_popup.png').convert_alpha(),
-                    'graph': img_import('graph_bg_green.png',(500,350))}
+                    'graph': img_import('graph_bg_green.png',(500,350)), 
+                    'game_over': pygame.image.load('data\\game_over_bg.jpg').convert_alpha()}
                     
     misc = {'arrow' : img_import('arrow.png',(100,50))}
     
@@ -37,6 +38,9 @@ class Data(object):
                     'Rebellion': img_import('rebellion.png',(550,310)),
                     'Alien Tech': img_import('alien_tech.png',(550,310)),
                     'Astronomer': img_import('astronomer.png',(550,310))}
+                    
+    '''music & sounds'''
+    musics = {'theme' : 'data\\musictheme.ogg'}
     
     
     

@@ -33,14 +33,15 @@ class Interface(object):
     def get_map_offset(self):
         mx,my = pygame.mouse.get_pos()
         delta = 10
-        if mx <= 10:
+        zone_from_edge = 25
+        if mx <= zone_from_edge:
             self.map_offset_x += delta
-        elif mx >= Config.screen_w-10:
+        elif mx >= Config.screen_w-zone_from_edge:
             self.map_offset_x -= delta
             
-        if my <= 10:
+        if my <= zone_from_edge:
             self.map_offset_y += delta
-        elif my >= Config.screen_h-10:
+        elif my >= Config.screen_h-zone_from_edge:
             self.map_offset_y -= delta   
 
     def centered_offset(self,offset):
@@ -51,8 +52,8 @@ class Interface(object):
         self.message_display()
         '''blit pause status'''
         if self.game.pause: fn.display_txt('Game Paused','Impact',16,(0,255,0),self.screen,(int(Config.screen_w*0.75),15))
-        '''blit time in months'''
-        fn.display_txt('Current Month: {}'.format(self.game.month),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,15))
+        '''blit time in years'''
+        fn.display_txt('Current year: {}'.format(self.game.year),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,15))
         '''blit the player's points'''
         fn.display_txt('Your KP: {}'.format(explorer.kp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-350,Config.screen_h-30))
         fn.display_txt('Your RP: {}'.format(explorer.rp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-150,Config.screen_h-30))                    
@@ -146,8 +147,8 @@ class Interface(object):
                 planet.pos,
                 planet.discovered_by,
                 planet.explored_by,
-                '{} (+{}/month)'.format(planet.disc_kp,fn.kp_formula(planet,self.game.month+1,explorer.logbook[planet.name].time_of_exploration,explorer.kp,explorer.kp_bonus)),
-                '{} (+{}/month)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.month+1,explorer.logbook[planet.name].time_of_exploration,explorer.rp_bonus)),
+                '{} (+{}/year)'.format(planet.disc_kp,fn.kp_formula(planet,self.game.year+1,explorer.logbook[planet.name].time_of_exploration,explorer.kp,explorer.kp_bonus)),
+                '{} (+{}/year)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.year+1,explorer.logbook[planet.name].time_of_exploration,explorer.rp_bonus)),
                 explorer.logbook[planet.name].travel_cost,
                 explorer.logbook[planet.name].travel_time]
             else:
@@ -239,15 +240,15 @@ class Interface(object):
     def graph_display(self):
         rp_pts = []
         kp_pts = []
-        for month in range(1,11):
-            next_month_rp = 0
-            next_month_kp = 0
+        for year in range(1,11):
+            next_year_rp = 0
+            next_year_kp = 0
             for log in (log for log in self.game.player.logbook.itervalues() if log.is_explored):
-                next_month_kp += fn.kp_formula(log.instance[0],self.game.month+month,log.time_of_exploration,self.game.player.kp,self.game.player.kp_bonus)
-                next_month_rp += fn.rp_formula(log.instance[0],self.game.month+month,log.time_of_exploration,self.game.player.rp_bonus)
-            next_month_rp -= self.game.player.monthly_rp_expense
-            rp_pts.append((month,next_month_rp))
-            kp_pts.append((month,next_month_kp))
+                next_year_kp += fn.kp_formula(log.instance[0],self.game.year+year,log.time_of_exploration,self.game.player.kp,self.game.player.kp_bonus)
+                next_year_rp += fn.rp_formula(log.instance[0],self.game.year+year,log.time_of_exploration,self.game.player.rp_bonus)
+            next_year_rp -= self.game.player.yearly_rp_expense
+            rp_pts.append((year,next_year_rp))
+            kp_pts.append((year,next_year_kp))
         '''transfer data into graph compatible data'''
         data_kp,ylab_kp,xlab_kp = fn.get_graph_data(kp_pts,(100,300),(400,250),30)
         data_rp,ylab_rp,xlab_rp = fn.get_graph_data(rp_pts,(100,300),(400,250),15)

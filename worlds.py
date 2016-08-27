@@ -33,7 +33,7 @@ class World_Habitable(Planet):
 class World_Frozen(Planet):
     img_ref = 'Frozen'
     cat = 'Frozen World'
-    weight = 10
+    weight = 12
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.radius = random.randint(500,700) #SOF

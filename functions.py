@@ -100,12 +100,13 @@ def blitc(dest,surface,blitpos): #blitpos is the center of the image
 #    corrected_blitpos = sum_tulp(rect.topleft, (dx,dy))
     dest.blit(surface, corrected_blitpos)
     
-def display_txt(txt,font,size,color,surface,pos):
+def display_txt(txt,font,size,color,surface,pos,centered = False):
     txt = str(txt)
     font = pygame.font.SysFont(font, size, bold=False, italic=False)
     text = font.render(txt, True, color)
     textpos = text.get_rect()
     textpos.topleft = pos
+    if centered: textpos.center = pos
     surface.blit(text, textpos)
     
 def name_gen(capitalize):

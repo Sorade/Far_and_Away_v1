@@ -60,7 +60,6 @@ class Planet(sprite.MySprite):
     def unveil(self,explorer,player_induced):
         if player_induced == True:
             explorer.kp -= fn.search_cost(self.cat)
-            print explorer.search_bonus
             if not explorer.check_discovery(self) and self.chance_of_discovery + explorer.search_bonus >= random.randint(0,100):
                 explorer.logbook[self.name].is_discovered = True
                 self.discovered_by.append(explorer.name)
@@ -90,7 +89,7 @@ class Planet(sprite.MySprite):
                     explorer.kp += self.disc_kp
                     #works out cost/gain from exploration
                     explorer.rp += self.disc_rp - fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),explorer.kp,self.disc_kp)
-                    explorer.logbook[self.name].time_of_exploration = self.game.month
+                    explorer.logbook[self.name].time_of_exploration = self.game.year
                     #self.pop_around()
                     self.is_virgin = False
 
@@ -115,7 +114,7 @@ class Planet(sprite.MySprite):
                 explorer.rp -= explorer.logbook[explorer.location].travel_cost
                 explorer.location = self.name
                 for x in range(explorer.logbook[explorer.location].travel_time):
-                    self.game.event_manager.all_monthly_events(explorer)
+                    self.game.event_manager.all_yearly_events(explorer)
                 self.game.interface.add_message('Player is at {}'.format(self.name),1)
                 return True
         else:
