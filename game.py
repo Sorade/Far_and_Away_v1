@@ -55,9 +55,13 @@ class Game(object):
         tierra.discovered_by.append(self.player.name)
         tierra.explored_by.append(self.player.name)
         self.player.location = tierra.name
-        tierra.disc_kp,tierra.disc_rp = 10,8
+        tierra.disc_kp,tierra.disc_rp = 15,8
         tierra.radius = 600
         tierra.pop_around(max_planet = 5, max_iter = 50)
+        
+        #increases the chance of discovery of starting planets
+        for planet in self.all_planets:
+            planet.chance_of_discovery = 75
         
         '''creats events'''
         self.event_manager.event_list = [Precious_Ore_Discovered(self),Raiders(self),Old_Archives(self),Storm(self),Rebellion(self),Alien_Tech(self),Astronomer(self)]

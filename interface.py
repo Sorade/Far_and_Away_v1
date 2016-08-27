@@ -146,7 +146,7 @@ class Interface(object):
                 planet.pos,
                 planet.discovered_by,
                 planet.explored_by,
-                '{} (+{}/month)'.format(planet.disc_kp,fn.kp_formula(planet,self.game.month+1,explorer.logbook[planet.name].time_of_exploration,explorer.kp_bonus)),
+                '{} (+{}/month)'.format(planet.disc_kp,fn.kp_formula(planet,self.game.month+1,explorer.logbook[planet.name].time_of_exploration,explorer.kp,explorer.kp_bonus)),
                 '{} (+{}/month)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.month+1,explorer.logbook[planet.name].time_of_exploration,explorer.rp_bonus)),
                 explorer.logbook[planet.name].travel_cost,
                 explorer.logbook[planet.name].travel_time]
@@ -243,7 +243,7 @@ class Interface(object):
             next_month_rp = 0
             next_month_kp = 0
             for log in (log for log in self.game.player.logbook.itervalues() if log.is_explored):
-                next_month_kp += fn.kp_formula(log.instance[0],self.game.month+month,log.time_of_exploration,self.game.player.kp_bonus)
+                next_month_kp += fn.kp_formula(log.instance[0],self.game.month+month,log.time_of_exploration,self.game.player.kp,self.game.player.kp_bonus)
                 next_month_rp += fn.rp_formula(log.instance[0],self.game.month+month,log.time_of_exploration,self.game.player.rp_bonus)
             next_month_rp -= self.game.player.monthly_rp_expense
             rp_pts.append((month,next_month_rp))

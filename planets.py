@@ -58,8 +58,9 @@ class Planet(sprite.MySprite):
             
         
     def unveil(self,explorer,player_induced):
-        if player_induced == True  and explorer.kp >= 5:
-            explorer.kp -= 5
+        if player_induced == True:
+            explorer.kp -= fn.search_cost(self.cat)
+            print explorer.search_bonus
             if not explorer.check_discovery(self) and self.chance_of_discovery + explorer.search_bonus >= random.randint(0,100):
                 explorer.logbook[self.name].is_discovered = True
                 self.discovered_by.append(explorer.name)
@@ -122,19 +123,22 @@ class Planet(sprite.MySprite):
             
     def search_in_SOF(self,explorer,player_induced):
         if explorer.logbook[self.name].is_explored:
-            launch = True if explorer.kp >= 5 else False
-            if player_induced and launch: 
+            if player_induced: 
                 self.game.interface.add_message('Searching around {} ...'.format(self.name),1)
-                loc_bonus = 20
+                loc_bonus = 30
                 if explorer.location == self.name: explorer.search_bonus += loc_bonus # adds a loc bonus
-            for planet in self.planets_in_SOF:
-                if launch == False:
-                    break
-                if not explorer.check_discovery(planet): #prevents checking already explored planets
-                    planet.unveil(explorer,player_induced)
-            if player_induced and launch:
+                
+                for planet in self.planets_in_SOF:
+                    if explorer.kp >= fn.search_cost(planet.cat) and not explorer.check_discovery(planet):
+                        planet.unveil(explorer,player_induced)
+                        
                 self.game.interface.add_message('... search completed'.format(self.name),1)
                 if explorer.location == self.name: explorer.search_bonus -= loc_bonus #remove the loc bonus
+            else:
+                for planet in self.planets_in_SOF:
+                    if not explorer.check_discovery(planet):
+                        planet.unveil(explorer,player_induced)
+
 
     def get_in_SOF(self):
         self.planets_in_SOF = []

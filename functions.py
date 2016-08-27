@@ -35,10 +35,20 @@ def check_collision(item,list):
 
 def dist(point1, point2):
     return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**0.5
+    
+def search_cost(planet_cat):
+    cost = 0
+    if planet_cat == 'Mining World' :    cost = 10
+    if planet_cat == 'Habitable World' : cost = 8
+    if planet_cat == 'Frozen World' :    cost = 15
+    if planet_cat == 'Alien World' :     cost = 10
+    if planet_cat == 'Jungle World' :    cost = 10
+    return cost
 
-def kp_formula(planet,game_time,exploration_time,bonus):
+
+def kp_formula(planet,game_time,exploration_time,explorer_kp,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
-    return int(abs(np.sin(dt*0.5)*(planet.disc_kp+bonus)*np.exp(-0.02*dt)))
+    return int(abs(np.sin(dt*1)*(planet.disc_kp+bonus)*np.exp(-(explorer_kp/1000.)*dt))) 
     
 def rp_formula(planet,game_time,exploration_time,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1

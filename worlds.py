@@ -11,7 +11,7 @@ import functions as fn
 class World_Mining(Planet):
     img_ref = 'Venus'
     cat = 'Mining World'
-    weight = 8
+    weight = 7
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.radius = random.randint(250,350) #SOF
@@ -55,7 +55,7 @@ class World_Alien(Planet):
 class World_Jungle(Planet):
     img_ref = 'Jungle'
     cat = 'Jungle World'
-    weight = 5
+    weight = 3
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.radius = random.randint(350,550) #SOF
