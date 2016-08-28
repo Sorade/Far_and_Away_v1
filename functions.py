@@ -48,12 +48,12 @@ def search_cost(planet_cat):
 
 def kp_formula(planet,game_time,exploration_time,explorer_kp,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
-    return int(abs(np.sin(dt*1)*(planet.disc_kp+bonus)*np.exp(-(explorer_kp/1000.)*dt))) 
+    return int(abs(np.sin(dt*1)*max(planet.disc_kp+bonus,0)*np.exp(-(explorer_kp/1000.)*dt))) 
     
 def rp_formula(planet,game_time,exploration_time,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
 #    return int((planet.disc_rp + bonus) * np.exp(-( planet.disc_rp/500)*dt)*(np.cos(2*np.pi*dt)))
-    return int(abs(np.sin(dt)*(planet.disc_rp+bonus)*np.exp(-0.025*dt)))
+    return int(abs(np.sin(dt)*max(planet.disc_rp+bonus,0)*np.exp(-0.025*dt)))
     
 def exploration_cost_formula(nb_explored,exp_kp,disc_kp):
     return int(5+disc_kp+nb_explored*(nb_explored/(exp_kp+1)))
@@ -108,6 +108,20 @@ def display_txt(txt,font,size,color,surface,pos,centered = False):
     textpos.topleft = pos
     if centered: textpos.center = pos
     surface.blit(text, textpos)
+    
+def surname_gen(capitalize):
+    start = ['Mo','Ma','Mu','Lo','La','Lu','Po','Pa','Pu']
+    mid = ['lin','lom','sam','bam','for']
+    end = ['son','va','p','ham','kol']
+    
+    word = ''
+    for ls in [start,mid,end]:
+        word += random.choice(ls)
+        
+    if (capitalize==True):
+        word=word.capitalize()
+    return word
+    
     
 def name_gen(capitalize):
 

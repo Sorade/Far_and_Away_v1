@@ -18,7 +18,6 @@ class Event_Manager(object):
         self.get_random_event()
         self.planet_discovery_event(False)
         self.points_adjustement_event()
-        self.network_expenses_event()
         for event in self.event_list: event.get_weight(explorer)
         
     def get_random_event(self):
@@ -36,30 +35,38 @@ class Event_Manager(object):
         for log in self.game.player.logbook.values():
             log.instance[0].search_in_SOF(self.game.player,False)
             
-    def resource_prod_event(self):
+    def resource_prod_event(self,year):
+        income = 0
         for log in self.game.player.logbook.values():
             if log.is_explored:
-                self.game.player.rp += fn.rp_formula(log.instance[0],self.game.year,log.time_of_exploration,self.game.player.rp_bonus)
+                income += fn.rp_formula(log.instance[0],year,log.time_of_exploration,self.game.player.rp_bonus)
+        #self.game.player.rp += self.game.player.yearly_rp_income
+        return income
                 
-    def knowledge_prod_event(self):
+    def knowledge_prod_event(self,year):
+        income = 0
         for log in self.game.player.logbook.values():
             if log.is_explored:
-                self.game.player.kp += fn.kp_formula(log.instance[0],self.game.year,log.time_of_exploration,self.game.player.kp,self.game.player.kp_bonus)
-                
+                income += fn.kp_formula(log.instance[0],year,log.time_of_exploration,self.game.player.kp,self.game.player.kp_bonus)
+        return income
+        
     ''''Make this into a function... maybe store all event values as event manager
     variables and make a new method handling those variables'''   
-    def network_expenses_event(self):
+    def network_expenses_event(self,year):
         cost = 0
         for log in self.game.player.logbook.values():
-            if log.is_explored and self.game.year - log.time_of_exploration <= 100:
+            if log.is_explored and year - log.time_of_exploration <= 100:
                 cost += 1
-        self.game.player.rp -= int(cost)
-        self.game.player.yearly_rp_expense = int(cost) #stores the cost value for the current game state in a variable
-        #so that it can be accessed in the graph display
+        #self.game.player.rp -= int(cost)
+        #self.game.player.yearly_rp_expense = int(cost) #stores the cost value for the current game state in a variable
+        return cost                                                #so that it can be accessed in the graph display
                 
     def points_adjustement_event(self):
-        self.resource_prod_event()
-        self.knowledge_prod_event()
+        self.game.player.yearly_rp_income = self.resource_prod_event(self.game.year) #assigns yearl_income
+        self.game.player.yearly_rp_expense = self.network_expenses_event(self.game.year) #assigns yearl_expense
+        #update player's rp points
+        self.game.player.rp += self.game.player.yearly_rp_income - self.game.player.yearly_rp_expense
+        self.game.player.kp += self.knowledge_prod_event(self.game.year)
         
         
         

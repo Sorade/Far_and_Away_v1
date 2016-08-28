@@ -10,7 +10,7 @@ from logbook import*
 class Explorer(object):
     def __init__(self,game):
         self.game = game
-        self.name = random.choice(['Roger','Logan','Fred','Susan','Morgane','Iloa'])
+        self.name = random.choice(['Roger','Logan','Fred','Susan','Morgane','Iloa']) +' ' + fn.surname_gen(True)
         self.location = 0
         self.logbook = {}
         self.kp = 10
@@ -21,6 +21,7 @@ class Explorer(object):
         self.search_bonus = 0
         self.yearly_rp_expense = 0
         self.yearly_rp_income = 0
+        self.yearly_kp_income = 0
         
         
     @property

@@ -22,15 +22,15 @@ class Event(object):
 class Precious_Ore_Discovered(Event):
     def __init__(self,game):
         self.name = 'Precious Ore Discovered'
-        self.weight = 2
+        self.weight = 0
         self.planet_pointer = None
         self.text ='''An ore of precious metal has been found in one of your colonies and is being traded throughout the galaxy. It will surely increase our production for a few more years.'''
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
         
     def get_weight(self,explorer):
         total_explored_mining_worlds = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Mining World'])
-        self.weight = total_explored_mining_worlds*11/(self.game.year+1)
-#        print 'mining',self.weight
+        self.weight =  total_explored_mining_worlds*11/(self.game.year+1)
+        print 'mining',self.weight
         
     def execute(self):
         self.game.player.rp_bonus += 2
@@ -46,17 +46,20 @@ class Precious_Ore_Discovered(Event):
 class Raiders(Event):
     def __init__(self,game):
         self.name = 'Raiders'
-        self.weight = 1
+        self.weight = 0
         self.text ='''Raiders have been reported to disrupt our supply lines and are causing havoc amongst interplanetary trade. This is starting to show in our finances.'''
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
         
     def get_weight(self,explorer):
-        total_unexplored_planets = len([p for p in self.game.all_planets if not self.game.player.check_exploration(p) and  self.game.player.check_discovery(p)])
-        self.weight = total_unexplored_planets*10/(self.game.year+1) if total_unexplored_planets > 5 else 0
-#        print 'raider',self.weight
+        total_unexplored_planets = len([p for p in self.game.all_planets if not self.game.player.check_exploration(p) and  self.game.player.check_discovery(p) and p.cat == 'Frozen World'])
+        total_explored_planets = len([p for p in self.game.all_planets if self.game.player.check_exploration(p) and  self.game.player.check_discovery(p) and p.cat == 'Frozen World'])        #self.weight = total_unexplored_planets*10/(self.game.year+1) if total_unexplored_planets > 5 else 0
+        self.weight = 3 if total_unexplored_planets > 2 and float(total_explored_planets)/total_unexplored_planets <= 0.5 else 0
+        print 'raider',self.weight
         
     def execute(self):
+        print self.game.player.rp_bonus
         self.game.player.rp_bonus += -2
+        print self.game.player.rp_bonus
         
 class Storm(Event):
     def __init__(self,game):

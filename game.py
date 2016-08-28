@@ -86,7 +86,7 @@ class Game(object):
     def run(self):
         '''set up'''
         black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
-        black_bg.fill((0,0,25))        
+        black_bg.fill((0,0,3))        
         pygame.time.set_timer(USEREVENT + 1, 5000) # 1 event every 10 seconds
         pygame.time.set_timer(USEREVENT + 2, 1000) # 1 event every 1 seconds
         pygame.time.set_timer(USEREVENT + 3, 75) # map offset every 100 ms
@@ -141,7 +141,8 @@ class Game(object):
             self.interface.final_overlay(self.player) #will only display messages when USEREVENT+2 has occured
             fn.display_txt(str(len(self.all_planets)),'Lucida Console',16,(200,200,0),self.interface.screen,(20,20))
             fn.display_txt('score: '+str(self.get_score()),'Lucida Console',16,(200,200,0),self.interface.screen,(20,40))
-            
+            fn.display_txt('Current Position: '+str(fn.sum_tulp(pygame.mouse.get_pos(),(-self.interface.map_offset_x,-self.interface.map_offset_y))),'Lucida Console',16,(200,200,0),self.interface.screen,(20,config.Config.screen_h-20))
+
             pygame.display.update()
             
             '''Checks if game ends'''
@@ -214,7 +215,7 @@ class Game(object):
                 elif event.type == MOUSEBUTTONUP and event.button == 3:
                     self.pressed_right_clic = True
                 elif event.type == pygame.KEYDOWN and event.key == K_RETURN:
-                    self.run()                    
+                    self.instruction_menu()                    
                 elif event.type == USEREVENT + 1:
                     show_press_to_start = False if show_press_to_start else True
                     
@@ -225,6 +226,57 @@ class Game(object):
 
             if show_press_to_start:
                 fn.display_txt('PRESS ENTER TO START GAME','Lucida Console',50,(200,200,0),self.interface.screen,(config.Config.screen_w/2,config.Config.screen_h/2),True)
+    
+            pygame.display.update()
+            
+    def instruction_menu(self):
+        '''set up'''
+        pygame.time.set_timer(USEREVENT + 1, 1000) # 1 event every 1 second
+        show_press_to_start = True
+        black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
+        black_bg.fill((0,0,0))
+        black_bg.set_alpha(100)        
+        
+        
+        while True:
+            self.clock.tick(60) #needed to slow game down
+            for event in pygame.event.get(): #setting up quit
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                    print 'has quit'
+                elif event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                    print 'has quit' 
+                elif event.type == pygame.KEYDOWN and event.key == K_SPACE:
+                    if self.pause == True: self.pause = False
+                    elif self.pause == False: self.pause = True
+                elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                    self.pressed_left_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 1:
+                    self.pressed_left_clic = True
+                elif event.type == MOUSEBUTTONDOWN and event.button == 2:
+                    self.pressed_mid_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 2:
+                    self.pressed_mid_clic = True                    
+                elif event.type == MOUSEBUTTONDOWN and event.button == 3:
+                    self.pressed_right_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 3:
+                    self.pressed_right_clic = True
+                elif event.type == pygame.KEYDOWN and event.key == K_RETURN:
+                    self.run()                    
+                elif event.type == USEREVENT + 1:
+                    show_press_to_start = False if show_press_to_start else True
+                    
+
+            '''Calling Display functions'''
+            self.interface.screen.blit(pygame.transform.smoothscale(data.Data.backgrounds['game_over'],(config.Config.screen_w,config.Config.screen_h)),(0,0))
+            self.interface.screen.blit(black_bg,(0,0))
+            self.interface.screen.blit(pygame.transform.smoothscale(data.Data.misc['instructions'],(config.Config.screen_w,config.Config.screen_h)),(0,0))
+
+            if show_press_to_start:
+                fn.display_txt('PRESS ENTER TO START GAME','Lucida Console',20,(200,200,0),self.interface.screen,(config.Config.screen_w/2,config.Config.screen_h-25),True)
     
             pygame.display.update()        
         

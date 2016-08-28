@@ -55,8 +55,8 @@ class Interface(object):
         '''blit time in years'''
         fn.display_txt('Current year: {}'.format(self.game.year),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,15))
         '''blit the player's points'''
-        fn.display_txt('Your KP: {}'.format(explorer.kp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-350,Config.screen_h-30))
-        fn.display_txt('Your RP: {}'.format(explorer.rp),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-150,Config.screen_h-30))                    
+        fn.display_txt('Your KP: {} (+{}/y)'.format(explorer.kp, self.game.event_manager.knowledge_prod_event(self.game.year+1)),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-230,Config.screen_h-60))
+        fn.display_txt('Your RP: {} (+{}/y)'.format(explorer.rp, self.game.event_manager.resource_prod_event(self.game.year+1) - self.game.event_manager.network_expenses_event(self.game.year+1)),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-230,Config.screen_h-30))                    
         '''display arrows'''
         self.show_arrows()
         
@@ -157,7 +157,7 @@ class Interface(object):
                             explorer.logbook[planet.name].travel_time]
             x,y = blitpos[0],blitpos[1]
             
-            cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP ', 6:'Travel cost: ', 7:'Travel time: '}
+            cats = {0: 'Planet Id: ', 1:'Planet Location:  ', 2:'Discovered by: ', 3:'Explored by: ', 4:'KP: ', 5:'RP: ', 6:'Travel cost: ', 7:'Travel time: '}
             
             count = 0
             for stat in info_ls:
