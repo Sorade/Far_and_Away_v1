@@ -6,6 +6,7 @@ Created on Sat Aug 06 11:32:09 2016
 """
 import random
 from logbook import*
+from tools_classes import States
 
 class Explorer(object):
     def __init__(self,game):
@@ -22,6 +23,7 @@ class Explorer(object):
         self.yearly_rp_expense = 0
         self.yearly_rp_income = 0
         self.yearly_kp_income = 0
+        self.states = States()
         
         
     @property

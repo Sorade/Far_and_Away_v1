@@ -70,4 +70,8 @@ to the reference points'''
                 Quad.angle_list[2][2] -= 1 #BL
             else:
                 Quad.angle_list[1][2] -= 1 #BR
+                
+class States:
+    def __init__(self):
+        self.contaminated  = False
           

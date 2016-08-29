@@ -66,9 +66,15 @@ class Game(object):
             planet.chance_of_discovery = 75
         
         '''creats events'''
-        self.event_manager.event_list = [Precious_Ore_Discovered(self),Raiders(self),Old_Archives(self),Storm(self),Rebellion(self),Alien_Tech(self),Astronomer(self)]
-
-            
+        self.event_manager.event_list = [Precious_Ore_Discovered(self), 
+                                         Raiders(self),
+                                         Old_Archives(self), 
+                                         Storm(self),
+                                         Rebellion(self),
+                                         Alien_Tech(self),
+                                         Astronomer(self),
+                                         Contamination(self),
+                                         Cure(self)]            
         '''setting up game switches'''
         self.pressed_left_clic = False 
         self.pressed_mid_clic = False

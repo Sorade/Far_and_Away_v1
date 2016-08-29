@@ -265,7 +265,7 @@ class Interface(object):
         events = event_list
         for event in events:
             self.game.pause = True
-            event.update()
+            event.update(explorer)
             '''blits popup bg '''
             tooltip_bg = Data.backgrounds['event']
             tooltip_bg.set_alpha(50)
@@ -283,7 +283,7 @@ class Interface(object):
             
             if okay_but.selected and self.game.pressed_left_clic:
                 self.game.pause = False
-                event.execute()
+                event.execute(explorer)
                 self.game.event_manager.active_events.remove(event)
                 self.game.map_active = True
                 self.game.pressed_left_clic = False
