@@ -68,7 +68,7 @@ def point_pos(pt, d, theta_rad):
     
    
 def travel_formula(travel_time):
-    return int((travel_time)**2+2)
+    return int(travel_time**2+2)
 
 ''' List -> Object
 takes a list of object with a weight attribute and returns an object of this list randomly'''

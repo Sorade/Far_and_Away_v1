@@ -53,7 +53,7 @@ class Raiders(Event):
     def get_weight(self,explorer):
         total_unexplored_planets = len([p for p in self.game.all_planets if not explorer.check_exploration(p) and  explorer.check_discovery(p) and p.cat == 'Frozen World'])
         total_explored_planets = len([p for p in self.game.all_planets if explorer.check_exploration(p) and  explorer.check_discovery(p) and p.cat == 'Frozen World'])        #self.weight = total_unexplored_planets*10/(self.game.year+1) if total_unexplored_planets > 5 else 0
-        self.weight = 3 if total_unexplored_planets > 10 and float(total_explored_planets)/total_unexplored_planets <= 0.5 else 0
+        self.weight = 3 if total_unexplored_planets > 10 and float(total_explored_planets)/total_unexplored_planets <= 0.25 else 0
         print 'raider',self.weight
         
     def execute(self,explorer):
@@ -87,7 +87,7 @@ class Old_Archives(Event):
 class Rebellion(Event):
     def __init__(self,game):
         self.name = 'Rebellion'
-        self.weight = 5
+        self.weight = 0
         self.planet_pointer = None
         self.text = 'to be defined at exec'
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
@@ -162,11 +162,17 @@ class Contamination(Event):
         total_explored_jungle = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Alien World'])
         self.newly_explored = total_explored_jungle - self.already_explored
         self.already_explored = total_explored_jungle
-        self.weight = total_explored_jungle*3 if self.newly_explored > 0 else 0
+        if self.newly_explored > 0 and explorer.travel_bonus > 1:
+            if self.weight == 0:
+                self.weight = total_explored_jungle*3
+            else:
+                self.weight -= 1
+        else:
+            0
 #        print 'Contamination',self.weight
         
     def execute(self,explorer):
-        if explorer.travel_bonus > 0: explorer.travel_bonus -= 1
+        if explorer.travel_bonus > 1: explorer.travel_bonus -= 1
         explorer.states.contaminated = True
         
 class Cure(Event):
@@ -178,7 +184,7 @@ class Cure(Event):
         
     def get_weight(self,explorer):
         if explorer.states.contaminated:
-            self.weight = explorer.kp/100
+            self.weight = explorer.kp/200
 #        print 'Cure',self.weight
         
     def execute(self,explorer):

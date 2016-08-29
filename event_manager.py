@@ -27,8 +27,15 @@ class Event_Manager(object):
             self.game.map_active = False
             
         '''removes bonuses'''
-        if self.game.player.rp_bonus >= 1: self.game.player.rp_bonus -= 1
-        if self.game.player.kp_bonus >= 1: self.game.player.kp_bonus -= 1 
+        if self.game.player.rp_bonus >= 1:
+            self.game.player.rp_bonus -= 1 
+        elif  self.game.player.rp_bonus < 0:
+            self.game.player.rp_bonus += 1
+            
+        if self.game.player.kp_bonus >= 1:
+            self.game.player.kp_bonus -= 1 
+        elif  self.game.player.kp_bonus < 0:
+            self.game.player.kp_bonus += 1 
         
     
     def planet_discovery_event(self,player_induced):
@@ -55,7 +62,7 @@ class Event_Manager(object):
     def network_expenses_event(self,year):
         cost = 0
         for log in self.game.player.logbook.values():
-            if log.is_explored and year - log.time_of_exploration <= 100:
+            if log.is_explored and year - log.time_of_exploration <= 200:
                 cost += 1
         #self.game.player.rp -= int(cost)
         #self.game.player.yearly_rp_expense = int(cost) #stores the cost value for the current game state in a variable
