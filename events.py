@@ -57,9 +57,7 @@ class Raiders(Event):
         print 'raider',self.weight
         
     def execute(self,explorer):
-        print explorer.rp_bonus
         explorer.rp_bonus += -2
-        print explorer.rp_bonus
         
 class Storm(Event):
     def __init__(self,game):
