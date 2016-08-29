@@ -151,4 +151,22 @@ class Astronomer(Event):
         self.game.player.search_bonus += 10
         self.already_occured = True
 
-
+#class Contamination(Event):
+#    def __init__(self,game):
+#        self.name = 'Contamination'
+#        self.weight = 0
+#        self.text ='Following our exploration of a Jungle World, a new deadly virus was discovered amongst crew members of the ship. This will slow us down while we work on a cure !'
+#        self.newly_explored = 0
+#        self.already_explored = 0
+#        super(type(self), self).__init__(game,self.name,self.weight,self.text)
+#        
+#    def get_weight(self,explorer):
+#        total_explored_jungle = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Alien World'])
+#        self.newly_explored = total_explored_jungle - self.already_explored
+#        self.already_explored = total_explored_jungle
+#        self.weight = total_explored_jungle*3 if self.newly_explored > 0 else 0
+##        print 'AlienTech',self.weight
+#        
+#    def execute(self):
+#        if self.game.player.travel_bonus > 0: self.game.player.travel_bonus -= 1
+#        self.game.player.states.contaminated = True
