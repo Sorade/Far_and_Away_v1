@@ -126,7 +126,8 @@ class Planet(sprite.MySprite):
             
     def search_in_SOF(self,explorer,player_induced):
         if explorer.logbook[self.name].is_explored:
-            if player_induced: 
+            if player_induced:
+                self.game.event_manager.all_yearly_events(explorer)
                 self.game.interface.add_message('Searching around {} ...'.format(self.name),1)
                 loc_bonus = 30
                 if explorer.location == self.name: explorer.search_bonus += loc_bonus # adds a loc bonus

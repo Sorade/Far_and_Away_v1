@@ -53,8 +53,8 @@ class Raiders(Event):
     def get_weight(self,explorer):
         total_unexplored_planets = len([p for p in self.game.all_planets if not explorer.check_exploration(p) and  explorer.check_discovery(p) and p.cat == 'Frozen World'])
         total_explored_planets = len([p for p in self.game.all_planets if explorer.check_exploration(p) and  explorer.check_discovery(p) and p.cat == 'Frozen World'])        #self.weight = total_unexplored_planets*10/(self.game.year+1) if total_unexplored_planets > 5 else 0
-        self.weight = 3 if total_unexplored_planets > 10 and float(total_explored_planets)/total_unexplored_planets <= 0.25 else 0
-        print 'raider',self.weight
+        self.weight = 3 if total_unexplored_planets > 10 and float(total_explored_planets)/total_unexplored_planets <= 0.8 else 0
+        print 'raider',self.weight, float(total_explored_planets)/(total_unexplored_planets+0.01)
         
     def execute(self,explorer):
         explorer.rp_bonus += -2
@@ -170,7 +170,7 @@ class Contamination(Event):
             else:
                 self.weight -= 1
         else:
-            0
+            self.weight = 0
 #        print 'Contamination',self.weight
         
     def execute(self,explorer):
