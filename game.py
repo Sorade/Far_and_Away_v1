@@ -92,8 +92,10 @@ class Game(object):
     def run(self):
         '''set up'''
         black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
-        black_bg.fill((0,0,3))        
-        pygame.time.set_timer(USEREVENT + 1, 5000) # 1 event every 10 seconds
+        black_bg.fill((0,0,3))
+        delta_time = 1000
+        current_time_setting = 5000
+        pygame.time.set_timer(USEREVENT + 1, current_time_setting) # 1 event every 10 seconds
         pygame.time.set_timer(USEREVENT + 2, 1000) # 1 event every 1 seconds
         pygame.time.set_timer(USEREVENT + 3, 75) # map offset every 100 ms
         
@@ -112,34 +114,61 @@ class Game(object):
                 elif event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-                    print 'has quit' 
+                    print 'has quit'
+                    
                 elif event.type == USEREVENT + 3:
                     self.interface.get_map_offset()
-                elif event.type == pygame.KEYDOWN and event.key == K_SPACE:
-                    if self.pause == True: self.pause = False
-                    elif self.pause == False: self.pause = True
-                elif event.type == pygame.KEYDOWN and event.key == K_h:
-                    if self.interface.helpers == True: self.interface.helpers = False
-                    elif self.interface.helpers == False: self.interface.helpers = True                        
                 elif event.type == USEREVENT + 2:
                     self.interface.display_event = True
                     if self.interface.arrow_disp_time > 0: self.interface.arrow_disp_time -= 1
                 elif event.type == USEREVENT + 1 and self.pause == False:
                     #yearly Events and actions
-                    self.event_manager.all_yearly_events(self.player)                    
-                elif event.type == MOUSEBUTTONDOWN and event.button == 1:
-                    self.pressed_left_clic = True
-                elif event.type == MOUSEBUTTONUP and event.button == 1:
-                    self.pressed_left_clic = True
-                elif event.type == MOUSEBUTTONDOWN and event.button == 2:
-                    self.pressed_mid_clic = True
-                elif event.type == MOUSEBUTTONUP and event.button == 2:
-                    self.pressed_mid_clic = True                    
-                elif event.type == MOUSEBUTTONDOWN and event.button == 3:
-                    self.pressed_right_clic = True
-                elif event.type == MOUSEBUTTONUP and event.button == 3:
-                    self.pressed_right_clic = True                    
+                    self.event_manager.all_yearly_events(self.player)                      
+                    
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == K_SPACE:
+                        if self.pause == True: self.pause = False
+                        elif self.pause == False: self.pause = True
+                    elif event.key == K_h:
+                        if self.interface.helpers == True: self.interface.helpers = False
+                        elif self.interface.helpers == False: self.interface.helpers = True
+                    elif event.key == K_h:
+                        if self.interface.helpers == True: self.interface.helpers = False
+                        elif self.interface.helpers == False: self.interface.helpers = True  
+                    elif event.key == K_MINUS or event.key == K_KP_MINUS:
+                        print current_time_setting
+                        if current_time_setting <= 60000:
+                            current_time_setting += delta_time
+                        else:
+                            current_time_setting = 60000
+                        pygame.time.set_timer(USEREVENT + 1, current_time_setting)
+                    elif event.key == K_PLUS or event.key == K_KP_PLUS:
+                        if current_time_setting >= 1000:
+                            current_time_setting -= delta_time
+                        else:
+                            current_time_setting = 1000
+                        pygame.time.set_timer(USEREVENT + 1, current_time_setting)
 
+                elif event.type == MOUSEBUTTONDOWN:
+                    if event.button == 3:
+                        self.pressed_right_clic = True
+                    elif event.button == 1:
+                        self.pressed_left_clic = True
+                    elif event.button == 2:
+                        self.pressed_mid_clic = True
+                    elif event.button == 4:
+                        self.interface.delta += 1
+                    elif event.button == 5:
+                        self.interface.delta -= 1
+                        
+                elif event.type == MOUSEBUTTONUP:
+                    if event.button == 2:
+                        self.pressed_mid_clic = True                    
+                    elif event.button == 3:
+                        self.pressed_right_clic = True 
+                    elif event.button == 1:
+                        self.pressed_left_clic = True
+                    
             '''Calling Display functions'''
             self.interface.screen.blit(black_bg,(0,0))
             self.interface.view_solarsys(self.player,(config.Config.screen_w/2,config.Config.screen_h/2))

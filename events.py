@@ -165,6 +165,8 @@ class Contamination(Event):
         if self.newly_explored > 0 and explorer.travel_bonus > 1:
             if self.weight == 0:
                 self.weight = total_explored_jungle*3
+            elif self.weight >= 3:
+                self.weight = 3
             else:
                 self.weight -= 1
         else:

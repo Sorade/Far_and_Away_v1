@@ -50,10 +50,10 @@ def kp_formula(planet,game_time,exploration_time,explorer_kp,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
     return int(abs(np.sin(dt*1)*max(planet.disc_kp+bonus,0)*np.exp(-(explorer_kp/1000.)*dt))) 
     
-def rp_formula(planet,game_time,exploration_time,bonus):
+def rp_formula(planet,game_time,exploration_time,explorer_rp,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
 #    return int((planet.disc_rp + bonus) * np.exp(-( planet.disc_rp/500)*dt)*(np.cos(2*np.pi*dt)))
-    return int(abs(np.sin(dt)*max(planet.disc_rp+bonus,0)*np.exp(-0.025*dt)))
+    return int(abs(np.sin(dt)*max(planet.disc_rp+bonus,0)*np.exp(-min(0.04,(explorer_rp/5000.))*dt)))#0.025
     
 def exploration_cost_formula(nb_explored,exp_kp,disc_kp):
     return int(5+disc_kp+nb_explored*(nb_explored/(exp_kp+1)))

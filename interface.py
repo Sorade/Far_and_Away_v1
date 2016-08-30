@@ -29,34 +29,46 @@ class Interface(object):
         self.helpers = False
         self.map_offset_x = 0
         self.map_offset_y = 0
+        self.delta = 10
+        
+    @property
+    def delta(self):
+        return self._delta
+
+    @delta.setter
+    def delta(self, delta):
+        if delta < 1:
+            delta = 1
+        elif delta > 35:
+            delta = 35
+        self._delta = delta
         
     def get_map_offset(self):
         mx,my = pygame.mouse.get_pos()
-        delta = 10
         zone_from_edge = 25
         if mx <= zone_from_edge:
-            self.map_offset_x += delta
+            self.map_offset_x += self.delta
         elif mx >= Config.screen_w-zone_from_edge:
-            self.map_offset_x -= delta
+            self.map_offset_x -= self.delta
             
         if my <= zone_from_edge:
-            self.map_offset_y += delta
+            self.map_offset_y += self.delta
         elif my >= Config.screen_h-zone_from_edge:
-            self.map_offset_y -= delta   
+            self.map_offset_y -= self.delta   
 
     def centered_offset(self,offset):
         x,y = offset[0],offset[1]
         return (self.screen.get_rect().centerx-x,self.screen.get_rect().centery-y)
         
     def final_overlay(self,explorer):
-        self.message_display()
+        self.message_display(explorer)
         '''blit pause status'''
         if self.game.pause: fn.display_txt('Game Paused','Impact',16,(0,255,0),self.screen,(int(Config.screen_w*0.75),15))
         '''blit time in years'''
         fn.display_txt('Current year: {}'.format(self.game.year),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w/2,15))
         '''blit the player's points'''
-        fn.display_txt('Your KP: {} (+{}/y)'.format(explorer.kp, self.game.event_manager.knowledge_prod_event(self.game.year+1)),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-230,Config.screen_h-60))
-        fn.display_txt('Your RP: {} (+{}/y)'.format(explorer.rp, self.game.event_manager.resource_prod_event(self.game.year+1) - self.game.event_manager.network_expenses_event(self.game.year+1)),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-230,Config.screen_h-30))                    
+        fn.display_txt('Your KP: {} (+{}/y)'.format(explorer.kp, self.game.event_manager.knowledge_prod_event(explorer,self.game.year+1)),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-230,Config.screen_h-60))
+        fn.display_txt('Your RP: {} (+{}/y)'.format(explorer.rp, self.game.event_manager.resource_prod_event(explorer,self.game.year+1) - self.game.event_manager.network_expenses_event(explorer,self.game.year+1)),'Lucida Console',16,(0,255,0),self.screen,(Config.screen_w-230,Config.screen_h-30))                    
         '''display arrows'''
         self.show_arrows()
         
@@ -148,7 +160,7 @@ class Interface(object):
                 planet.discovered_by,
                 planet.explored_by,
                 '{} (+{}/year)'.format(planet.disc_kp,fn.kp_formula(planet,self.game.year+1,explorer.logbook[planet.name].time_of_exploration,explorer.kp,explorer.kp_bonus)),
-                '{} (+{}/year)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.year+1,explorer.logbook[planet.name].time_of_exploration,explorer.rp_bonus)),
+                '{} (+{}/year)'.format(planet.disc_rp,fn.rp_formula(planet,self.game.year+1,explorer.logbook[planet.name].time_of_exploration,explorer.rp,explorer.rp_bonus)),
                 explorer.logbook[planet.name].travel_cost,
                 explorer.logbook[planet.name].travel_time]
             else:
@@ -216,7 +228,7 @@ class Interface(object):
         if self.arrow_disp_time <= 0:
             self.arrows = []
         
-    def message_display(self):
+    def message_display(self,explorer):
         if self.display_event == True: #displays on call to USEREVENT+2 in game.py
             '''removes 1 second from the display timer'''
             self.message_disp_time -= 1
@@ -234,19 +246,19 @@ class Interface(object):
         elif self.message_disp_time <= 0:
             self.messages = [] #if the message timer reaches 0 the messages are deleted
             
-        if self.helpers: self.graph_display()
+        if self.helpers: self.graph_display(explorer)
             
             
-    def graph_display(self):
+    def graph_display(self,explorer):
         rp_pts = []
         kp_pts = []
         for year in range(1,11):
             next_year_rp = 0
             next_year_kp = 0
-            for log in (log for log in self.game.player.logbook.itervalues() if log.is_explored):
-                next_year_kp += fn.kp_formula(log.instance[0],self.game.year+year,log.time_of_exploration,self.game.player.kp,self.game.player.kp_bonus)
-                next_year_rp += fn.rp_formula(log.instance[0],self.game.year+year,log.time_of_exploration,self.game.player.rp_bonus)
-            next_year_rp -= self.game.player.yearly_rp_expense
+            for log in (log for log in explorer.logbook.itervalues() if log.is_explored):
+                next_year_kp += fn.kp_formula(log.instance[0],self.game.year+year,log.time_of_exploration,explorer.kp,explorer.kp_bonus)
+                next_year_rp += fn.rp_formula(log.instance[0],self.game.year+year,log.time_of_exploration,explorer.rp,explorer.rp_bonus)
+            next_year_rp -= explorer.yearly_rp_expense
             rp_pts.append((year,next_year_rp))
             kp_pts.append((year,next_year_kp))
         '''transfer data into graph compatible data'''
