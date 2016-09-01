@@ -38,6 +38,7 @@ class Data(object):
                     'Old Archives': img_import('old_archives_event.png',(550,310)),
                     'Rebellion': img_import('rebellion.png',(550,310)),
                     'Alien Tech': img_import('alien_tech.png',(550,310)),
+                    'Xenos Weaponary': img_import('alien_weapons.png',(550,310)),
                     'Astronomer': img_import('astronomer.png',(550,310)),
                     'Contamination': img_import('contamination.jpg',(550,310)),
                     'Cure': img_import('cure.jpg',(550,310))}

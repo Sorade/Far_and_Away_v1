@@ -74,4 +74,5 @@ to the reference points'''
 class States:
     def __init__(self):
         self.contaminated  = False
+        self.has_new_weapons = False
           

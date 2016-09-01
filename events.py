@@ -53,7 +53,10 @@ class Raiders(Event):
     def get_weight(self,explorer):
         total_unexplored_planets = len([p for p in self.game.all_planets if not explorer.check_exploration(p) and  explorer.check_discovery(p) and p.cat == 'Frozen World'])
         total_explored_planets = len([p for p in self.game.all_planets if explorer.check_exploration(p) and  explorer.check_discovery(p) and p.cat == 'Frozen World'])        #self.weight = total_unexplored_planets*10/(self.game.year+1) if total_unexplored_planets > 5 else 0
-        self.weight = 3 if total_unexplored_planets > 10 and float(total_explored_planets)/total_unexplored_planets <= 0.8 else 0
+        if total_unexplored_planets > 10 and float(total_explored_planets)/total_unexplored_planets <= 0.8:
+            self.weight = 3 if explorer.states.has_new_weapons else 1
+        else:
+            self.weight = 0
 #        print 'raider',self.weight, float(total_explored_planets)/(total_unexplored_planets+0.01)
         
     def execute(self,explorer):
@@ -78,7 +81,7 @@ class Old_Archives(Event):
         
     def get_weight(self,explorer):
         total_explored_habitable_alien = len([p for p in self.game.all_planets if explorer.check_exploration(p) and (p.cat == 'Habitable World' or p.cat == 'Alien World')])
-        self.weight = total_explored_habitable_alien*20/(self.game.year+1)
+        self.weight = total_explored_habitable_alien*25/(self.game.year+1)
 #        print 'archive',self.weight
         
     def execute(self,explorer):
@@ -120,17 +123,34 @@ class Alien_Tech(Event):
         self.text ='New Alien hyperdrive technology is available, making our travels faster !'
         self.newly_explored = 0
         self.already_explored = 0
-        super(type(self), self).__init__(game,self.name,self.weight,self.text)
+        super(Alien_Tech, self).__init__(game,self.name,self.weight,self.text)
         
     def get_weight(self,explorer):
         total_explored_alien = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Alien World'])
         self.newly_explored = total_explored_alien - self.already_explored
         self.already_explored = total_explored_alien
-        self.weight = total_explored_alien*3 if self.newly_explored > 0 else 0
+        self.weight = total_explored_alien*4 if self.newly_explored > 0 else 0
 #        print 'AlienTech',self.weight
         
     def execute(self,explorer):
         explorer.travel_bonus += 1
+        
+class Alien_Weapons(Alien_Tech):
+    def __init__(self,game):
+        super(type(self), self).__init__(game)
+        self.name = 'Xenos Weaponary'
+        self.weight = 0
+        self.text ='A successful trade deal with an alien colony has allowed to equip our fleet with new, more powerfull weapons. Surely, this will give raiders something to think about !'
+        
+    def get_weight(self,explorer):
+        if not explorer.states.has_new_weapons:
+            super(type(self), self).get_weight(explorer)
+        else:
+            self.weight = 0
+        
+    def execute(self,explorer):
+        explorer.states.has_new_weapons = True
+        
         
 class Astronomer(Event):
     def __init__(self,game):
@@ -186,7 +206,7 @@ class Cure(Event):
         
     def get_weight(self,explorer):
         if explorer.states.contaminated:
-            self.weight = explorer.kp/200
+            self.weight = explorer.kp/150
 #        print 'Cure',self.weight
         
     def execute(self,explorer):

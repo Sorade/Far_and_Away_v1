@@ -62,7 +62,7 @@ class Event_Manager(object):
     def network_expenses_event(self,explorer,year):
         cost = 0
         for log in explorer.logbook.values():
-            if log.is_explored and year - log.time_of_exploration <= 200:
+            if log.is_explored and year - log.time_of_exploration <= 100:
                 cost += 1
         #explorer.rp -= int(cost)
         #explorer.yearly_rp_expense = int(cost) #stores the cost value for the current game state in a variable

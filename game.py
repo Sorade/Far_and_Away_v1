@@ -58,7 +58,7 @@ class Game(object):
         tierra.explored_by.append(self.player.name)
         self.player.location = tierra.name
         tierra.disc_kp,tierra.disc_rp = 15,8
-        tierra.radius = 600
+        tierra.radius = 450
         tierra.pop_around(max_planet = 5, max_iter = 100)
         
         #increases the chance of discovery of starting planets
@@ -72,6 +72,7 @@ class Game(object):
                                          Storm(self),
                                          Rebellion(self),
                                          Alien_Tech(self),
+                                         Alien_Weapons(self),
                                          Astronomer(self),
                                          Contamination(self),
                                          Cure(self)]            
