@@ -64,7 +64,7 @@ class Planet(sprite.MySprite):
     def unveil(self,explorer,player_induced):
         if player_induced == True:
             explorer.kp -= fn.search_cost(self.cat)
-            if not explorer.check_discovery(self) and self.chance_of_discovery + explorer.search_bonus >= random.randint(0,100):
+            if self.chance_of_discovery + explorer.search_bonus >= random.randint(0,100): #not explorer.check_discovery(self) and 
                 explorer.logbook[self.name].is_discovered = True
                 self.discovered_by.append(explorer.name)
                 self.game.interface.add_message('Discovered {}'.format(self.name),1)
@@ -72,7 +72,7 @@ class Planet(sprite.MySprite):
                 arrow_stats = self.game.interface.arrow_param(self)
                 if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
                 
-        elif not explorer.check_discovery(self) and self.chance_of_discovery >= random.randint(0,100):
+        elif self.chance_of_discovery >= random.randint(0,100): #not explorer.check_discovery(self) and 
             explorer.logbook[self.name].is_discovered = True
             self.discovered_by.append(explorer.name)
             self.game.interface.add_message('Auto-Discovered {}'.format(self.name),1)
@@ -126,6 +126,7 @@ class Planet(sprite.MySprite):
             
     def search_in_SOF(self,explorer,player_induced):
         if explorer.logbook[self.name].is_explored:
+            if explorer.states.has_radar: self.get_in_SOF()
             if player_induced:
                 self.game.event_manager.all_yearly_events(explorer)
                 self.game.interface.add_message('Searching around {} ...'.format(self.name),1)
