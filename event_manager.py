@@ -16,7 +16,7 @@ class Event_Manager(object):
     def all_yearly_events(self,explorer):
         self.game.year += 1 #adds a years of gametime every 10 seconds
         self.get_random_event(explorer)
-        self.planet_discovery_event(explorer,False)
+        #self.planet_discovery_event(explorer,False)
         self.points_adjustement_event(explorer)
         for event in self.event_list: event.get_weight(explorer)
         

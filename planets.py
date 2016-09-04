@@ -68,7 +68,7 @@ class Planet(sprite.MySprite):
                 explorer.logbook[self.name].is_discovered = True
                 self.discovered_by.append(explorer.name)
                 self.game.interface.add_message('Discovered {}'.format(self.name),1)
-                if random.randint(0,100) <= 10: self.pop_around()
+                if random.randint(0,100) <= 25: self.pop_around(max_planet=self.pop_factor,max_iter=self.pop_factor*2)
                 arrow_stats = self.game.interface.arrow_param(self)
                 if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
                 
@@ -76,7 +76,7 @@ class Planet(sprite.MySprite):
             explorer.logbook[self.name].is_discovered = True
             self.discovered_by.append(explorer.name)
             self.game.interface.add_message('Auto-Discovered {}'.format(self.name),1)
-            if random.randint(0,100) <= 10: self.pop_around()
+            if random.randint(0,100) <= 25: self.pop_around(max_planet=self.pop_factor,max_iter=self.pop_factor*2)
             arrow_stats = self.game.interface.arrow_param(self)
             if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
             
@@ -94,7 +94,7 @@ class Planet(sprite.MySprite):
                     #works out cost/gain from exploration
                     explorer.rp += self.disc_rp - fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),explorer.kp,self.disc_kp)
                     explorer.logbook[self.name].time_of_exploration = self.game.year
-                    self.pop_around()
+                    self.pop_around(max_planet=self.pop_factor,max_iter=self.pop_factor*2)
                     self.is_virgin = False
 
                 #to do at every exploration or re-explroation
@@ -129,7 +129,7 @@ class Planet(sprite.MySprite):
             if player_induced:
                 self.game.event_manager.all_yearly_events(explorer)
                 self.game.interface.add_message('Searching around {} ...'.format(self.name),1)
-                loc_bonus = 30
+                loc_bonus = 20
                 if explorer.location == self.name: explorer.search_bonus += loc_bonus # adds a loc bonus
                 
                 for planet in self.planets_in_SOF:
