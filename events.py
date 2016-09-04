@@ -1,110 +1,214 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Aug 08 12:07:13 2016
+Created on Wed Aug 24 19:04:07 2016
 
 @author: Julien
 """
-import functions as fn
 import random
 
-class Event_Manager(object):
-    def __init__(self,game):
-        self.game = game
-        self.event_list = [Precious_Ore_Discovered(game),Raiders(game),Old_Archives(game),Storm(game)]
-        self.active_event = None
-        
-    def all_monthly_events(self):
-        self.game.month += 1 #adds a months of gametime every 10 seconds
-        self.get_random_event()
-        self.planet_discovery_event(False)
-        self.points_adjustement_event()
-        #self.network_expenses_event()
-        
-    def get_random_event(self):
-        '''get random event'''
-        if random.randint(0,5) == 0: 
-            self.active_event = fn.choice_weighted(self.game.event_manager.event_list)
-            self.game.map_active = False
-            
-        '''removes bonuses'''
-        if self.game.player.rp_bonus >= 1: self.game.player.rp_bonus -= 1
-        if self.game.player.kp_bonus >= 1: self.game.player.kp_bonus -= 1 
-        
-    
-    def planet_discovery_event(self,player_induced):
-        for log in self.game.player.logbook.values():
-            log.instance[0].search_in_SOF(self.game.player,False,0)
-            
-    def resource_prod_event(self):
-        for log in self.game.player.logbook.values():
-            if log.is_explored:
-                self.game.player.rp += fn.rp_formula(log.instance[0],self.game.month,log.time_of_exploration,self.game.player.rp_bonus)
-                
-    def knowledge_prod_event(self):
-        for log in self.game.player.logbook.values():
-            if log.is_explored:
-                self.game.player.kp += fn.kp_formula(log.instance[0],self.game.month,log.time_of_exploration,self.game.player.kp_bonus)
-                
-    ''''Make this into a function... maybe store all event values as event manager
-    variables and make a new method handling those variables'''   
-    def network_expenses_event(self):
-        cost = 0
-        for log in self.game.player.logbook.values():
-            if log.is_explored:
-                cost += 1
-        self.game.player.rp -= cost*2
-        self.game.player.monthly_expense = cost*2 #stores the cost value for the current game state in a variable
-        #so that it can be accessed in the graph display
-                
-    def points_adjustement_event(self):
-        self.resource_prod_event()
-        self.knowledge_prod_event()
-        
-        
 class Event(object):
     def __init__(self,game, name, weight ,text):
         self.game = game
         self.name = name
         self.weight = weight
         self.text = text
+        
+    def get_weight(self,explorer):
+        pass
+        
+    def update(self,explorer):
+        pass
     
 class Precious_Ore_Discovered(Event):
     def __init__(self,game):
         self.name = 'Precious Ore Discovered'
-        self.weight = 2
+        self.weight = 0
+        self.planet_pointer = None
         self.text ='''An ore of precious metal has been found in one of your colonies and is being traded throughout the galaxy. It will surely increase our production for a few more years.'''
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
         
-    def execute(self):
-        self.game.player.rp_bonus += 2
+    def get_weight(self,explorer):
+        total_explored_mining_worlds = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Mining World'])
+        self.weight =  total_explored_mining_worlds*11/(self.game.year+1)
+        print 'mining',self.weight
+        
+    def execute(self,explorer):
+        explorer.rp_bonus += 2
+        self.planet_pointer[0].disc_rp += 10
+        self.planet_pointer = None
+        
+    def update(self,explorer):
+        if self.planet_pointer is None:
+            self.planet_pointer = [random.choice([p for p in self.game.all_planets if explorer.check_exploration(p) and p.name != explorer.location])]
+            self.text ='''An ore of precious metal has been found in {} and is being traded throughout the galaxy. It will surely increase our production for a few more years.'''.format(self.planet_pointer[0].name)
+
 
 class Raiders(Event):
     def __init__(self,game):
         self.name = 'Raiders'
-        self.weight = 1
+        self.weight = 0
         self.text ='''Raiders have been reported to disrupt our supply lines and are causing havoc amongst interplanetary trade. This is starting to show in our finances.'''
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
         
-    def execute(self):
-        self.game.player.rp_bonus += -2
+    def get_weight(self,explorer):
+        total_unexplored_planets = len([p for p in self.game.all_planets if not explorer.check_exploration(p) and  explorer.check_discovery(p) and p.cat == 'Frozen World'])
+        total_explored_planets = len([p for p in self.game.all_planets if explorer.check_exploration(p) and  explorer.check_discovery(p) and p.cat == 'Frozen World'])        #self.weight = total_unexplored_planets*10/(self.game.year+1) if total_unexplored_planets > 5 else 0
+        if total_unexplored_planets > 10 and float(total_explored_planets)/total_unexplored_planets <= 0.8:
+            self.weight = 3 if explorer.states.has_new_weapons else 1
+        else:
+            self.weight = 0
+#        print 'raider',self.weight, float(total_explored_planets)/(total_unexplored_planets+0.01)
+        
+    def execute(self,explorer):
+        explorer.rp_bonus += -2
         
 class Storm(Event):
     def __init__(self,game):
         self.name = 'Storm'
-        self.weight = 2
+        self.weight = 1
         self.text ='''An electromagnetic storm has damaged our servers costing us some precious data which we had spend years gathering !!'''
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
         
-    def execute(self):
-        self.game.player.kp_bonus += -2
+    def execute(self,explorer):
+        explorer.kp_bonus += -2
         
 class Old_Archives(Event):
     def __init__(self,game):
         self.name = 'Old Archives'
-        self.weight = 3
+        self.weight = 2
         self.text ='''One of your crew librarians has managed to find some long lost archives. They must surely be of interest to us.'''
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
         
-    def execute(self):
-        self.game.player.kp_bonus += 2
+    def get_weight(self,explorer):
+        total_explored_habitable_alien = len([p for p in self.game.all_planets if explorer.check_exploration(p) and (p.cat == 'Habitable World' or p.cat == 'Alien World')])
+        self.weight = total_explored_habitable_alien*25/(self.game.year+1)
+#        print 'archive',self.weight
         
+    def execute(self,explorer):
+        explorer.kp_bonus += 2
+        
+class Rebellion(Event):
+    def __init__(self,game):
+        self.name = 'Rebellion'
+        self.weight = 0
+        self.planet_pointer = None
+        self.text = 'to be defined at exec'
+        super(type(self), self).__init__(game,self.name,self.weight,self.text)
+        
+    def get_weight(self,explorer):
+        total_explored_planets = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.name != explorer.location])
+        self.weight = total_explored_planets*6/(self.game.year+1) if total_explored_planets > 5 else 0
+#        print 'rebel',self.weight
+
+    def execute(self,explorer):
+        explorer.logbook[self.planet_pointer[0].name].is_explored = False
+        self.planet_pointer[0].explored_by.remove(explorer.name)
+        self.planet_pointer = None
+        
+    def update(self,explorer):
+        if self.planet_pointer is None:
+            list_of_potential_rebelious_planets = [p for p in self.game.all_planets if
+                                        explorer.check_exploration(p)
+                                        and p.name != explorer.location
+                                        and (p.cat == 'Habitable World'
+                                        or p.cat == 'Alien World' 
+                                        or p.cat == 'Mining World')]
+            if len(list_of_potential_rebelious_planets) > 0: self.planet_pointer = [random.choice(list_of_potential_rebelious_planets)]
+            self.text ='''The governement of {} has rebelled against your authority. Refusing to pay you the taxes you are owed to carry your duty.'''.format(self.planet_pointer[0].name)
+
+class Alien_Tech(Event):
+    def __init__(self,game):
+        self.name = 'Alien Tech'
+        self.weight = 0
+        self.text ='New Alien hyperdrive technology is available, making our travels faster !'
+        self.newly_explored = 0
+        self.already_explored = 0
+        super(Alien_Tech, self).__init__(game,self.name,self.weight,self.text)
+        
+    def get_weight(self,explorer):
+        total_explored_alien = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Alien World'])
+        self.newly_explored = total_explored_alien - self.already_explored
+        self.already_explored = total_explored_alien
+        self.weight = total_explored_alien*4 if self.newly_explored > 0 else 0
+#        print 'AlienTech',self.weight
+        
+    def execute(self,explorer):
+        explorer.travel_bonus += 1
+        
+class Alien_Weapons(Alien_Tech):
+    def __init__(self,game):
+        super(type(self), self).__init__(game)
+        self.name = 'Xenos Weaponary'
+        self.weight = 0
+        self.text ='A successful trade deal with an alien colony has allowed to equip our fleet with new, more powerfull weapons. Surely, this will give raiders something to think about !'
+        
+    def get_weight(self,explorer):
+        if not explorer.states.has_new_weapons:
+            super(type(self), self).get_weight(explorer)
+        else:
+            self.weight = 0
+        
+    def execute(self,explorer):
+        explorer.states.has_new_weapons = True
+        
+        
+class Astronomer(Event):
+    def __init__(self,game):
+        self.name = 'Astronomer'
+        self.weight = 0
+        self.already_occured = False
+        self.text ='An astronomer has joined your high-command concil, enhancing your research efforts for new worlds.'
+        super(type(self), self).__init__(game,self.name,self.weight,self.text)
+        
+    def get_weight(self,explorer):
+        total_explored = len([p for p in self.game.all_planets if explorer.check_exploration(p)])
+        self.weight = 2 if self.game.year > 10 and not self.already_occured and total_explored > 15 else 0
+#        print 'Astro',self.weight
+        
+    def execute(self,explorer):
+        explorer.search_bonus += 10
+        self.already_occured = True
+
+class Contamination(Event):
+    def __init__(self,game):
+        self.name = 'Contamination'
+        self.weight = 0
+        self.text ='Following our exploration of a Jungle World, a new deadly virus was discovered amongst crew members of the ship. This will slow us down while we work on a cure !'
+        self.newly_explored = 0
+        self.already_explored = 0
+        super(type(self), self).__init__(game,self.name,self.weight,self.text)
+        
+    def get_weight(self,explorer):
+        total_explored_jungle = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Alien World'])
+        self.newly_explored = total_explored_jungle - self.already_explored
+        self.already_explored = total_explored_jungle
+        if self.newly_explored > 0 and explorer.travel_bonus > 1:
+            if self.weight == 0:
+                self.weight = total_explored_jungle*3
+            elif self.weight >= 3:
+                self.weight = 3
+            else:
+                self.weight -= 1
+        else:
+            self.weight = 0
+#        print 'Contamination',self.weight
+        
+    def execute(self,explorer):
+        if explorer.travel_bonus > 1: explorer.travel_bonus -= 1
+        explorer.states.contaminated = True
+        
+class Cure(Event):
+    def __init__(self,game):
+        self.name = 'Cure'
+        self.weight = 0
+        self.text ='Commander, a cure has finally been found to cure one of the virus present in the fleet. We can now focus on our task once again !'
+        super(type(self), self).__init__(game,self.name,self.weight,self.text)
+        
+    def get_weight(self,explorer):
+        if explorer.states.contaminated:
+            self.weight = explorer.kp/150
+#        print 'Cure',self.weight
+        
+    def execute(self,explorer):
+        explorer.travel_bonus += 1
+        explorer.states.contaminated = False

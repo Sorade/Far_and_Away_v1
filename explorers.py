@@ -6,19 +6,25 @@ Created on Sat Aug 06 11:32:09 2016
 """
 import random
 from logbook import*
+from tools_classes import States
 
 class Explorer(object):
     def __init__(self,game):
         self.game = game
-        self.name = random.choice(['Roger','Logan','Fred','Susan','Morgane','Iloa'])
+        self.name = random.choice(['Roger','Logan','Fred','Susan','Morgane','Iloa']) +' ' + fn.surname_gen(True)
         self.location = 0
         self.logbook = {}
         self.kp = 10
         self.rp = 10
         self.kp_bonus = 0
         self.rp_bonus = 0
-        self.monthly_rp_expense = 0
-        self.monthly_rp_income = 0
+        self.travel_bonus = 1
+        self.search_bonus = 0
+        self.yearly_rp_expense = 0
+        self.yearly_rp_income = 0
+        self.yearly_kp_income = 0
+        self.states = States()
+        
         
     @property
     def kp(self):
@@ -37,4 +43,25 @@ class Explorer(object):
     def rp(self, rp):
         rp = 0 if rp < 0 else rp
         self._rp = rp
+        
+    def select_displacement(self, planet):
+        ''' checks whether the explorer has explored the planet or not and
+            performs the corresponding displacement function (explore or visit)
+            Explorer Planet -> None
+            SE: -explore
+                -visit
+        '''
+        if not self.check_exploration(planet):
+            planet.explore(self)
+        else:
+            planet.visit(self)
+            
+    def check_discovery(self, planet):
+        return self.name in planet.discovered_by
 
+    def check_exploration(self, planet):
+        return self.name in planet.explored_by
+        
+    def get_logbook_planets(self):
+        for log in self.logbook.itervalues():
+            yield log.instance[0] 

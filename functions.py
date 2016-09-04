@@ -12,7 +12,7 @@ from math import pi,radians,sin,cos,acos
 '''takes a list of tulpe values and plots them in a graph
 of which the bottom left corner is set as o_pos and has 
 a width and height defined by the dim tulpe = to (w,h)'''
-def get_graph_data(list,o_pos,dim,  lab_offset):
+def get_graph_data(list,o_pos, dim,  lab_offset):
     ox,oy = o_pos
     w,h = dim
     xls,yls = [x-1 for x,y in list], [y for x,y in list]
@@ -35,18 +35,34 @@ def check_collision(item,list):
 
 def dist(point1, point2):
     return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**0.5
-
-def kp_formula(planet,game_time,exploration_time,bonus):
-    dt = game_time - exploration_time if game_time != exploration_time else 1
-    return int(abs(np.sin(dt)*(planet.disc_kp+bonus)*np.exp(-0.025*dt)))
     
-def rp_formula(planet,game_time,exploration_time,bonus):
+def search_cost(planet_cat):
+    cost = 0
+    if planet_cat == 'Mining World' :    cost = 10
+    if planet_cat == 'Habitable World' : cost = 8
+    if planet_cat == 'Frozen World' :    cost = 15
+    if planet_cat == 'Alien World' :     cost = 10
+    if planet_cat == 'Jungle World' :    cost = 10
+    return cost
+
+
+def kp_formula(planet,game_time,exploration_time,explorer_kp,bonus):
+    dt = game_time - exploration_time if game_time != exploration_time else 1
+    return int(abs(np.sin(dt*1)*max(planet.disc_kp+bonus,0)*np.exp(-(explorer_kp/1000.)*dt))) 
+    
+def rp_formula(planet,game_time,exploration_time,explorer_rp,bonus):
     dt = game_time - exploration_time if game_time != exploration_time else 1
 #    return int((planet.disc_rp + bonus) * np.exp(-( planet.disc_rp/500)*dt)*(np.cos(2*np.pi*dt)))
-    return int(abs(np.sin(dt)*(planet.disc_rp+bonus)*np.exp(-0.025*dt)))
+    if explorer_rp/5000. < 0.035:
+        modif = 0.035
+    elif explorer_rp/5000. > 0.05:
+        modif = 0.05
+    else:
+        modif = (explorer_rp/5000.)
+    return int(abs(np.sin(dt)*max(planet.disc_rp+bonus,0)*np.exp(-modif*dt)))#0.025
     
-def exploration_cost_formula(nb_explored,kp):
-    return int(5+nb_explored*(nb_explored/(kp+1)))
+def exploration_cost_formula(nb_explored,exp_kp,disc_kp):
+    return int(5+disc_kp+nb_explored*(nb_explored/(exp_kp+1)))
     
 def travel_time(distance,travel_units):
     return int(distance/travel_units)
@@ -58,7 +74,7 @@ def point_pos(pt, d, theta_rad):
     
    
 def travel_formula(travel_time):
-    return int(travel_time*travel_time)
+    return int(travel_time**2+2)
 
 ''' List -> Object
 takes a list of object with a weight attribute and returns an object of this list randomly'''
@@ -90,13 +106,28 @@ def blitc(dest,surface,blitpos): #blitpos is the center of the image
 #    corrected_blitpos = sum_tulp(rect.topleft, (dx,dy))
     dest.blit(surface, corrected_blitpos)
     
-def display_txt(txt,font,size,color,surface,pos):
+def display_txt(txt,font,size,color,surface,pos,centered = False):
     txt = str(txt)
     font = pygame.font.SysFont(font, size, bold=False, italic=False)
     text = font.render(txt, True, color)
     textpos = text.get_rect()
     textpos.topleft = pos
+    if centered: textpos.center = pos
     surface.blit(text, textpos)
+    
+def surname_gen(capitalize):
+    start = ['Mo','Ma','Mu','Lo','La','Lu','Po','Pa','Pu']
+    mid = ['lin','lom','sam','bam','for']
+    end = ['son','va','p','ham','kol']
+    
+    word = ''
+    for ls in [start,mid,end]:
+        word += random.choice(ls)
+        
+    if (capitalize==True):
+        word=word.capitalize()
+    return word
+    
     
 def name_gen(capitalize):
 
