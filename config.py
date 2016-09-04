@@ -7,9 +7,9 @@ Created on Sat Aug 06 18:56:10 2016
 import pygame
 
 class Config(object):
-    fullscreen = True
+    fullscreen = False
     screen_h = 700
-    screen_w = 1200
+    screen_w = 1100
     
     if fullscreen == True:
         screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
