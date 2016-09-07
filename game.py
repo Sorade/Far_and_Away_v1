@@ -105,7 +105,7 @@ class Game(object):
         
         while True:
             self.clock.tick(60) #needed to slow game down
-            #t0 = time.time()
+            
             
             for event in pygame.event.get(): #setting up quit
                 if event.type == QUIT:
@@ -172,13 +172,14 @@ class Game(object):
                     
             '''Calling Display functions'''
             self.interface.screen.blit(black_bg,(0,0))
+            self.player.set_action('none')
             self.interface.view_solarsys(self.player,(config.Config.screen_w/2,config.Config.screen_h/2))
             self.interface.event_popup(self.event_manager.active_events,self.player)    
             self.interface.final_overlay(self.player) #will only display messages when USEREVENT+2 has occured
             fn.display_txt(str(len(self.all_planets)),'Lucida Console',16,(200,200,0),self.interface.screen,(20,20))
             fn.display_txt('score: '+str(self.get_score()),'Lucida Console',16,(200,200,0),self.interface.screen,(20,40))
             fn.display_txt('Current Position: '+str(fn.sum_tulp(pygame.mouse.get_pos(),(-self.interface.map_offset_x,-self.interface.map_offset_y))),'Lucida Console',16,(200,200,0),self.interface.screen,(20,config.Config.screen_h-20))
-
+            self.player.ai.train()
             pygame.display.update()
             
             '''Checks if game ends'''

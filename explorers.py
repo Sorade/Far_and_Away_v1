@@ -7,10 +7,12 @@ Created on Sat Aug 06 11:32:09 2016
 import random
 from logbook import*
 from tools_classes import States
+from AI import ai
 
 class Explorer(object):
     def __init__(self,game):
         self.game = game
+        self.ai = ai(game,self)
         self.name = random.choice(['Roger','Logan','Fred','Susan','Morgane','Iloa']) +' ' + fn.surname_gen(True)
         self.location = 0
         self.logbook = {}
@@ -24,6 +26,8 @@ class Explorer(object):
         self.yearly_rp_income = 0
         self.yearly_kp_income = 0
         self.states = States()
+        self.time_since_last_action = 0
+        self.action = 0
         
         
     @property
@@ -52,8 +56,10 @@ class Explorer(object):
                 -visit
         '''
         if not self.check_exploration(planet):
+            self.set_action('explore')
             planet.explore(self)
         else:
+            self.set_action('visit')
             planet.visit(self)
             
     def check_discovery(self, planet):
@@ -64,4 +70,13 @@ class Explorer(object):
         
     def get_logbook_planets(self):
         for log in self.logbook.itervalues():
-            yield log.instance[0] 
+            yield log.instance[0]
+            
+    def set_time_since_last_action(self):
+        if self.action != 0:
+            self.time_since_last_action = self.game.year - self.time_since_last_action
+        
+    def set_action(self,action):
+        actions = {'none' : 0, 'visit' : 1, 'explore' : 2, 'search' : 3}
+        self.action = actions[action]
+        self.set_time_since_last_action()

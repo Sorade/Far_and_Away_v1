@@ -30,7 +30,7 @@ class Precious_Ore_Discovered(Event):
     def get_weight(self,explorer):
         total_explored_mining_worlds = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Mining World'])
         self.weight =  total_explored_mining_worlds*11/(self.game.year+1)
-        print 'mining',self.weight
+#        print 'mining',self.weight
         
     def execute(self,explorer):
         explorer.rp_bonus += 2

@@ -5,26 +5,27 @@ Created on Wed Sep 07 17:29:21 2016
 @author: julien
 """
 
-class AI:
+class ai:
     def __init__(self,game,player):
         self.game = game
         self.player = player
-        self.variables = [ time_since_last_action, 
-                         resource_pts, knowledge_pts, 
-                         number_of_discovered_planets, 
-                         number_of_explored_planets,                           
-                         number_of_unexplored_planets,
-                         time_in_game, current_expenses, 
-                         current_resource_income, 
-                         current_knowledge_income, 
-                         action]
+        self.variables = [ 'time_since_last_action', 
+                         'resource_pts', 'knowledge_pts', 
+                         'number_of_discovered_planets', 
+                         'number_of_explored_planets',                           
+                         'number_of_unexplored_planets',
+                         'time_in_game',
+                         'current_expenses', 
+                         'current_resource_income', 
+                         'current_knowledge_income', 
+                         'action']
                  
     def get_variables(self):
         nb_disc, nb_exp = 0,0
         for x in range(len(self.variables)):
             '''choices'''
             if x == 0:
-                var = self.player.time_since_last_action,
+                var = self.player.time_since_last_action
             elif x == 1:
                 var = self.player.rp
             elif x == 2:
@@ -38,7 +39,7 @@ class AI:
             elif x == 5:
                 var = nb_disc - nb_exp
             elif x == 6:
-                var = self.game.month
+                var = self.game.year
             elif x == 7:
                 var = self.player.yearly_rp_expense
             elif x == 8:
@@ -49,16 +50,15 @@ class AI:
                 var = self.player.action
             '''assigns variable'''
             self.variables[x] = var
-            '''print to file ...'''
+            
+    def print_to_file(self):
+        print self.variables
+        
+    def train(self):
+        self.get_variables()
+        self.print_to_file()
                  
                  
-''' in explorer.py'''
-def set_time_since_last_action(self):
-    self.time_since_last_action = current_time - self.time_since_last_action
-    
-def set_action(self,action):
-    actions = {'nothing' : 0, 'visit' : 1, 'explore' : 2, 'search' : 3}
-    self.action = actions[action]
     
     
     
