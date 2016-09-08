@@ -52,7 +52,7 @@ class Game(object):
         '''assign starting planet to player only'''
         tierra.name = 'Tierra'
         tierra.img_ref = 'Earth'
-        self.player.logbook[tierra.name] = lgbk.Logbook(tierra,True,True)
+        self.player.logbook[tierra.name] = lgbk.Log(self.player,tierra,True,True)
         self.player.logbook[tierra.name].time_of_exploration = self.year
         tierra.discovered_by.append(self.player.name)
         tierra.explored_by.append(self.player.name)

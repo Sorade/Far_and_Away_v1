@@ -16,6 +16,7 @@ class Explorer(object):
         self.name = random.choice(['Roger','Logan','Fred','Susan','Morgane','Iloa']) +' ' + fn.surname_gen(True)
         self.location = 0
         self.logbook = {}
+        self.explored_planets = []
         self.kp = 10
         self.rp = 10
         self.kp_bonus = 0

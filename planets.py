@@ -33,7 +33,7 @@ class Planet(sprite.MySprite):
         self.rect.center = pos
         
     def add_to_logbook(self,explorer):
-        explorer.logbook[self.name] = lgbk.Logbook(self,False,False)
+        explorer.logbook[self.name] = lgbk.Log(explorer,self,False,False)
         
     def pop_around(self, max_planet = 2, max_iter = 3):
         if not self.has_popped:

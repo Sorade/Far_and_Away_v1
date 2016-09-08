@@ -52,7 +52,7 @@ class ai:
             self.variables[x] = var
             
     def print_to_file(self):
-        print self.variables
+        pass#print self.variables
         
     def train(self):
         self.get_variables()
