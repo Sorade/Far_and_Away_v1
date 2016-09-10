@@ -52,7 +52,7 @@ class Game(object):
         '''assign starting planet to player only'''
         tierra.name = 'Tierra'
         tierra.img_ref = 'Earth'
-        self.player.logbook[tierra.name] = lgbk.Logbook(tierra,True,True)
+        self.player.logbook[tierra.name] = lgbk.Log(self.player,tierra,True,True)
         self.player.logbook[tierra.name].time_of_exploration = self.year
         tierra.discovered_by.append(self.player.name)
         tierra.explored_by.append(self.player.name)
@@ -217,9 +217,11 @@ class Game(object):
                     self.pressed_right_clic = True
 
             '''Calling Display functions'''
+            self.player.set_action('none')
             self.interface.screen.blit(pygame.transform.smoothscale(data.Data.backgrounds['game_over'],(config.Config.screen_w,config.Config.screen_h)),(0,0))
             fn.display_txt('score: '+str(self.get_score()),'Lucida Console',50,(200,200,0),self.interface.screen,(config.Config.screen_w/2,config.Config.screen_h/4),True)
             
+            self.player.ai.train()
             pygame.display.update()
             
     def start_menu(self):
