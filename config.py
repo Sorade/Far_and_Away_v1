@@ -10,6 +10,8 @@ class Config(object):
     fullscreen = False
     screen_h = 700
     screen_w = 1100
+    train_ai = True
+
     
     if fullscreen == True:
         screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)

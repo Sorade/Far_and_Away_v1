@@ -43,6 +43,7 @@ class Game(object):
         '''create explorers and player'''
         self.all_explorers = [explorers.Explorer(self) for x in range (2)]
         self.player = explorers.Explorer(self)
+        if not config.Config.train_ai: self.player.ai.set_algo()
 
         '''Create Planets'''
         tierra = World_Habitable(self,(config.Config.screen_w/2,config.Config.screen_h/2))
@@ -175,7 +176,10 @@ class Game(object):
                     
             '''Calling Display functions'''
             self.interface.screen.blit(black_bg,(0,0))
-            self.player.set_action('none')
+            if config.Config.train_ai:
+                self.player.set_action('none')
+            elif not config.Config.train_ai:
+                self.player.ai.play()
             self.interface.view_solarsys(self.player,(config.Config.screen_w/2,config.Config.screen_h/2))
             self.interface.event_popup(self.event_manager.active_events,self.player)    
             self.interface.final_overlay(self.player) #will only display messages when USEREVENT+2 has occured
@@ -183,7 +187,7 @@ class Game(object):
             fn.display_txt('score: '+str(self.get_score()),'Lucida Console',16,(200,200,0),self.interface.screen,(20,40))
             fn.display_txt('Current Position: '+str(fn.sum_tulp(pygame.mouse.get_pos(),(-self.interface.map_offset_x,-self.interface.map_offset_y))),'Lucida Console',16,(200,200,0),self.interface.screen,(20,config.Config.screen_h-20))
 
-            self.player.ai.train()
+            if config.Config.train_ai: self.player.ai.train()
             pygame.display.update()
             
             '''Checks if game ends'''

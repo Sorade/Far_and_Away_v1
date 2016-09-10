@@ -28,6 +28,7 @@ class Explorer(object):
         self.yearly_kp_income = 0
         self.states = States()
         self.time_since_last_action = 0
+        self.time_of_last_action = 0
         self.action = 0
         
         
@@ -75,7 +76,8 @@ class Explorer(object):
             
     def set_time_since_last_action(self):
         if self.action != 0:
-            self.time_since_last_action = self.game.year - self.time_since_last_action
+            self.time_since_last_action = self.game.year - self.time_of_last_action
+            self.time_of_last_action = self.game.year
         
     def set_action(self,action):
         actions = {'none' : 0, 'visit' : 1, 'explore' : 2, 'search' : 3}
