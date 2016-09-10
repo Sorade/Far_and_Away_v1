@@ -71,9 +71,9 @@ class ai:
         self.print_to_file()
         
     def play(self):
-        '''free search around discovered planets'''
-        for p in self.explorer.explored_planets:
-            p.search_in_SOF(self.explorer, False)
+#        '''free search around discovered planets'''
+#        for p in self.explorer.explored_planets:
+#            p.search_in_SOF(self.explorer, False)
 
         '''get action'''
         self.get_variables() #monitors state of game
@@ -84,16 +84,19 @@ class ai:
             pot_dests = list(self.explorer.explored_planets)
             pot_dests.remove(self.explorer.logbook[self.explorer.location].instance[0])
             if len(pot_dests) > 0:
+                self.explorer.set_action('visit')
                 random.choice(pot_dests).visit(self.explorer)
             else:
                 action = 2 #if only 1 planet is explored, then explores
         if action == 2: #explore
             unexplored_planets = [log.instance[0] for log in self.explorer.logbook.itervalues() if log.is_discovered and not log.is_explored]
             if len(unexplored_planets) > 0:
+                self.explorer.set_action('explore')
                 random.choice(unexplored_planets).explore(self.explorer)
             else:
                 action = 3 #to do a search instead
         if action == 3: #search
+            self.explorer.set_action('search')
             self.explorer.logbook[self.explorer.location].instance[0].search_in_SOF(self.explorer, True)
             
 
@@ -110,7 +113,7 @@ class ai:
     
     def get_action_from_rand_forest(self):
         test = self.variables[:-1]
-        test[0] = 9
+#        test[0] = 9
         return self.algo.predict(test)
         #savetxt('Data/submission2.csv', rf.predict(test), delimiter=',', fmt='%f')
 #

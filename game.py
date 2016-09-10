@@ -176,9 +176,9 @@ class Game(object):
                     
             '''Calling Display functions'''
             self.interface.screen.blit(black_bg,(0,0))
-            if config.Config.train_ai:
-                self.player.set_action('none')
-            elif not config.Config.train_ai:
+#            if config.Config.train_ai:
+            self.player.set_action('none')
+            if not config.Config.train_ai:
                 self.player.ai.play()
             self.interface.view_solarsys(self.player,(config.Config.screen_w/2,config.Config.screen_h/2))
             self.interface.event_popup(self.event_manager.active_events,self.player)    

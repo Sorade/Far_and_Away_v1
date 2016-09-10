@@ -10,7 +10,7 @@ class Config(object):
     fullscreen = False
     screen_h = 700
     screen_w = 1100
-    train_ai = True
+    train_ai = False
 
     
     if fullscreen == True:
