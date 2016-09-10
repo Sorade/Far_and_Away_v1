@@ -75,4 +75,6 @@ class States:
     def __init__(self):
         self.contaminated  = False
         self.has_new_weapons = False
+        self.has_hyperdrive = False
+        self.has_radar = False
           

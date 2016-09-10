@@ -29,7 +29,7 @@ class Precious_Ore_Discovered(Event):
         
     def get_weight(self,explorer):
         total_explored_mining_worlds = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Mining World'])
-        self.weight =  total_explored_mining_worlds*11/(self.game.year+1)
+        self.weight =  total_explored_mining_worlds*20/(self.game.year+1)
         print 'mining',self.weight
         
     def execute(self,explorer):
@@ -53,8 +53,8 @@ class Raiders(Event):
     def get_weight(self,explorer):
         total_unexplored_planets = len([p for p in self.game.all_planets if not explorer.check_exploration(p) and  explorer.check_discovery(p) and p.cat == 'Frozen World'])
         total_explored_planets = len([p for p in self.game.all_planets if explorer.check_exploration(p) and  explorer.check_discovery(p) and p.cat == 'Frozen World'])        #self.weight = total_unexplored_planets*10/(self.game.year+1) if total_unexplored_planets > 5 else 0
-        if total_unexplored_planets > 10 and float(total_explored_planets)/total_unexplored_planets <= 0.8:
-            self.weight = 3 if explorer.states.has_new_weapons else 1
+        if total_unexplored_planets > 10 and float(total_explored_planets)/total_unexplored_planets <= 0.999:
+            self.weight = 3 if not explorer.states.has_new_weapons else 1
         else:
             self.weight = 0
 #        print 'raider',self.weight, float(total_explored_planets)/(total_unexplored_planets+0.01)
@@ -130,10 +130,11 @@ class Alien_Tech(Event):
         self.newly_explored = total_explored_alien - self.already_explored
         self.already_explored = total_explored_alien
         self.weight = total_explored_alien*4 if self.newly_explored > 0 else 0
-#        print 'AlienTech',self.weight
+        print 'AlienTech',self.weight
         
     def execute(self,explorer):
         explorer.travel_bonus += 1
+        explorer.states.has_hyperdrive = True
         
 class Alien_Weapons(Alien_Tech):
     def __init__(self,game):
@@ -162,8 +163,8 @@ class Astronomer(Event):
         
     def get_weight(self,explorer):
         total_explored = len([p for p in self.game.all_planets if explorer.check_exploration(p)])
-        self.weight = 2 if self.game.year > 10 and not self.already_occured and total_explored > 15 else 0
-#        print 'Astro',self.weight
+        self.weight = 2 if self.game.year > 50 and not self.already_occured and total_explored > 25 else 0
+        print 'Astro',self.weight
         
     def execute(self,explorer):
         explorer.search_bonus += 10
@@ -179,19 +180,19 @@ class Contamination(Event):
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
         
     def get_weight(self,explorer):
-        total_explored_jungle = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Alien World'])
+        total_explored_jungle = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Jungle World'])
         self.newly_explored = total_explored_jungle - self.already_explored
         self.already_explored = total_explored_jungle
         if self.newly_explored > 0 and explorer.travel_bonus > 1:
             if self.weight == 0:
                 self.weight = total_explored_jungle*3
-            elif self.weight >= 3:
+            elif self.weight > 3:
                 self.weight = 3
             else:
                 self.weight -= 1
         else:
             self.weight = 0
-#        print 'Contamination',self.weight
+        print 'Contamination',self.weight
         
     def execute(self,explorer):
         if explorer.travel_bonus > 1: explorer.travel_bonus -= 1
@@ -206,9 +207,27 @@ class Cure(Event):
         
     def get_weight(self,explorer):
         if explorer.states.contaminated:
-            self.weight = explorer.kp/150
-#        print 'Cure',self.weight
+            self.weight = explorer.kp/100
+        print 'Cure',self.weight
         
     def execute(self,explorer):
         explorer.travel_bonus += 1
         explorer.states.contaminated = False
+        
+class Radar(Alien_Tech):
+    def __init__(self,game):
+        super(type(self), self).__init__(game)
+        self.name = 'Radar'
+        self.weight = 0
+        self.text ='Our understanding of Xenos technology has enabled us to develop beam casting radars which make us more likely to discover new planets.'
+        
+    def get_weight(self,explorer):
+        if not explorer.states.has_radar and explorer.states.has_hyperdrive and explorer.states.has_new_weapons:
+            super(type(self), self).get_weight(explorer)
+            if self.weight > 0: self.weight = 2
+        print 'Rada',self.weight
+        
+    def execute(self,explorer):
+        explorer.travel_bonus += 1
+        explorer.states.has_radar = True
+

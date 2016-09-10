@@ -18,6 +18,7 @@ class World_Mining(Planet):
         self.chance_of_discovery = random.randint(0,10)
         self.disc_kp = random.randint(0,3)
         self.disc_rp = random.randint(10,15)
+        self.pop_factor = 1
         
 class World_Habitable(Planet):
     img_ref = 'Habitable_world'
@@ -29,17 +30,19 @@ class World_Habitable(Planet):
         self.chance_of_discovery = random.randint(0,15)
         self.disc_kp = random.randint(5,10)
         self.disc_rp = random.randint(10,10)
+        self.pop_factor = 1
         
 class World_Frozen(Planet):
     img_ref = 'Frozen'
     cat = 'Frozen World'
-    weight = 12
+    weight = 11
     def __init__(self, game, pos):
         super(type(self), self).__init__(game,pos, type(self).img_ref)
         self.radius = random.randint(500,700) #SOF
         self.chance_of_discovery = random.randint(0,5)
         self.disc_kp = random.randint(0,2)
         self.disc_rp = random.randint(0,2)
+        self.pop_factor = 3
         
 class World_Alien(Planet):
     img_ref = 'Alien_hive'
@@ -51,6 +54,7 @@ class World_Alien(Planet):
         self.chance_of_discovery = random.randint(0,25)
         self.disc_kp = random.randint(20,30)
         self.disc_rp = random.randint(5,10)
+        self.pop_factor = 0
         
 class World_Jungle(Planet):
     img_ref = 'Jungle'
@@ -62,6 +66,7 @@ class World_Jungle(Planet):
         self.chance_of_discovery = random.randint(0,5)
         self.disc_kp = random.randint(10,20)
         self.disc_rp = random.randint(1,10)
+        self.pop_factor = 0
         
         
 

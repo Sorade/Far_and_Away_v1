@@ -23,7 +23,8 @@ class Data(object):
                     'game_over': pygame.image.load('data\\game_over_bg.jpg').convert_alpha()}
                     
     misc = {'arrow' : img_import('arrow.png',(100,50)),
-            'instructions': pygame.image.load('data\\instructions.png').convert_alpha()}
+            'instructions': pygame.image.load('data\\instructions.png').convert_alpha(),
+            'planets_info': pygame.image.load('data\\Planets_info.png').convert_alpha()}
     
     images_planets = {'Venus' : image_venus,
                       'Earth' : img_import('earth.png',(50,50)),

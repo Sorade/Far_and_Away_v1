@@ -58,12 +58,15 @@ class Game(object):
         tierra.explored_by.append(self.player.name)
         self.player.location = tierra.name
         tierra.disc_kp,tierra.disc_rp = 15,8
-        tierra.radius = 450
-        tierra.pop_around(max_planet = 5, max_iter = 100)
+        tierra.radius = 600
+        for x in range(2): tierra.pop_around(max_planet = 3, max_iter = 10000)
         
         #increases the chance of discovery of starting planets
         for planet in self.all_planets:
-            planet.chance_of_discovery = 75
+            planet.chance_of_discovery = 101
+            
+        #makes initial discovery for player
+        self.event_manager.planet_discovery_event(self.player,False)
         
         '''creats events'''
         self.event_manager.event_list = [Precious_Ore_Discovered(self), 
@@ -196,7 +199,7 @@ class Game(object):
                     pygame.quit()
                     sys.exit()
                     print 'has quit'
-                elif event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
+                elif event.type == pygame.KEYDOWN and (event.key == K_ESCAPE or event.key == K_RETURN):
                     pygame.quit()
                     sys.exit()
                     print 'has quit' 
@@ -301,7 +304,7 @@ class Game(object):
                 elif event.type == MOUSEBUTTONUP and event.button == 3:
                     self.pressed_right_clic = True
                 elif event.type == pygame.KEYDOWN and event.key == K_RETURN:
-                    self.run()                    
+                    self.planets_info()                    
                 elif event.type == USEREVENT + 1:
                     show_press_to_start = False if show_press_to_start else True
                     
@@ -310,6 +313,57 @@ class Game(object):
             self.interface.screen.blit(pygame.transform.smoothscale(data.Data.backgrounds['game_over'],(config.Config.screen_w,config.Config.screen_h)),(0,0))
             self.interface.screen.blit(black_bg,(0,0))
             self.interface.screen.blit(pygame.transform.smoothscale(data.Data.misc['instructions'],(config.Config.screen_w,config.Config.screen_h)),(0,0))
+
+            if show_press_to_start:
+                fn.display_txt('PRESS ENTER TO START GAME','Lucida Console',20,(200,200,0),self.interface.screen,(config.Config.screen_w/2,config.Config.screen_h-25),True)
+    
+            pygame.display.update()
+            
+    def planets_info(self):
+        '''set up'''
+        pygame.time.set_timer(USEREVENT + 1, 1000) # 1 event every 1 second
+        show_press_to_start = True
+        black_bg = pygame.Surface((config.Config.screen_w,config.Config.screen_h))
+        black_bg.fill((0,0,0))
+        black_bg.set_alpha(100)        
+        
+        
+        while True:
+            self.clock.tick(60) #needed to slow game down
+            for event in pygame.event.get(): #setting up quit
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                    print 'has quit'
+                elif event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                    print 'has quit' 
+                elif event.type == pygame.KEYDOWN and event.key == K_SPACE:
+                    if self.pause == True: self.pause = False
+                    elif self.pause == False: self.pause = True
+                elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                    self.pressed_left_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 1:
+                    self.pressed_left_clic = True
+                elif event.type == MOUSEBUTTONDOWN and event.button == 2:
+                    self.pressed_mid_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 2:
+                    self.pressed_mid_clic = True                    
+                elif event.type == MOUSEBUTTONDOWN and event.button == 3:
+                    self.pressed_right_clic = True
+                elif event.type == MOUSEBUTTONUP and event.button == 3:
+                    self.pressed_right_clic = True
+                elif event.type == pygame.KEYDOWN and event.key == K_RETURN:
+                    self.run()                    
+                elif event.type == USEREVENT + 1:
+                    show_press_to_start = False if show_press_to_start else True
+                    
+
+            '''Calling Display functions'''
+            self.interface.screen.blit(pygame.transform.smoothscale(data.Data.backgrounds['game_over'],(config.Config.screen_w,config.Config.screen_h)),(0,0))
+            self.interface.screen.blit(black_bg,(0,0))
+            self.interface.screen.blit(pygame.transform.smoothscale(data.Data.misc['planets_info'],(config.Config.screen_w,config.Config.screen_h)),(0,0))
 
             if show_press_to_start:
                 fn.display_txt('PRESS ENTER TO START GAME','Lucida Console',20,(200,200,0),self.interface.screen,(config.Config.screen_w/2,config.Config.screen_h-25),True)
