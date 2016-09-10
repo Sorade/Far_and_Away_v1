@@ -30,7 +30,7 @@ class Precious_Ore_Discovered(Event):
     def get_weight(self,explorer):
         total_explored_mining_worlds = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.cat == 'Mining World'])
         self.weight =  total_explored_mining_worlds*20/(self.game.year+1)
-        print 'mining',self.weight
+#        print 'mining',self.weight
         
     def execute(self,explorer):
         explorer.rp_bonus += 2
@@ -130,7 +130,7 @@ class Alien_Tech(Event):
         self.newly_explored = total_explored_alien - self.already_explored
         self.already_explored = total_explored_alien
         self.weight = total_explored_alien*4 if self.newly_explored > 0 else 0
-        print 'AlienTech',self.weight
+#        print 'AlienTech',self.weight
         
     def execute(self,explorer):
         explorer.travel_bonus += 1
@@ -164,7 +164,7 @@ class Astronomer(Event):
     def get_weight(self,explorer):
         total_explored = len([p for p in self.game.all_planets if explorer.check_exploration(p)])
         self.weight = 2 if self.game.year > 50 and not self.already_occured and total_explored > 25 else 0
-        print 'Astro',self.weight
+#        print 'Astro',self.weight
         
     def execute(self,explorer):
         explorer.search_bonus += 10
@@ -192,7 +192,7 @@ class Contamination(Event):
                 self.weight -= 1
         else:
             self.weight = 0
-        print 'Contamination',self.weight
+#        print 'Contamination',self.weight
         
     def execute(self,explorer):
         if explorer.travel_bonus > 1: explorer.travel_bonus -= 1
@@ -208,7 +208,7 @@ class Cure(Event):
     def get_weight(self,explorer):
         if explorer.states.contaminated:
             self.weight = explorer.kp/100
-        print 'Cure',self.weight
+#        print 'Cure',self.weight
         
     def execute(self,explorer):
         explorer.travel_bonus += 1
@@ -225,7 +225,7 @@ class Radar(Alien_Tech):
         if not explorer.states.has_radar and explorer.states.has_hyperdrive and explorer.states.has_new_weapons:
             super(type(self), self).get_weight(explorer)
             if self.weight > 0: self.weight = 2
-        print 'Rada',self.weight
+#        print 'Radar',self.weight
         
     def execute(self,explorer):
         explorer.travel_bonus += 1

@@ -7,4 +7,4 @@ Created on Sat Aug 06 19:09:42 2016
 
 from game import*
 
-Game().start_menu()
+Game().run()
