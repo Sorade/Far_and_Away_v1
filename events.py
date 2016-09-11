@@ -39,7 +39,8 @@ class Precious_Ore_Discovered(Event):
         
     def update(self,explorer):
         if self.planet_pointer is None:
-            self.planet_pointer = [random.choice([p for p in self.game.all_planets if explorer.check_exploration(p) and p.name != explorer.location])]
+            ls = [p for p in self.game.all_planets if explorer.check_exploration(p)]
+            self.planet_pointer = [random.choice(ls)]
             self.text ='''An ore of precious metal has been found in {} and is being traded throughout the galaxy. It will surely increase our production for a few more years.'''.format(self.planet_pointer[0].name)
 
 

@@ -83,18 +83,25 @@ class Interface(object):
         for p in explorer.get_logbook_planets():
             if explorer.check_discovery(p):
                 if explorer.check_exploration(p):
-                    [pygame.draw.line(self.screen, (0,250,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), fn.sum_tulp(p2.pos,(self.map_offset_x,self.map_offset_y)), 5) for p2 in p.planets_in_SOF if explorer.check_exploration(p2)]
+                    [pygame.draw.line(self.screen, explorer.color, fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), fn.sum_tulp(p2.pos,(self.map_offset_x,self.map_offset_y)), 5) for p2 in p.planets_in_SOF if explorer.check_exploration(p2)]
                 planets_to_blit.append(p)
                 self.check_hovered(p)
         
         #need another loop to ensure planets are blitted in front of all the lines        
         for p in planets_to_blit:
-            if explorer.check_discovery(p):
-                if not explorer.check_exploration(p):
-                    pygame.draw.circle(self.screen, (255,0,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.6), 0)
-                if explorer.location == p.name:
-                    pygame.draw.circle(self.screen, (0,255,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.75), 0)
-                fn.blitc(self.screen, Data.images_planets[p.img_ref], fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)))
+#            if explorer.check_discovery(p):
+            #adds other explorers' color halo
+            cpu_explorers = [e for e in self.game.all_explorers if e.name in p.explored_by and e.type != 'human']
+            x = len(cpu_explorers)
+            for e in cpu_explorers:
+                pygame.draw.circle(self.screen, e.color, fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.6)+7*x, 0)
+                x -= 1
+        
+            if not explorer.check_exploration(p):
+                pygame.draw.circle(self.screen, (255,0,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.6), 0)
+            if explorer.location == p.name:
+                pygame.draw.circle(self.screen, explorer.color, fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.75), 0)
+            fn.blitc(self.screen, Data.images_planets[p.img_ref], fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)))
                                 
             '''Mouse interaction'''
             self.solar_sys_mouse_interaction(explorer,p)
@@ -230,24 +237,25 @@ class Interface(object):
             self.arrows = []
         
     def message_display(self,explorer):
-        if self.display_event == True: #displays on call to USEREVENT+2 in game.py
-            '''removes 1 second from the display timer'''
-            self.message_disp_time -= 1
-            if self.message_disp_time < 0: self.message_disp_time = 0
-        self.display_event = False #disable the display until the next call to USEREVENT+2 in game.py
-
-        if len(self.messages) >= 15: self.messages.pop(0) #ensure message list isn't too long
-
-        if self.message_disp_time > 0 and self.helpers:
-            '''displays messages'''
-            x = 0
-            for msg in self.messages:
-                fn.display_txt(msg,'Lucida Console',16,(0,255,0),self.screen,(int(Config.screen_w*0.75),50+x))
-                x += 25
-        elif self.message_disp_time <= 0:
-            self.messages = [] #if the message timer reaches 0 the messages are deleted
-            
-        if self.helpers: self.graph_display(explorer)
+        if explorer.type == 'human':
+            if self.display_event == True: #displays on call to USEREVENT+2 in game.py
+                '''removes 1 second from the display timer'''
+                self.message_disp_time -= 1
+                if self.message_disp_time < 0: self.message_disp_time = 0
+            self.display_event = False #disable the display until the next call to USEREVENT+2 in game.py
+    
+            if len(self.messages) >= 15: self.messages.pop(0) #ensure message list isn't too long
+    
+            if self.message_disp_time > 0 and self.helpers:
+                '''displays messages'''
+                x = 0
+                for msg in self.messages:
+                    fn.display_txt(msg,'Lucida Console',16,(0,255,0),self.screen,(int(Config.screen_w*0.75),50+x))
+                    x += 25
+            elif self.message_disp_time <= 0:
+                self.messages = [] #if the message timer reaches 0 the messages are deleted
+                
+            if self.helpers: self.graph_display(explorer)
             
             
     def graph_display(self,explorer):
@@ -273,31 +281,34 @@ class Interface(object):
         [fn.display_txt(val,'Lucida Console',16,(255,0,0),self.screen,(x,y)) for x,y,val in ylab_rp]
         [fn.display_txt(val,'Lucida Console',16,(0,255,0),self.screen,(x,y)) for x,y,val in xlab_rp]
         
-    def event_popup(self,event_list,explorer):
+    def event_popup(self,explorer):
         '''get event from event manager and assign it locally'''
-        events = event_list
+        events = explorer.active_events
         for event in events:
-            self.game.pause = True
-            event.update(explorer)
-            '''blits popup bg '''
-            tooltip_bg = Data.backgrounds['event']
-            tooltip_bg.set_alpha(50)
-            tooltip_rect = tooltip_bg.get_rect()
-            fn.blitc(self.screen,tooltip_bg,(Config.screen_w/2,Config.screen_h/2))
-            '''blit event's img'''
-            fn.blitc(self.screen,Data.event_images[event.name],(Config.screen_w/2,Config.screen_h/2-115)) #-50 to adjust image to pupup bg
-            '''blit event's text'''
-            text_zone = pygame.Rect((Config.screen_w/2-300,Config.screen_h/2+50),(tooltip_rect.w-50,300))
-            fn.drawText(self.screen,event.text,(0,255,0),text_zone, pygame.font.SysFont('Lucida Console', 15))
-            '''button actions'''
-            okay_but = Button('Approve',event,Config.screen_w/2+15,Config.screen_h/2+210)
-            okay_but.check_select()
-            okay_but.display(self.screen)
             
-            if okay_but.selected and self.game.pressed_left_clic:
+            event.update(explorer)
+            
+            if explorer.type == 'human':
+                self.game.pause = True
+                '''blits popup bg '''
+                tooltip_bg = Data.backgrounds['event']
+                tooltip_bg.set_alpha(50)
+                tooltip_rect = tooltip_bg.get_rect()
+                fn.blitc(self.screen,tooltip_bg,(Config.screen_w/2,Config.screen_h/2))
+                '''blit event's img'''
+                fn.blitc(self.screen,Data.event_images[event.name],(Config.screen_w/2,Config.screen_h/2-115)) #-50 to adjust image to pupup bg
+                '''blit event's text'''
+                text_zone = pygame.Rect((Config.screen_w/2-300,Config.screen_h/2+50),(tooltip_rect.w-50,300))
+                fn.drawText(self.screen,event.text,(0,255,0),text_zone, pygame.font.SysFont('Lucida Console', 15))
+                '''button actions'''
+                okay_but = Button('Approve',event,Config.screen_w/2+15,Config.screen_h/2+210)
+                okay_but.check_select()
+                okay_but.display(self.screen)
+            
+            if explorer.type == 'cpu' or (okay_but.selected and self.game.pressed_left_clic):
                 self.game.pause = False
                 event.execute(explorer)
-                self.game.event_manager.active_events.remove(event)
+                explorer.active_events.remove(event)
                 self.game.map_active = True
                 self.game.pressed_left_clic = False
             break #only does the function for one event at a time

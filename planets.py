@@ -25,7 +25,7 @@ class Planet(sprite.MySprite):
         self.chance_of_discovery = random.randint(0,15)
         self.diameter = random.randint(5,50)
         self.img_ref = img_ref
-        self.is_virgin =  True
+       # self.is_virgin =  True
         self.has_popped = False
         
         
@@ -62,6 +62,9 @@ class Planet(sprite.MySprite):
             
         
     def unveil(self,explorer,player_induced):
+        if self.name not in explorer.logbook.iterkeys():
+            self.add_to_logbook(explorer)
+        
         if player_induced == True:
             explorer.kp -= fn.search_cost(self.cat)
             if self.chance_of_discovery + explorer.search_bonus >= random.randint(0,100): #not explorer.check_discovery(self) and 
@@ -70,15 +73,16 @@ class Planet(sprite.MySprite):
                 self.game.interface.add_message('Discovered {}'.format(self.name),1)
                 if random.randint(0,100) <= 25: self.pop_around(max_planet=self.pop_factor,max_iter=self.pop_factor*2)
                 arrow_stats = self.game.interface.arrow_param(self)
-                if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
+                if arrow_stats and explorer.type == 'human': self.game.interface.add_arrow(arrow_stats,2)
                 
         elif self.chance_of_discovery >= random.randint(0,100): #not explorer.check_discovery(self) and 
             explorer.logbook[self.name].is_discovered = True
             self.discovered_by.append(explorer.name)
             self.game.interface.add_message('Auto-Discovered {}'.format(self.name),1)
             if random.randint(0,100) <= 25: self.pop_around(max_planet=self.pop_factor,max_iter=self.pop_factor*2)
+        
             arrow_stats = self.game.interface.arrow_param(self)
-            if arrow_stats: self.game.interface.add_arrow(arrow_stats,2)
+            if arrow_stats and explorer.type == 'human': self.game.interface.add_arrow(arrow_stats,2)
             
         
     def explore(self, explorer):
@@ -89,21 +93,22 @@ class Planet(sprite.MySprite):
                 occurs first. If the test is true then the message will be re-added
                 at the end of the message list (after exploration msg)'''
                 #to do only for first explorer to explore
-                if self.is_virgin:
+                if explorer.logbook[self.name].first_exploration:
                     explorer.kp += self.disc_kp
                     #works out cost/gain from exploration
                     explorer.rp += self.disc_rp - fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),explorer.kp,self.disc_kp)
                     explorer.logbook[self.name].time_of_exploration = self.game.year
                     self.pop_around(max_planet=self.pop_factor,max_iter=self.pop_factor*2)
-                    self.is_virgin = False
-
+                    explorer.logbook[self.name].first_exploration = False
+                
                 #to do at every exploration or re-explroation
-                visit_msg = self.game.interface.messages[-1]
-                self.game.interface.messages.remove(visit_msg)                
                 explorer.logbook[self.name].is_explored = True
                 self.explored_by.append(explorer.name)
-                self.game.interface.add_message('Player explored {}'.format(self.name),1)
-                self.game.interface.add_message(visit_msg,1)
+                if explorer.type == 'human':
+                    visit_msg = self.game.interface.messages[-1]
+                    self.game.interface.messages.remove(visit_msg)                
+                    self.game.interface.add_message('Player explored {}'.format(self.name),1)
+                    self.game.interface.add_message(visit_msg,1)
         
     def visit(self, explorer, explo = False):
         if explorer.location != self.name:
@@ -117,9 +122,10 @@ class Planet(sprite.MySprite):
                 #removes cost of travel
                 explorer.rp -= explorer.logbook[explorer.location].travel_cost
                 explorer.location = self.name
-                for x in range(explorer.logbook[explorer.location].travel_time):
-                    self.game.event_manager.all_yearly_events(explorer)
-                self.game.interface.add_message('Player is at {}'.format(self.name),1)
+                if explorer.type == 'human':
+                    for x in range(explorer.logbook[explorer.location].travel_time):
+                        self.game.event_manager.all_yearly_events(explorer)
+                    self.game.interface.add_message('You are at {}'.format(self.name),1)
                 return True
         else:
             return False
@@ -128,8 +134,9 @@ class Planet(sprite.MySprite):
         if explorer.logbook[self.name].is_explored:
             if explorer.states.has_radar: self.get_in_SOF()
             if player_induced:
-                self.game.event_manager.all_yearly_events(explorer)
-                self.game.interface.add_message('Searching around {} ...'.format(self.name),1)
+                if explorer.type == 'human': 
+                    self.game.event_manager.all_yearly_events(explorer)
+                    self.game.interface.add_message('Searching around {} ...'.format(self.name),1)
                 loc_bonus = 20
                 if explorer.location == self.name: explorer.search_bonus += loc_bonus # adds a loc bonus
                 
@@ -137,7 +144,7 @@ class Planet(sprite.MySprite):
                     if explorer.kp >= fn.search_cost(planet.cat) and not explorer.check_discovery(planet):
                         planet.unveil(explorer,player_induced)
                         
-                self.game.interface.add_message('... search completed'.format(self.name),1)
+                if explorer.type == 'human': self.game.interface.add_message('... search completed'.format(self.name),1)
                 if explorer.location == self.name: explorer.search_bonus -= loc_bonus #remove the loc bonus
             else:
                 for planet in self.planets_in_SOF:

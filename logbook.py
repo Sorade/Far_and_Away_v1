@@ -26,6 +26,7 @@ class Log(object):
         self.is_discovered = is_discovered
         self.is_explored = is_explored
         self.time_of_exploration = None
+        self.first_exploration = True
         self.travel_time = 0
         self.travel_cost = 0
         

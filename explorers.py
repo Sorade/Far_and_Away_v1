@@ -13,6 +13,8 @@ class Explorer(object):
     def __init__(self,game):
         self.game = game
         self.ai = ai(game,self)
+        self.type = 'cpu'
+        self.color = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
         self.name = random.choice(['Roger','Logan','Fred','Susan','Morgane','Iloa']) +' ' + fn.surname_gen(True)
         self.location = 0
         self.logbook = {}
@@ -30,6 +32,7 @@ class Explorer(object):
         self.time_since_last_action = 0
         self.time_of_last_action = 0
         self.action = 0
+        self.active_events = []
         
         
     @property
@@ -49,6 +52,15 @@ class Explorer(object):
     def rp(self, rp):
         rp = 0 if rp < 0 else rp
         self._rp = rp
+        
+    def assign_starting_planet(self,planet):
+        self.logbook[planet.name] = Log(self,planet,True,True)
+        self.logbook[planet.name].time_of_exploration = self.game.year
+        planet.discovered_by.append(self.name)
+        planet.explored_by.append(self.name)
+        self.location = planet.name
+        planet.disc_kp,planet.disc_rp = 15,8
+        planet.radius = 600        
         
     def select_displacement(self, planet):
         ''' checks whether the explorer has explored the planet or not and

@@ -10,20 +10,24 @@ import random
 class Event_Manager(object):
     def __init__(self,game):
         self.game = game
-        self.active_events = []
+        #self.active_events = []
         self.event_list = None
         
     def all_yearly_events(self,explorer):
-        self.game.year += 1 #adds a years of gametime every 10 seconds
-        self.get_random_event(explorer)
+        if explorer.type == 'human': 
+            self.game.year += 1 #adds a years of gametime every 10 seconds
+            for event in self.event_list: event.get_weight(explorer)
+            self.get_random_event(explorer)
+            for e in self.game.all_explorers:
+                self.all_yearly_events(e)
+                e.ai.play_procedural()
         #self.planet_discovery_event(explorer,False)
         self.points_adjustement_event(explorer)
-        for event in self.event_list: event.get_weight(explorer)
         
     def get_random_event(self,explorer):
         '''get random event'''
         if random.randint(0,5) == 0: 
-            self.active_events.append(fn.choice_weighted(self.event_list))
+            explorer.active_events.append(fn.choice_weighted(self.event_list))
             self.game.map_active = False
             
         '''removes bonuses'''
