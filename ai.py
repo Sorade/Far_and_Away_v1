@@ -23,8 +23,10 @@ class ai:
                          'current_expenses', 
                          'current_resource_income', 
                          'current_knowledge_income', 
+                         'ratio_disc_to_pop', 
+                         'ratio_exp_to_disc',
                          'action']
-                 
+                         
     def get_variables(self):
         nb_disc, nb_exp = 0,0
         for x in range(len(self.variables)):
@@ -51,8 +53,12 @@ class ai:
                 var = self.explorer.yearly_rp_income
             elif x == 9:
                 var = self.explorer.yearly_kp_income
-            elif x ==10:
+            elif x ==12:
                 var = self.explorer.action
+            elif x == 10:
+                ratios = self.explorer.get_planet_ratio_at_loc() #returns a tuple
+                var = ratios[0]
+                self.variables[x+1] = ratios[1]
             '''assigns variable'''
             self.variables[x] = var
             
@@ -70,6 +76,20 @@ class ai:
         self.get_variables()
         self.print_to_file()
         
+    def play_procedural(self):
+        
+        old_SOF = list(self.explorer.logbook[self.explorer.location].instance[0].planets_in_SOF) #get the ps in SOF of explorer's loc
+        self.explorer.logbook[self.explorer.location].instance[0].get_in_SOF() #scans for nearby planets
+        self.get_variables() #monitors state of game
+        self.explorer.logbook[self.explorer.location].instance[0].planets_in_SOF = old_SOF #resets SOF in case human player uses planet
+        
+        if self.variables[10] != 1: #checks if all planets in sof have been discovered
+            self.perform_action(3)
+        if self.variables[11] != 1: #checks if all planets in sof are explored
+            self.perform_action(2) #forces exploration at start of play
+        else:
+            self.perform_action(1)
+                
     def play(self):
 #        '''free search around discovered planets'''
 #        for p in self.explorer.explored_planets:
@@ -77,11 +97,18 @@ class ai:
 
         '''get action'''
         self.get_variables() #monitors state of game
+        print self.variables
         action = self.get_action_from_rand_forest()[0] #get's action from state of game
+        
+        if self.game.year <= 5: action = 2 #forces exploration at start of play
         if action != 0: print action
+            
+        self.perform_action(action)
+            
+    def perform_action(self,action):
         '''perform action'''
         if action == 1: #visit
-            pot_dests = list(self.explorer.explored_planets)
+            pot_dests = [p for p in self.explorer.explored_planets if self.explorer.logbook[self.explorer.location].get_travel_info(p, self.explorer.travel_bonus) is None and self.explorer.logbook[self.explorer.location].travel_time <= 3]
             pot_dests.remove(self.explorer.logbook[self.explorer.location].instance[0])
             if len(pot_dests) > 0:
                 self.explorer.set_action('visit')
@@ -89,7 +116,7 @@ class ai:
             else:
                 action = 2 #if only 1 planet is explored, then explores
         if action == 2: #explore
-            unexplored_planets = [log.instance[0] for log in self.explorer.logbook.itervalues() if log.is_discovered and not log.is_explored]
+            unexplored_planets = [log.instance[0] for log in self.explorer.logbook.itervalues() if log.is_discovered and not log.is_explored and self.explorer.logbook[self.explorer.location].get_travel_info(log.instance[0], self.explorer.travel_bonus) is None and self.explorer.logbook[self.explorer.location].travel_time <= 4]
             if len(unexplored_planets) > 0:
                 self.explorer.set_action('explore')
                 random.choice(unexplored_planets).explore(self.explorer)
@@ -113,7 +140,6 @@ class ai:
     
     def get_action_from_rand_forest(self):
         test = self.variables[:-1]
-#        test[0] = 9
         return self.algo.predict(test)
         #savetxt('Data/submission2.csv', rf.predict(test), delimiter=',', fmt='%f')
 #

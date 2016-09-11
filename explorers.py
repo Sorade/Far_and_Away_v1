@@ -75,9 +75,17 @@ class Explorer(object):
             yield log.instance[0]
             
     def set_time_since_last_action(self):
+        self.time_since_last_action = self.game.year - self.time_of_last_action
         if self.action != 0:
-            self.time_since_last_action = self.game.year - self.time_of_last_action
             self.time_of_last_action = self.game.year
+            
+    def get_planet_ratio_at_loc(self):
+        planets_in_sof =  self.logbook[self.location].instance[0].planets_in_SOF
+        discovered_planets = [p for p in planets_in_sof if self.check_discovery(p)]
+        explored_planets = [p for p in planets_in_sof if self.check_exploration(p)]
+        ratio_exp_to_disc = float(len(explored_planets))/len(discovered_planets)
+        ratio_disc_to_pop = float(len(discovered_planets))/len(planets_in_sof)
+        return ratio_disc_to_pop, ratio_exp_to_disc
         
     def set_action(self,action):
         actions = {'none' : 0, 'visit' : 1, 'explore' : 2, 'search' : 3}

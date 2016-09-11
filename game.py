@@ -129,7 +129,7 @@ class Game(object):
                 elif event.type == USEREVENT + 1 and self.pause == False:
                     #yearly Events and actions
                     self.event_manager.all_yearly_events(self.player)                      
-                    
+                    self.player.ai.play_procedural()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == K_SPACE:
                         if self.pause == True: self.pause = False
@@ -178,8 +178,8 @@ class Game(object):
             self.interface.screen.blit(black_bg,(0,0))
 #            if config.Config.train_ai:
             self.player.set_action('none')
-            if not config.Config.train_ai:
-                self.player.ai.play()
+#            if not config.Config.train_ai:
+#                self.player.ai.play_procedural()
             self.interface.view_solarsys(self.player,(config.Config.screen_w/2,config.Config.screen_h/2))
             self.interface.event_popup(self.event_manager.active_events,self.player)    
             self.interface.final_overlay(self.player) #will only display messages when USEREVENT+2 has occured
