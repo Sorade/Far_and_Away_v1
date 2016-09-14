@@ -60,8 +60,13 @@ class Game(object):
         tierra.explored_by.append(self.player.name)
         self.player.location = tierra.name
         tierra.disc_kp,tierra.disc_rp = 15,8
-        tierra.radius = 600
-        for x in range(2): tierra.pop_around(max_planet = 3, max_iter = 10000)
+        tierra.radius = 300
+        self.player.kp, self.player.rp = 10,10
+        while len(tierra.planets_in_SOF) < 8:
+            tierra.pop_around(max_planet = 1, max_iter = 10000)
+            tierra.has_popped = False
+            tierra.radius += 100
+            
         
         #increases the chance of discovery of starting planets
         for planet in self.all_planets:
@@ -115,6 +120,7 @@ class Game(object):
         pygame.mixer.music.load(data.Data.musics['theme'])
         pygame.mixer.music.play(-1,0.0)
         
+        reveal = False #to remove
         while True:
             self.clock.tick(60) #needed to slow game down
             #t0 = time.time()
@@ -145,10 +151,12 @@ class Game(object):
                         elif self.pause == False: self.pause = True
                     elif event.key == K_h:
                         if self.interface.helpers == True: self.interface.helpers = False
-                        elif self.interface.helpers == False: self.interface.helpers = True
-                    elif event.key == K_h:
-                        if self.interface.helpers == True: self.interface.helpers = False
-                        elif self.interface.helpers == False: self.interface.helpers = True  
+                        elif self.interface.helpers == False: self.interface.helpers = True:
+                    #to remove
+                    elif event.key == K_r:
+                        reveal = True
+#                        if self.interface.helpers == True: self.interface.helpers = False
+#                        elif self.interface.helpers == False: self.interface.helpers = True  
                     elif event.key == K_MINUS or event.key == K_KP_MINUS:
                         print current_time_setting
                         if current_time_setting <= 60000:
@@ -190,14 +198,17 @@ class Game(object):
 #            if not config.Config.train_ai:
 #                self.player.ai.play_procedural()
             self.interface.view_solarsys(self.player,(config.Config.screen_w/2,config.Config.screen_h/2))
-
+            
+            '''condition to remove'''
+            if reveal:
+                for p in self.all_planets:
+                    fn.blitc(self.interface.screen, p.blinker.blink(), fn.sum_tulp(p.pos,(self.interface.map_offset_x,self.interface.map_offset_y)))
 #            for explorer in list(self.all_explorers+[self.player]): #needs to be here for blit order
             self.interface.event_popup(self.player)    
             
             self.interface.final_overlay(self.player) #will only display messages when USEREVENT+2 has occured
             fn.display_txt(str(len(self.all_planets)),'Lucida Console',16,(200,200,0),self.interface.screen,(20,20))
-            for n,e in enumerate(list(self.all_explorers+[self.player])):
-                fn.display_txt('{}: '.format(e.name)+str(self.get_score(e)),'Lucida Console',16,(200,200,0),self.interface.screen,(20,40*(n+1)))
+            self.display_scores(16,(20,40),False)
             fn.display_txt('Current Position: '+str(fn.sum_tulp(pygame.mouse.get_pos(),(-self.interface.map_offset_x,-self.interface.map_offset_y))),'Lucida Console',16,(200,200,0),self.interface.screen,(20,config.Config.screen_h-20))
 
 #            if config.Config.train_ai: self.player.ai.train()
@@ -209,6 +220,10 @@ class Game(object):
     def get_score(self,explorer):
         total_explored_planets = sum([1 for planet in self.all_planets if explorer.check_exploration(planet)])
         return total_explored_planets + self.year
+        
+    def display_scores(self,ft_size,(x,y),centered):
+        for n,e in enumerate(list(self.all_explorers+[self.player])):
+            fn.display_txt('{}: '.format(e.name)+str(self.get_score(e)),'Lucida Console',ft_size,e.color,self.interface.screen,(x,y*(n+1)),centered)
         
     def game_over_screen(self):
         while True:
@@ -237,8 +252,9 @@ class Game(object):
 
             '''Calling Display functions'''
             self.interface.screen.blit(pygame.transform.smoothscale(data.Data.backgrounds['game_over'],(config.Config.screen_w,config.Config.screen_h)),(0,0))
-            fn.display_txt('score: '+str(self.get_score(self.player)),'Lucida Console',50,(200,200,0),self.interface.screen,(config.Config.screen_w/2,config.Config.screen_h/4),True)
             
+            #fn.display_txt('score: '+str(self.get_score(self.player)),'Lucida Console',50,(200,200,0),self.interface.screen,(config.Config.screen_w/2,config.Config.screen_h/4),True)
+            self.display_scores(50,(config.Config.screen_w/2,config.Config.screen_h/4),True)
             pygame.display.update()
             
     def start_menu(self):

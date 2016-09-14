@@ -92,17 +92,19 @@ class Interface(object):
 #            if explorer.check_discovery(p):
             #adds other explorers' color halo
             cpu_explorers = [e for e in self.game.all_explorers if e.name in p.explored_by and e.type != 'human']
-            x = len(cpu_explorers)
-            for e in cpu_explorers:
-                pygame.draw.circle(self.screen, e.color, fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.6)+7*x, 0)
-                x -= 1
         
             if not explorer.check_exploration(p):
                 pygame.draw.circle(self.screen, (255,0,0), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.6), 0)
+            else:
+                x = len(cpu_explorers)
+                for e in cpu_explorers:
+                    pygame.draw.circle(self.screen, e.color, fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.6)+7*x, 0)
+                    x -= 1
+
             if explorer.location == p.name:
                 pygame.draw.circle(self.screen, explorer.color, fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.75), 0)
-            fn.blitc(self.screen, Data.images_planets[p.img_ref], fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)))
-                                
+            fn.blitc(self.screen, p.blinker.blink(), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)))
+                               
             '''Mouse interaction'''
             self.solar_sys_mouse_interaction(explorer,p)
             

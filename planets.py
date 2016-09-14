@@ -11,7 +11,7 @@ import data
 import sprite
 import logbook as lgbk
 import functions as fn
-from tools_classes import Quad
+from tools_classes import Quad, Blinker
 
 class Planet(sprite.MySprite):
     def __init__(self, game, pos, img_ref):
@@ -25,7 +25,7 @@ class Planet(sprite.MySprite):
         self.chance_of_discovery = random.randint(0,15)
         self.diameter = random.randint(5,50)
         self.img_ref = img_ref
-       # self.is_virgin =  True
+        self.blinker = Blinker(img_ref)
         self.has_popped = False
         
         
@@ -97,7 +97,8 @@ class Planet(sprite.MySprite):
                     explorer.kp += self.disc_kp
                     #works out cost/gain from exploration
                     explorer.rp += self.disc_rp - fn.exploration_cost_formula(len([log for log in self.game.player.logbook.itervalues() if log.is_explored]),explorer.kp,self.disc_kp)
-                    explorer.logbook[self.name].time_of_exploration = self.game.year
+                    min_time = self.get_lowest_exploration_time()
+                    explorer.logbook[self.name].time_of_exploration = self.game.year if min_time == None else min_time
                     self.pop_around(max_planet=self.pop_factor,max_iter=self.pop_factor*2)
                     explorer.logbook[self.name].first_exploration = False
                 
@@ -109,6 +110,11 @@ class Planet(sprite.MySprite):
                     self.game.interface.messages.remove(visit_msg)                
                     self.game.interface.add_message('Player explored {}'.format(self.name),1)
                     self.game.interface.add_message(visit_msg,1)
+                    
+    def get_lowest_exploration_time(self):
+        if len(self.explored_by) > 0:
+            min_time = min([e.logbook[self.name].time_of_exploration for e in list(self.game.all_explorers + [self.game.player]) if e.name in self.explored_by])
+            return min_time
         
     def visit(self, explorer, explo = False):
         if explorer.location != self.name:

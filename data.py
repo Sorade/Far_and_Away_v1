@@ -26,7 +26,7 @@ class Data(object):
             'instructions': pygame.image.load('data\\instructions.png').convert_alpha(),
             'planets_info': pygame.image.load('data\\Planets_info.png').convert_alpha()}
     
-    images_planets = {'Venus' : image_venus,
+    images_planets = {'Venus' : img_import('Venus.png',(50,50)),
                       'Earth' : img_import('earth.png',(50,50)),
                         'Habitable_world' : img_import('habitable_world.png',(50,50)),
                         'Frozen' : img_import('frozen.png',(50,50)),

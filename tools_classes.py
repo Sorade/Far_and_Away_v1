@@ -5,6 +5,23 @@ Created on Tue Aug 16 22:10:01 2016
 @author: julien
 """
 from math import pi
+from data import Data
+
+class Blinker:
+    def __init__(self, img_ref, speed = 5):
+        self.alpha = speed
+        self.speed = speed
+        self.img_ref = img_ref
+        
+    def blink(self):
+        image = Data.images_planets[self.img_ref].convert_alpha()
+        image.set_alpha(self.alpha)
+        if -self.speed <= self.alpha < (250 - self.speed):
+            self.speed *= 1
+        else:
+            self.speed *= -1
+        self.alpha += self.speed
+        return image
 
 '''a class which enables to return weighted quadrants based on the
 inverse amount of occurences in the given quadrant.

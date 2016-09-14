@@ -7,7 +7,7 @@ Created on Sat Aug 06 18:56:10 2016
 import pygame
 
 class Config(object):
-    fullscreen = False
+    fullscreen = True
     screen_h = 700
     screen_w = 1100
     train_ai = False

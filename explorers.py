@@ -15,12 +15,12 @@ class Explorer(object):
         self.ai = ai(game,self)
         self.type = 'cpu'
         self.color = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
-        self.name = random.choice(['Roger','Logan','Fred','Susan','Morgane','Iloa']) +' ' + fn.surname_gen(True)
+        self.name = random.choice(['Drake','Logan','Fredrik','Susan','Morgane','Iloa','Markus','Karson','Clyde','Athelstan']) +' ' + fn.surname_gen(True)
         self.location = 0
         self.logbook = {}
         self.explored_planets = []
-        self.kp = 10
-        self.rp = 10
+        self.kp = 40
+        self.rp = 30
         self.kp_bonus = 0
         self.rp_bonus = 0
         self.travel_bonus = 1
