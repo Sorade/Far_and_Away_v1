@@ -104,6 +104,7 @@ class Rebellion(Event):
     def execute(self,explorer):
         explorer.logbook[self.planet_pointer[0].name].is_explored = False
         self.planet_pointer[0].explored_by.remove(explorer.name)
+        explorer.explored_planets.remove(self.planet_pointer[0])
         self.planet_pointer = None
         
     def update(self,explorer):

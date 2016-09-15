@@ -146,6 +146,7 @@ class ai:
                 else:
                     pot_dests = [p for p in self.explorer.explored_planets if self.explorer.logbook[self.explorer.location].get_travel_info(p, self.explorer.travel_bonus) is None and self.explorer.logbook[self.explorer.location].travel_time <= 3]
                     pot_dests.remove(self.explorer.logbook[self.explorer.location].instance[0])
+                    print 'passed'
                     if len(pot_dests) > 0:
                         random.choice(pot_dests).visit(self.explorer)
                 self.explorer.set_action('visit')

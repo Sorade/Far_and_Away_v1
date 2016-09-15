@@ -62,6 +62,7 @@ class Game(object):
         tierra.disc_kp,tierra.disc_rp = 15,8
         tierra.radius = 300
         self.player.kp, self.player.rp = 10,10
+        self.player.explored_planets.append(tierra)
         while len(tierra.planets_in_SOF) < 8:
             tierra.pop_around(max_planet = 1, max_iter = 10000)
             tierra.has_popped = False

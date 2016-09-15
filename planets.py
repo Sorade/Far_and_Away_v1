@@ -105,6 +105,7 @@ class Planet(sprite.MySprite):
                 #to do at every exploration or re-explroation
                 explorer.logbook[self.name].is_explored = True
                 self.explored_by.append(explorer.name)
+                explorer.explored_planets.append(self)
                 if explorer.type == 'human':
                     visit_msg = self.game.interface.messages[-1]
                     self.game.interface.messages.remove(visit_msg)                

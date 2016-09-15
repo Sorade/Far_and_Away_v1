@@ -57,6 +57,7 @@ class Explorer(object):
     def assign_starting_planet(self,planet):
         self.logbook[planet.name] = Log(self,planet,True,True)
         self.logbook[planet.name].time_of_exploration = self.game.year
+        self.explored_planets.append(planet)
         planet.discovered_by.append(self.name)
         planet.explored_by.append(self.name)
         self.location = planet.name
