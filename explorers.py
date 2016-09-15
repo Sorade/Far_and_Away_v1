@@ -17,7 +17,8 @@ class Explorer(object):
         self.color = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
         self.name = random.choice(['Drake','Logan','Fredrik','Susan','Morgane','Iloa','Markus','Karson','Clyde','Athelstan']) +' ' + fn.surname_gen(True)
         self.location = 0
-        self.logbook = {}
+        self.dest = self.location
+        self.logbook = Logbook(self,game)
         self.explored_planets = []
         self.kp = 40
         self.rp = 30
@@ -81,6 +82,14 @@ class Explorer(object):
 
     def check_exploration(self, planet):
         return self.name in planet.explored_by
+        
+    def get_destinations_of_interest(self):
+        if self.dest == self.location:
+            pot_dests = [p.name for p in self.explorer.explored_planets if len([n for n in p.planets_in_SOF if not self.explorer.check_exploration(n) or not self.explorer.check_discovery(n)])]
+            if len(pot_dests) > 0:
+                self.dest = random.choice(pot_dests)
+            else:
+                self.dest = None
         
     def get_logbook_planets(self):
         for log in self.logbook.itervalues():

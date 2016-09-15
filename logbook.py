@@ -18,6 +18,19 @@ import functions as fn
 #    def get_travel_info(self,planet,travel_bonus):
 #        self.travel_time = fn.travel_time(fn.dist(self.instance[0].pos,planet.pos),self.instance[0].game.space_travel_unit)/travel_bonus
 #        self.travel_cost = fn.travel_formula(self.travel_time)
+
+class Logbook(dict):
+    def __init__(self,explorer,game):
+        self.explorer = explorer
+        self.game = game
+        
+    def fetch_neighbors(self,planet_name):
+        if planet_name not in self.iterkeys():
+            for planet in self.game.all_planets:
+                if planet.name == planet_name:
+                    planet.add_to_logbook(self.explorer)
+                    
+        return [p.name for p in self[planet_name].instance[0].planets_in_SOF]
         
 class Log(object):
     def __init__(self, explorer, body, is_discovered, is_explored):

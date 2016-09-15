@@ -8,6 +8,7 @@ import pygame
 from sklearn.ensemble import RandomForestClassifier
 from numpy import genfromtxt, savetxt
 import random
+import pathfinding as pth
 
 class ai:
     def __init__(self,game,explorer):
@@ -62,19 +63,50 @@ class ai:
             '''assigns variable'''
             self.variables[x] = var
             
-    def print_to_file(self):
-        f = open('./ai_training_data/test.csv', 'a')
-        string = ''
-        for val in self.variables:
-            string = string + str(val) + ',' 
-        string = string[:-1]    
-        string += '\n'
-        f.write(string)
-        f.close()
+#    def print_to_file(self):
+#        f = open('./ai_training_data/test.csv', 'a')
+#        string = ''
+#        for val in self.variables:
+#            string = string + str(val) + ',' 
+#        string = string[:-1]    
+#        string += '\n'
+#        f.write(string)
+#        f.close()
         
-    def train(self):
-        self.get_variables()
-        self.print_to_file()
+#    def train(self):
+#        self.get_variables()
+#        self.print_to_file()
+        
+    def get_planet_with_unexplored(self, init = True):
+        if init:
+            neighbors = self.explorer.logbook[self.explorer.location].instance[0].planets_in_SOF
+        else:
+            neighbors = init.planets_in_SOF
+        
+            
+        for p in neighbors:
+            if self.explorer.check_discovery(p): #makes sure the returned planet will be reachable
+                for pp in p.planets_in_SOF:
+                    if self.explorer.check_exploration(pp):
+                        return pp.name
+        return False
+        
+    def get_planet_with_undiscovered(self, init = True):
+        if init:
+            neighbors = self.explorer.logbook[self.explorer.location].instance[0].planets_in_SOF
+        else:
+            neighbors = init.planets_in_SOF
+        
+            
+        for p in neighbors:
+            if self.explorer.check_discovery(p): #makes sure the returned planet will be reachable
+                for pp in p.planets_in_SOF:
+                    if self.explorer.check_discovery(pp):
+                        return pp.name
+        return False
+
+
+                
         
     def play_procedural(self):
         
@@ -90,31 +122,37 @@ class ai:
         else:
             self.perform_action(1)
                 
-    def play(self):
-#        '''free search around discovered planets'''
-#        for p in self.explorer.explored_planets:
-#            p.search_in_SOF(self.explorer, False)
 
-        '''get action'''
-        self.get_variables() #monitors state of game
-        print self.variables
-        action = self.get_action_from_rand_forest()[0] #get's action from state of game
-        
-        if self.game.year <= 5: action = 2 #forces exploration at start of play
-        if action != 0: print action
-            
-        self.perform_action(action)
             
     def perform_action(self,action):
         '''perform action'''
+#        if action == 1: #visit
+#            pot_dests = [p for p in self.explorer.explored_planets if self.explorer.logbook[self.explorer.location].get_travel_info(p, self.explorer.travel_bonus) is None and self.explorer.logbook[self.explorer.location].travel_time <= 3]
+#            pot_dests.remove(self.explorer.logbook[self.explorer.location].instance[0])
+#            if len(pot_dests) > 0:
+#                self.explorer.set_action('visit')
+#                random.choice(pot_dests).visit(self.explorer)
+#            else:
+#                action = 2 #if only 1 planet is explored, then explores
+        #____________________________________________________________________________________
+        
         if action == 1: #visit
-            pot_dests = [p for p in self.explorer.explored_planets if self.explorer.logbook[self.explorer.location].get_travel_info(p, self.explorer.travel_bonus) is None and self.explorer.logbook[self.explorer.location].travel_time <= 3]
-            pot_dests.remove(self.explorer.logbook[self.explorer.location].instance[0])
-            if len(pot_dests) > 0:
+            self.explorer.get_destinations_of_interest()
+            #pot_dests.remove(self.explorer.logbook[self.explorer.location].instance[0])
+            if self.explorer.dest is not None:
+                dest = pth.breadth_first_search(self.explorer,self.explorer.location,self.explorer.dest)
+                if len(dest) > 0:
+                    self.explorer.logbook[dest[0]].instance[0].visit(self.explorer)
+                else:
+                    pot_dests = [p for p in self.explorer.explored_planets if self.explorer.logbook[self.explorer.location].get_travel_info(p, self.explorer.travel_bonus) is None and self.explorer.logbook[self.explorer.location].travel_time <= 3]
+                    pot_dests.remove(self.explorer.logbook[self.explorer.location].instance[0])
+                    if len(pot_dests) > 0:
+                        random.choice(pot_dests).visit(self.explorer)
                 self.explorer.set_action('visit')
-                random.choice(pot_dests).visit(self.explorer)
             else:
                 action = 2 #if only 1 planet is explored, then explores
+         #_________________________________________________________________________________________       
+                
         if action == 2: #explore
             unexplored_planets = [log.instance[0] for log in self.explorer.logbook.itervalues() if log.is_discovered and not log.is_explored and self.explorer.logbook[self.explorer.location].get_travel_info(log.instance[0], self.explorer.travel_bonus) is None and self.explorer.logbook[self.explorer.location].travel_time <= 4]
             if len(unexplored_planets) > 0:
@@ -126,22 +164,36 @@ class ai:
             self.explorer.set_action('search')
             self.explorer.logbook[self.explorer.location].instance[0].search_in_SOF(self.explorer, True)
             
+#    def play(self):
+##        '''free search around discovered planets'''
+##        for p in self.explorer.explored_planets:
+##            p.search_in_SOF(self.explorer, False)
+#
+#        '''get action'''
+#        self.get_variables() #monitors state of game
+#        print self.variables
+#        action = self.get_action_from_rand_forest()[0] #get's action from state of game
+#        
+#        if self.game.year <= 5: action = 2 #forces exploration at start of play
+#        if action != 0: print action
+#            
+#        self.perform_action(action)            
 
-    def set_algo(self):
-        #create the training & test sets, skipping the header row with [1:]
-        dataset = genfromtxt(open('./ai_training_data/test.csv','r'), delimiter=',', dtype='f8')[1:]
-        target = [x[-1:] for x in dataset]
-        train = [x[:-1] for x in dataset]
-        
-        #create and train the random forest
-        #multi-core CPUs can use: rf = RandomForestClassifier(n_estimators=100, n_jobs=2)
-        self.algo = RandomForestClassifier(n_estimators=100)
-        self.algo.fit(train, target)
-    
-    def get_action_from_rand_forest(self):
-        test = self.variables[:-1]
-        return self.algo.predict(test)
-        #savetxt('Data/submission2.csv', rf.predict(test), delimiter=',', fmt='%f')
+#    def set_algo(self):
+#        #create the training & test sets, skipping the header row with [1:]
+#        dataset = genfromtxt(open('./ai_training_data/test.csv','r'), delimiter=',', dtype='f8')[1:]
+#        target = [x[-1:] for x in dataset]
+#        train = [x[:-1] for x in dataset]
+#        
+#        #create and train the random forest
+#        #multi-core CPUs can use: rf = RandomForestClassifier(n_estimators=100, n_jobs=2)
+#        self.algo = RandomForestClassifier(n_estimators=100)
+#        self.algo.fit(train, target)
+#    
+#    def get_action_from_rand_forest(self):
+#        test = self.variables[:-1]
+#        return self.algo.predict(test)
+#        #savetxt('Data/submission2.csv', rf.predict(test), delimiter=',', fmt='%f')
 #
 #
 #variables = [ time_since_last_action, 

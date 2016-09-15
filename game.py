@@ -151,7 +151,7 @@ class Game(object):
                         elif self.pause == False: self.pause = True
                     elif event.key == K_h:
                         if self.interface.helpers == True: self.interface.helpers = False
-                        elif self.interface.helpers == False: self.interface.helpers = True:
+                        elif self.interface.helpers == False: self.interface.helpers = True
                     #to remove
                     elif event.key == K_r:
                         reveal = True
