@@ -97,8 +97,8 @@ class Rebellion(Event):
         super(type(self), self).__init__(game,self.name,self.weight,self.text)
         
     def get_weight(self,explorer):
-        total_explored_planets = len([p for p in self.game.all_planets if explorer.check_exploration(p) and p.name != explorer.location])
-        self.weight = total_explored_planets*6/(self.game.year+1) if total_explored_planets > 5 else 0
+        total_explored_planets = len([p for p in explorer.explored_planets if p.name != explorer.location])
+        self.weight = total_explored_planets*5/(self.game.year+1) if total_explored_planets > 5 else 0
 #        print 'rebel',self.weight
 
     def execute(self,explorer):
@@ -115,8 +115,9 @@ class Rebellion(Event):
                                         and (p.cat == 'Habitable World'
                                         or p.cat == 'Alien World' 
                                         or p.cat == 'Mining World')]
-            if len(list_of_potential_rebelious_planets) > 0: self.planet_pointer = [random.choice(list_of_potential_rebelious_planets)]
-            self.text ='''The governement of {} has rebelled against your authority. Refusing to pay you the taxes you are owed to carry your duty.'''.format(self.planet_pointer[0].name)
+            if len(list_of_potential_rebelious_planets) > 0: 
+                self.planet_pointer = [random.choice(list_of_potential_rebelious_planets)]
+                self.text ='''The governement of {} has rebelled against your authority. Refusing to pay you the taxes you are owed to carry your duty.'''.format(self.planet_pointer[0].name)
 
 class Alien_Tech(Event):
     def __init__(self,game):

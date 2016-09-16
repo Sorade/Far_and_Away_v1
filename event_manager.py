@@ -51,15 +51,14 @@ class Event_Manager(object):
         for log in explorer.logbook.values():
             if log.is_explored:
                 income += fn.rp_formula(log.instance[0],year,log.time_of_exploration,explorer.rp,explorer.rp_bonus)
-        #explorer.rp += explorer.yearly_rp_income
-        return income
+        return int(income*explorer.ai_income_modifier)
                 
     def knowledge_prod_event(self,explorer,year):
         income = 0
         for log in explorer.logbook.values():
             if log.is_explored:
                 income += fn.kp_formula(log.instance[0],year,log.time_of_exploration,explorer.kp,explorer.kp_bonus)
-        return income
+        return int(income*explorer.ai_income_modifier)
         
     ''''Make this into a function... maybe store all event values as event manager
     variables and make a new method handling those variables'''   

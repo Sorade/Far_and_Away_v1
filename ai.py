@@ -63,19 +63,6 @@ class ai:
             '''assigns variable'''
             self.variables[x] = var
             
-#    def print_to_file(self):
-#        f = open('./ai_training_data/test.csv', 'a')
-#        string = ''
-#        for val in self.variables:
-#            string = string + str(val) + ',' 
-#        string = string[:-1]    
-#        string += '\n'
-#        f.write(string)
-#        f.close()
-        
-#    def train(self):
-#        self.get_variables()
-#        self.print_to_file()
         
     def get_planet_with_unexplored(self, init = True):
         if init:
@@ -126,19 +113,9 @@ class ai:
             
     def perform_action(self,action):
         '''perform action'''
-#        if action == 1: #visit
-#            pot_dests = [p for p in self.explorer.explored_planets if self.explorer.logbook[self.explorer.location].get_travel_info(p, self.explorer.travel_bonus) is None and self.explorer.logbook[self.explorer.location].travel_time <= 3]
-#            pot_dests.remove(self.explorer.logbook[self.explorer.location].instance[0])
-#            if len(pot_dests) > 0:
-#                self.explorer.set_action('visit')
-#                random.choice(pot_dests).visit(self.explorer)
-#            else:
-#                action = 2 #if only 1 planet is explored, then explores
-        #____________________________________________________________________________________
         
         if action == 1: #visit
             self.explorer.get_destinations_of_interest()
-            #pot_dests.remove(self.explorer.logbook[self.explorer.location].instance[0])
             if self.explorer.dest is not None:
                 dest = pth.breadth_first_search(self.explorer,self.explorer.location,self.explorer.dest)
                 if len(dest) > 0:
@@ -146,13 +123,11 @@ class ai:
                 else:
                     pot_dests = [p for p in self.explorer.explored_planets if self.explorer.logbook[self.explorer.location].get_travel_info(p, self.explorer.travel_bonus) is None and self.explorer.logbook[self.explorer.location].travel_time <= 3]
                     pot_dests.remove(self.explorer.logbook[self.explorer.location].instance[0])
-                    print 'passed'
                     if len(pot_dests) > 0:
                         random.choice(pot_dests).visit(self.explorer)
                 self.explorer.set_action('visit')
             else:
                 action = 2 #if only 1 planet is explored, then explores
-         #_________________________________________________________________________________________       
                 
         if action == 2: #explore
             unexplored_planets = [log.instance[0] for log in self.explorer.logbook.itervalues() if log.is_discovered and not log.is_explored and self.explorer.logbook[self.explorer.location].get_travel_info(log.instance[0], self.explorer.travel_bonus) is None and self.explorer.logbook[self.explorer.location].travel_time <= 4]
@@ -164,6 +139,20 @@ class ai:
         if action == 3: #search
             self.explorer.set_action('search')
             self.explorer.logbook[self.explorer.location].instance[0].search_in_SOF(self.explorer, True)
+
+#    def print_to_file(self):
+#        f = open('./ai_training_data/test.csv', 'a')
+#        string = ''
+#        for val in self.variables:
+#            string = string + str(val) + ',' 
+#        string = string[:-1]    
+#        string += '\n'
+#        f.write(string)
+#        f.close()
+        
+#    def train(self):
+#        self.get_variables()
+#        self.print_to_file()
             
 #    def play(self):
 ##        '''free search around discovered planets'''

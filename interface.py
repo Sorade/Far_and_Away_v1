@@ -9,6 +9,7 @@ import matplotlib as plt
 import functions as fn
 from config import*
 from data import*
+from ship import Ship
 
 
 class Interface(object):
@@ -98,19 +99,28 @@ class Interface(object):
             else:
                 x = len(cpu_explorers)
                 for e in cpu_explorers:
-                    pygame.draw.circle(self.screen, e.color, fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.6)+7*x, 0)
+                    pygame.draw.circle(self.screen, e.color, fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.5)+6*x, 0)
                     x -= 1
 
-            if explorer.location == p.name:
-                pygame.draw.circle(self.screen, explorer.color, fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)), int(p.rect.w*0.75), 0)
             fn.blitc(self.screen, p.blinker.blink(), fn.sum_tulp(p.pos,(self.map_offset_x,self.map_offset_y)))
                                
             '''Mouse interaction'''
             self.solar_sys_mouse_interaction(explorer,p)
             
+        '''blitting explorers' ships'''
+        self.blit_explorer_ship(explorer)
+        for e in self.game.all_explorers:
+            if explorer.check_exploration(e.get_location()):
+                self.blit_explorer_ship(e)
+        
         '''blitting planet info'''
         self.view_planet(explorer)
     
+    def blit_explorer_ship(self,explorer):    
+        planet_pos = explorer.get_location().pos
+        offset_blitting_pos = fn.sum_tulp( planet_pos, (self.map_offset_x,self.map_offset_y) )
+        explorer.ship.blit(self.screen, offset_blitting_pos)
+
     def solar_sys_mouse_interaction(self,explorer,planet):
         ''' None -> None
             Handles mouse interaction when in solar system view

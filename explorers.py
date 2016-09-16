@@ -5,15 +5,17 @@ Created on Sat Aug 06 11:32:09 2016
 @author: julien
 """
 import random
+from config import *
 from logbook import*
 from tools_classes import States
 from ai import ai
+from ship import Ship
 
 class Explorer(object):
-    def __init__(self,game):
+    def __init__(self,game,player_type = 'cpu'):
         self.game = game
         self.ai = ai(game,self)
-        self.type = 'cpu'
+        self.type = player_type #or 'human'
         self.color = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
         self.name = random.choice(['Drake','Logan','Fredrik','Susan','Morgane','Iloa','Markus','Karson','Clyde','Athelstan']) +' ' + fn.surname_gen(True)
         self.location = 0
@@ -29,11 +31,16 @@ class Explorer(object):
         self.yearly_rp_expense = 0
         self.yearly_rp_income = 0
         self.yearly_kp_income = 0
+        if self.type == 'cpu':
+            self.ai_income_modifier = [1+0.1*(n+1) for n,dif in enumerate(Config.ai_difficulty.iteritems()) if dif[1]][0]
+        else:
+            self.ai_income_modifier = 1
         self.states = States()
         self.time_since_last_action = 0
         self.time_of_last_action = 0
         self.action = 0
         self.active_events = []
+        self.ship = Ship(self)
         
         
     @property
@@ -53,6 +60,9 @@ class Explorer(object):
     def rp(self, rp):
         rp = 0 if rp < 0 else rp
         self._rp = rp
+        
+    def get_location(self):
+        return self.logbook[self.location].instance[0]
         
     def assign_starting_planet(self,planet):
         self.logbook[planet.name] = Log(self,planet,True,True)

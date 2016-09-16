@@ -184,7 +184,41 @@ def drawText(surface, text, color, rect, font, aa=False, bkg=None):
         text = text[i:]
  
     return text
+    
+# =============================================================================
+#                  NEEDED TO GET ANGLE
+# =============================================================================
+def length(s,v):
+    return ((s[0]-v[0])**2+(s[1]-v[1])**2)**0.5
+    
+'''a · b = ax × bx + ay × by'''
+def dot_product(s,v,w):
+   return (v[0]-s[0])*(w[0]-s[0])+(v[1]-s[1])*(w[1]-s[1])
+def determinant(s,v,w):
+   return (v[0]-s[0])*(w[1]-s[1])-(v[1]-s[1])*(w[0]-s[0])
+def inner_angle(s,v,w):
+    if (length(s,v)*length(s,w)) != 0:
+       cosx=dot_product(s,v,w)/(length(s,v)*length(s,w))
+       rad=acos(cosx) # in radians
+       return rad*180/pi # returns degrees
+    else:
+        return 0
+def angle_clockwise(center,A, B):
+    a = (float(A[0]),float(A[1]))
+    b = (float(B[0]),float(B[1]))
+    inner=inner_angle(center,a,b)
+    det = determinant(center,a,b)
+    if det<0: #this is a property of the det. If the det < 0 then B is clockwise of A
+        return inner
+    else: # if the det > 0 then A is immediately clockwise of B
+        return 360-inner   
 
+def color_surface(surface, (red, green, blue)):
+    arr = pygame.surfarray.pixels3d(surface)
+    arr[:,:,0] = red
+    arr[:,:,1] = green
+    arr[:,:,2] = blue
+    
 
 
     
